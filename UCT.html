@@ -1,0 +1,2925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCVT — Universal Converter Toolkit v6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #080c10;
+  --bg1: #0d1117;
+  --bg2: #131921;
+  --bg3: #1c2430;
+  --border: #1e3a5f33;
+  --border2: #1e3a5f88;
+  --amber: #f59e0b;
+  --amber2: #fcd34d;
+  --cyan: #22d3ee;
+  --cyan2: #67e8f9;
+  --green: #34d399;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --pink: #f472b6;
+  --orange: #fb923c;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg0);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Grid overlay ─────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Header ───────────────────────────── */
+header {
+  position: relative;
+  background: linear-gradient(135deg, #080c10 0%, #0d1a2a 50%, #080c10 100%);
+  border-bottom: 1px solid var(--border2);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 10;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--amber), transparent);
+  opacity: 0.4;
+}
+.logo {
+  display: flex; align-items: center; gap: 14px;
+}
+.logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #0d2a3a, #1a4a6a);
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 0 16px rgba(34,211,238,.2);
+}
+.logo-text h1 {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.logo-text p {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+.header-stats {
+  display: flex; gap: 20px;
+}
+.stat-pill {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  background: var(--bg2);
+  letter-spacing: 1px;
+}
+.stat-pill span { color: var(--amber); }
+
+/* ── Main layout ──────────────────────── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* ── Panels ───────────────────────────── */
+.panel {
+  background: var(--bg1);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.panel-title {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-body { padding: 20px; }
+
+/* ── Tabs ─────────────────────────────── */
+.tabs {
+  display: flex; gap: 4px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 3px;
+  margin-bottom: 18px;
+  width: fit-content;
+}
+.tab {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text3);
+  transition: all .2s;
+  text-transform: uppercase;
+}
+.tab.active { background: var(--cyan); color: #000; }
+.tab:hover:not(.active) { color: var(--text2); background: var(--bg3); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── Drop zone ───────────────────────── */
+.drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 8px;
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s;
+  background: var(--bg0);
+  position: relative;
+  overflow: hidden;
+}
+.drop-zone::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(34,211,238,.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--cyan);
+  background: rgba(34,211,238,.04);
+}
+.dz-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+.dz-text { font-size: 0.85rem; color: var(--text2); }
+.dz-text strong { color: var(--cyan); cursor: pointer; }
+.dz-sub { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); margin-top: 6px; }
+#fileInput { display: none; }
+
+.file-badge {
+  display: none;
+  margin-top: 12px;
+  padding: 8px 14px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--green);
+  align-items: center;
+  gap: 8px;
+}
+.file-badge.show { display: flex; }
+
+/* ── Textarea ─────────────────────────── */
+textarea.code {
+  width: 100%;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.65;
+  resize: vertical;
+  outline: none;
+  transition: border .2s;
+}
+textarea.code:focus { border-color: var(--cyan); }
+textarea.code.rev { height: 130px; }
+
+/* ── Format grid ─────────────────────── */
+.format-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.fmt-check {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--bg0);
+  transition: all .2s;
+  user-select: none;
+}
+.fmt-check:hover { border-color: var(--border2); background: var(--bg2); }
+.fmt-check input { display: none; }
+.fmt-check .ficon { font-size: 1rem; }
+.fmt-check .flabel {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: .5px;
+  flex: 1;
+}
+.fmt-check .fbadge {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  background: var(--bg2);
+  color: var(--text3);
+}
+.fmt-check.checked {
+  background: var(--bg2);
+}
+
+/* Format colors */
+.fmt-check[data-fmt="bin"].checked  { border-color: #3b82f6; }
+.fmt-check[data-fmt="bin"].checked .flabel { color: #60a5fa; }
+.fmt-check[data-fmt="bin"].checked .fbadge { background:#1e3a5f; color:#60a5fa; }
+.fmt-check[data-fmt="dec"].checked  { border-color: #22c55e; }
+.fmt-check[data-fmt="dec"].checked .flabel { color: #4ade80; }
+.fmt-check[data-fmt="dec"].checked .fbadge { background:#14532d; color:#4ade80; }
+.fmt-check[data-fmt="hex"].checked  { border-color: #f59e0b; }
+.fmt-check[data-fmt="hex"].checked .flabel { color: #fbbf24; }
+.fmt-check[data-fmt="hex"].checked .fbadge { background:#451a03; color:#fbbf24; }
+.fmt-check[data-fmt="hexdump"].checked { border-color: #fb923c; }
+.fmt-check[data-fmt="hexdump"].checked .flabel { color:#fb923c; }
+.fmt-check[data-fmt="hexdump"].checked .fbadge { background:#431407; color:#fb923c; }
+.fmt-check[data-fmt="b64"].checked  { border-color: #f472b6; }
+.fmt-check[data-fmt="b64"].checked .flabel { color: #f472b6; }
+.fmt-check[data-fmt="b64"].checked .fbadge { background:#4a044e; color:#f472b6; }
+.fmt-check[data-fmt="b64url"].checked { border-color: #e879f9; }
+.fmt-check[data-fmt="b64url"].checked .flabel { color:#e879f9; }
+.fmt-check[data-fmt="b64url"].checked .fbadge { background:#3b0764; color:#e879f9; }
+.fmt-check[data-fmt="b32"].checked  { border-color: #c084fc; }
+.fmt-check[data-fmt="b32"].checked .flabel { color: #c084fc; }
+.fmt-check[data-fmt="b32"].checked .fbadge { background:#2e1065; color:#c084fc; }
+.fmt-check[data-fmt="deflate"].checked { border-color: #34d399; }
+.fmt-check[data-fmt="deflate"].checked .flabel { color:#34d399; }
+.fmt-check[data-fmt="deflate"].checked .fbadge { background:#064e3b; color:#34d399; }
+.fmt-check[data-fmt="sha256"].checked { border-color: #a78bfa; }
+.fmt-check[data-fmt="sha256"].checked .flabel { color:#a78bfa; }
+.fmt-check[data-fmt="sha256"].checked .fbadge { background:#1e1b4b; color:#a78bfa; }
+.fmt-check[data-fmt="qp"].checked { border-color: #38bdf8; }
+.fmt-check[data-fmt="qp"].checked .flabel { color:#38bdf8; }
+.fmt-check[data-fmt="qp"].checked .fbadge { background:#082f49; color:#38bdf8; }
+.fmt-check[data-fmt="url"].checked { border-color: #f97316; }
+.fmt-check[data-fmt="url"].checked .flabel { color:#f97316; }
+.fmt-check[data-fmt="url"].checked .fbadge { background:#431407; color:#f97316; }
+.fmt-check[data-fmt="gzip"].checked { border-color: #2dd4bf; }
+.fmt-check[data-fmt="gzip"].checked .flabel { color:#2dd4bf; }
+.fmt-check[data-fmt="gzip"].checked .fbadge { background:#042f2e; color:#2dd4bf; }
+.fmt-check[data-fmt="ez"].checked { border-color: #facc15; }
+.fmt-check[data-fmt="ez"].checked .flabel { color:#facc15; }
+.fmt-check[data-fmt="ez"].checked .fbadge { background:#422006; color:#facc15; }
+/* New format colors */
+.fmt-check[data-fmt="oct"].checked { border-color: #2dd4bf; }
+.fmt-check[data-fmt="oct"].checked .flabel { color:#2dd4bf; }
+.fmt-check[data-fmt="oct"].checked .fbadge { background:#042f2e; color:#2dd4bf; }
+.fmt-check[data-fmt="b85"].checked { border-color: #fb923c; }
+.fmt-check[data-fmt="b85"].checked .flabel { color:#fb923c; }
+.fmt-check[data-fmt="b85"].checked .fbadge { background:#431407; color:#fb923c; }
+.fmt-check[data-fmt="b91"].checked { border-color: #f9a8d4; }
+.fmt-check[data-fmt="b91"].checked .flabel { color:#f9a8d4; }
+.fmt-check[data-fmt="b91"].checked .fbadge { background:#500724; color:#f9a8d4; }
+.fmt-check[data-fmt="b122"].checked { border-color: #7dd3fc; }
+.fmt-check[data-fmt="b122"].checked .flabel { color:#7dd3fc; }
+.fmt-check[data-fmt="b122"].checked .fbadge { background:#082f49; color:#7dd3fc; }
+.fmt-check[data-fmt="b58"].checked { border-color: #f87171; }
+.fmt-check[data-fmt="b58"].checked .flabel { color:#f87171; }
+.fmt-check[data-fmt="b58"].checked .fbadge { background:#450a0a; color:#f87171; }
+.fmt-check[data-fmt="b62"].checked { border-color: #38bdf8; }
+.fmt-check[data-fmt="b62"].checked .flabel { color:#38bdf8; }
+.fmt-check[data-fmt="b62"].checked .fbadge { background:#082f49; color:#38bdf8; }
+.fmt-check[data-fmt="b36"].checked { border-color: #94a3b8; }
+.fmt-check[data-fmt="b36"].checked .flabel { color:#94a3b8; }
+.fmt-check[data-fmt="b36"].checked .fbadge { background:#1e293b; color:#94a3b8; }
+.fmt-check[data-fmt="morse"].checked { border-color: #a3e635; }
+.fmt-check[data-fmt="morse"].checked .flabel { color:#a3e635; }
+.fmt-check[data-fmt="morse"].checked .fbadge { background:#1a2e05; color:#a3e635; }
+
+/* ── Base-to-Base converter panel ─── */
+.b2b-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media(max-width:700px){ .b2b-grid { grid-template-columns:1fr; } }
+.b2b-input-row {
+  display: flex; gap: 8px; align-items: flex-end;
+}
+.b2b-input-row textarea {
+  flex: 1;
+}
+.b2b-select-col {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.b2b-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+.b2b-result-card {
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.b2b-result-card:hover { border-color: var(--cyan); }
+.b2b-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.b2b-card-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.b2b-card-body {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  padding: 8px 10px;
+  word-break: break-all;
+  min-height: 32px;
+  max-height: 80px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+.b2b-card-body.empty { color: var(--text3); font-style: italic; }
+.b2b-copy-btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 3px 7px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all .2s;
+}
+.b2b-copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.b2b-err { color: var(--red); font-family: var(--mono); font-size: 0.7rem; margin-top: 8px; }
+.base-slider-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.base-slider-row label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.base-slider-row input[type=range] {
+  flex: 1;
+  accent-color: var(--cyan);
+}
+.base-slider-row .base-val {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--amber);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ── EZ Step Visualization ───────────── */
+.ez-pipeline {
+  display: flex; flex-direction: column; gap: 0;
+}
+.ez-step {
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: var(--bg0);
+}
+.ez-step-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.ez-step-head:hover { background: var(--bg3); }
+.ez-step-label {
+  font-family: var(--mono);
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.ez-step-meta {
+  font-family: var(--mono);
+  font-size: 0.6rem; color: var(--text3);
+  display: flex; gap: 10px;
+}
+.ez-step-meta em { color: var(--amber); font-style: normal; }
+.ez-step-body {
+  font-family: var(--mono);
+  font-size: 0.7rem; line-height: 1.6;
+  color: #94a3b8;
+  padding: 10px 12px;
+  max-height: 100px;
+  overflow-y: auto;
+  word-break: break-all;
+  white-space: pre-wrap;
+  display: none;
+}
+.ez-step-body.open { display: block; }
+.ez-arrow {
+  text-align: center; color: var(--cyan);
+  font-size: 1.1rem; margin: -2px 0;
+  line-height: 1;
+}
+.ez-badge-bin  { background:#1e3a5f; color:#60a5fa; }
+.ez-badge-b64  { background:#1a3a3a; color:#4ade80; }
+.ez-badge-rle  { background:#3a1a3a; color:#facc15; }
+.ez-rev-pipeline .ez-step-head { cursor: default; }
+.ez-rev-pipeline .ez-step-head:hover { background: var(--bg2); }
+
+/* ── Buttons ──────────────────────────── */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+button.btn {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all .2s;
+}
+.btn-primary { background: var(--cyan); border-color: var(--cyan); color: #000; }
+.btn-primary:hover { background: var(--cyan2); box-shadow: 0 0 16px rgba(34,211,238,.3); }
+.btn-amber { background: var(--amber); border-color: var(--amber); color: #000; }
+.btn-amber:hover { background: var(--amber2); box-shadow: 0 0 16px rgba(245,158,11,.3); }
+.btn-ghost { background: transparent; border-color: var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+.btn-danger { background: transparent; border-color: #7f1d1d; color: var(--red); }
+.btn-danger:hover { background: rgba(248,113,113,.1); }
+.btn-sm { padding: 5px 12px; font-size: 0.65rem; }
+button:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+/* ── Progress ─────────────────────────── */
+.prog-wrap {
+  margin-top: 14px;
+  display: none;
+}
+.prog-wrap.show { display: block; }
+.prog-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text3);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+.prog-track {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.prog-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--amber));
+  border-radius: 2px;
+  width: 0%;
+  transition: width .08s linear;
+}
+
+/* ── Output blocks ────────────────────── */
+.out-block {
+  margin-bottom: 16px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.out-block.active { border-color: var(--border2); }
+.out-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.out-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+}
+.status-dot.spin {
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber);
+  animation: blink 0.8s infinite;
+}
+.status-dot.ok { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.err { background: var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.out-meta {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text3);
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.out-meta em { color: var(--amber); font-style: normal; }
+.out-actions { display: flex; gap: 4px; }
+.out-body {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.65;
+  color: #94a3b8;
+  background: var(--bg0);
+  padding: 14px 16px;
+  max-height: 280px;
+  overflow-y: auto;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.out-body::-webkit-scrollbar { width: 5px; }
+.out-body::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+.out-body::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+.out-placeholder {
+  color: var(--text3);
+  font-style: italic;
+  text-align: center;
+  padding: 24px;
+  font-size: 0.75rem;
+}
+.trunc-note {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 8px 14px;
+  background: rgba(245,158,11,.08);
+  border-top: 1px solid rgba(245,158,11,.2);
+  color: var(--amber);
+}
+
+/* ── Reverse section ─────────────────── */
+.rev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 700px) { .rev-grid { grid-template-columns: 1fr; } }
+
+/* ── Decode input tabs ────────────────── */
+.rev-input-tabs {
+  display: flex; gap: 3px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 2px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+.rev-input-tab {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text3);
+  transition: all .15s;
+  text-transform: uppercase;
+}
+.rev-input-tab.active { background: var(--amber); color: #000; }
+.rev-input-tab:hover:not(.active) { color: var(--text2); background: var(--bg3); }
+
+/* ── Decode drop zone ─────────────────── */
+.rev-drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 6px;
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--bg0);
+  position: relative;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.rev-drop-zone:hover, .rev-drop-zone.over {
+  border-color: var(--amber);
+  background: rgba(245,158,11,.04);
+}
+.rev-drop-zone .dz-icon { font-size: 2rem; line-height: 1; }
+.rev-drop-zone .dz-text { font-size: 0.8rem; color: var(--text2); }
+.rev-drop-zone .dz-text strong { color: var(--amber); }
+.rev-drop-zone .dz-sub { font-family: var(--mono); font-size: 0.62rem; color: var(--text3); }
+#revFileInput { display: none; }
+
+/* ── Loaded file badge ────────────────── */
+.rev-file-badge {
+  display: none;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--green);
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.rev-file-badge.show { display: flex; }
+.rev-file-badge-clear {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 0.9rem; line-height: 1;
+  padding: 0 2px;
+}
+.rev-file-badge-clear:hover { color: var(--red); }
+select.sel {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 8px 12px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+select.sel:focus { border-color: var(--cyan); }
+.rev-result {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--bg0);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  display: none;
+}
+.rev-result.show { display: block; }
+.rev-info {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  background: rgba(34,211,238,.06);
+  border: 1px solid rgba(34,211,238,.2);
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.rev-info-text { color: var(--cyan2); font-size: 0.68rem; line-height: 1.5; }
+.rev-preview {
+  max-height: 180px;
+  overflow-y: auto;
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: var(--text2);
+  font-size: 0.7rem;
+  margin-bottom: 12px;
+}
+.rev-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Warning box ──────────────────────── */
+.warn-box {
+  margin-top: 10px;
+  padding: 9px 12px;
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--amber);
+  display: none;
+}
+.warn-box.show { display: block; }
+.err-box {
+  margin-top: 10px;
+  padding: 9px 12px;
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.3);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--red);
+  display: none;
+}
+.err-box.show { display: block; }
+
+/* ── Select all / none ───────────────── */
+.fmt-controls { display: flex; gap: 8px; margin-bottom: 10px; }
+
+/* ── Toast ────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 10px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--cyan);
+  border-radius: 6px;
+  color: var(--cyan);
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all .25s;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 320px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ──────────────────────── */
+@media (max-width: 600px) {
+  header { padding: 14px 16px; }
+  .header-stats { display: none; }
+  .wrap { padding: 16px 12px; }
+  .panel-body { padding: 14px; }
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 24px 0;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div class="logo-text">
+      <h1>BCVT</h1>
+      <p>UNIVERSAL CONVERTER TOOLKIT — v6.0</p>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">WORKERS: <span id="workerCount">0</span></div>
+    <div class="stat-pill">FILE: <span id="hdrFile">—</span></div>
+    <div class="stat-pill">SIZE: <span id="hdrSize">—</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ═══ INPUT ═══════════════════════════════════════ -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">📥 <span style="color:var(--cyan)">Input Source</span></div>
+    </div>
+    <div class="panel-body">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('file')">File Upload</button>
+        <button class="tab" onclick="switchTab('text')">Text Input</button>
+      </div>
+
+      <div class="tab-pane active" id="pane-file">
+        <div class="drop-zone" id="dz" onclick="document.getElementById('fileInput').click()">
+          <span class="dz-icon">📂</span>
+          <div class="dz-text">Drop any file here, or <strong>click to browse</strong></div>
+          <div class="dz-sub">Binary, images, documents, audio — any format supported</div>
+          <input type="file" id="fileInput">
+        </div>
+        <div class="file-badge" id="fileBadge">
+          <span>✓</span>
+          <span id="fileBadgeText"></span>
+        </div>
+        <div class="warn-box" id="sizeWarn">
+          ⚠ Large file detected — Binary and Decimal outputs will be very large (8× and 4× file size respectively). Consider using Base64 or Hex instead for files over 10 MB.
+        </div>
+      </div>
+
+      <div class="tab-pane" id="pane-text">
+        <textarea class="code" id="textInput" style="height:120px" placeholder="Type or paste text here…"></textarea>
+      </div>
+
+      <!-- Format selection -->
+      <div style="margin-top:18px">
+        <div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Select Output Formats</div>
+        <div class="fmt-controls">
+          <button class="btn btn-ghost btn-sm" onclick="selectAll()">All</button>
+          <button class="btn btn-ghost btn-sm" onclick="selectNone()">None</button>
+          <button class="btn btn-ghost btn-sm" onclick="selectSmart()">Smart (fast)</button>
+        </div>
+        <div class="format-grid" id="fmtGrid"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="convertBtn" onclick="startConversion()">▶ CONVERT</button>
+        <button class="btn btn-danger" id="stopBtn" onclick="stopConversion()" style="display:none">⏹ STOP</button>
+        <button class="btn btn-ghost" onclick="clearAll()">🗑 CLEAR</button>
+        <span style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-left:auto" id="workerStatus"></span>
+      </div>
+
+      <div class="prog-wrap" id="progWrap">
+        <div class="prog-label">
+          <span id="progText">Initialising…</span>
+          <span id="progPct">0%</span>
+        </div>
+        <div class="prog-track"><div class="prog-bar" id="progBar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OUTPUTS ══════════════════════════════════════ -->
+  <div id="outputArea"></div>
+
+  <div class="divider"></div>
+
+  <!-- ═══ REVERSE ═════════════════════════════════════ -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🔄 <span style="color:var(--amber)">Reverse Decode — Restore Original File</span></div>
+      <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3)">BCVT header auto-detected → filename &amp; MIME restored automatically</div>
+    </div>
+    <div class="panel-body">
+      <div class="rev-grid">
+
+        <!-- Left col: format + actions -->
+        <div>
+          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:6px">INPUT FORMAT</div>
+          <select class="sel" id="revFmt" style="width:100%;margin-bottom:14px">
+            <option value="b64">Base64</option>
+            <option value="b64url">Base64 URL-safe</option>
+            <option value="b32">Base32</option>
+            <option value="b85">Base85 / ASCII85</option>
+            <option value="b91">Base91</option>
+            <option value="b122">Base122</option>
+            <option value="b62">Base62 (alphanumeric)</option>
+            <option value="b58">Base58 (Bitcoin)</option>
+            <option value="b36">Base36</option>
+            <option value="deflate">Deflate+Base64 (compressed)</option>
+            <option value="gzip">GZIP+Base64 (compressed)</option>
+            <option value="hex">Hexadecimal</option>
+            <option value="oct">Octal</option>
+            <option value="bin">Binary</option>
+            <option value="dec">Decimal</option>
+            <option value="qp">Quoted-Printable</option>
+            <option value="url">URL Encoding</option>
+            <option value="morse">Morse Code</option>
+            <option value="ez">EZ Encoding (Base64 + RLE)</option>
+          </select>
+
+          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">ACTIONS</div>
+          <div class="btn-row" style="margin-top:0;flex-direction:column;align-items:stretch;gap:8px">
+            <button class="btn btn-amber" onclick="startReverse()" style="justify-content:center">🔄 DECODE &amp; RESTORE</button>
+            <button class="btn btn-ghost" onclick="useCurrentOut()" style="justify-content:center">↑ USE CURRENT OUTPUT</button>
+            <button class="btn btn-ghost" onclick="clearRevInput()" style="justify-content:center;color:var(--text3)">🗑 CLEAR INPUT</button>
+          </div>
+
+          <!-- Format hint box — shown after auto-detection -->
+          <div id="revDetectHint" style="display:none;margin-top:12px;padding:8px 10px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:6px;font-family:var(--mono);font-size:0.63rem;color:var(--cyan2);line-height:1.6"></div>
+        </div>
+
+        <!-- Right col: tabbed paste / file upload -->
+        <div>
+          <div class="rev-input-tabs">
+            <button class="rev-input-tab active" id="revTabPaste" onclick="switchRevTab('paste')">✏ Paste Text</button>
+            <button class="rev-input-tab" id="revTabFile" onclick="switchRevTab('file')">📂 Upload File</button>
+          </div>
+
+          <!-- Paste pane -->
+          <div id="revPaneText" style="display:block">
+            <textarea class="code rev" id="revInput" placeholder="Paste encoded data here…&#10;&#10;Tip: if the data has a BCVT header the format will be auto-detected." style="height:150px"></textarea>
+            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-top:4px">
+              <span id="revInputStats"></span>
+            </div>
+          </div>
+
+          <!-- File upload pane -->
+          <div id="revPaneFile" style="display:none">
+            <div class="rev-drop-zone" id="revDz" onclick="document.getElementById('revFileInput').click()">
+              <span class="dz-icon">📄</span>
+              <div class="dz-text">Drop encoded file here, or <strong>click to browse</strong></div>
+              <div class="dz-sub">.txt .b64 .hex .bin .ez .b85 .b91 .b32 .b58 .b62 — any text file</div>
+              <input type="file" id="revFileInput" accept="*/*">
+            </div>
+            <div class="rev-file-badge" id="revFileBadge">
+              <span id="revFileBadgeText">—</span>
+              <button class="rev-file-badge-clear" onclick="clearRevFile()" title="Remove file">✕</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /rev-grid -->
+
+      <div class="err-box" id="revErr"></div>
+      <div class="rev-result" id="revResult">
+        <div class="rev-info">
+          <span style="font-size:1.2rem">ℹ</span>
+          <div class="rev-info-text" id="revInfoText"></div>
+        </div>
+        <div class="rev-preview" id="revPreview"></div>
+        <div class="rev-actions" id="revActions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══ BASE-TO-BASE NUMBER CONVERTER ═══════════════ -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🔢 <span style="color:var(--green)">Base-to-Base Number Converter</span></div>
+      <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3)">Convert any number between any bases (2–36) + common encodings</div>
+    </div>
+    <div class="panel-body">
+      <div class="b2b-grid">
+        <div>
+          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">INPUT NUMBER</div>
+          <textarea class="code" id="b2bInput" style="height:80px" placeholder="Enter a number (e.g. 255, 11111111, FF, 0377…)"></textarea>
+          <div style="margin-top:10px">
+            <div class="base-slider-row">
+              <label>FROM BASE</label>
+              <input type="range" min="2" max="36" value="10" id="b2bFromSlider" oninput="b2bFromVal.textContent=this.value; b2bConvert()">
+              <span class="base-val" id="b2bFromVal">10</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(2)">BIN 2</button>
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(8)">OCT 8</button>
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(10)">DEC 10</button>
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(16)">HEX 16</button>
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(32)">B32</button>
+              <button class="btn btn-ghost btn-sm" onclick="setB2BFrom(36)">B36</button>
+            </div>
+          </div>
+        </div>
+        <div class="b2b-select-col">
+          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">CUSTOM TARGET BASE</div>
+          <div class="base-slider-row">
+            <label>TO BASE</label>
+            <input type="range" min="2" max="36" value="16" id="b2bToSlider" oninput="b2bToVal.textContent=this.value; b2bConvert()">
+            <span class="base-val" id="b2bToVal">16</span>
+          </div>
+          <div id="b2bCustomResult" style="font-family:var(--mono);font-size:0.8rem;color:var(--cyan);padding:8px;background:var(--bg0);border:1px solid var(--border2);border-radius:6px;word-break:break-all;min-height:36px;margin-top:4px"></div>
+          <div id="b2bErr" class="b2b-err" style="display:none"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">ALL COMMON BASES</div>
+      <div class="b2b-results" id="b2bResults"></div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  WORKER SOURCE — defined as a function to avoid any escaping issues
+// ═══════════════════════════════════════════════════════════════════════
+function workerMain() {
+  // ── Lookup tables (pre-computed) ───────────────────────────────
+  const BIN_LUT = new Array(256);
+  const HEX_LUT = new Array(256);
+  const DEC_LUT = new Array(256);
+  const OCT_LUT = new Array(256);
+  for (let i = 0; i < 256; i++) {
+    BIN_LUT[i] = i.toString(2).padStart(8, '0');
+    HEX_LUT[i] = i.toString(16).padStart(2, '0').toUpperCase();
+    DEC_LUT[i] = String(i).padStart(3, '0');
+    OCT_LUT[i] = i.toString(8).padStart(3, '0');
+  }
+
+  const B32_ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+  // ── Octal ──────────────────────────────────────────────────────
+  function encodeOctal(bytes) {
+    const parts = [];
+    const STEP = 8192;
+    for (let i = 0; i < bytes.length; i += STEP) {
+      const end = Math.min(i + STEP, bytes.length);
+      const sz = end - i;
+      const arr = new Array(sz);
+      for (let j = 0; j < sz; j++) arr[j] = OCT_LUT[bytes[i + j]];
+      parts.push(arr.join(' '));
+    }
+    return parts.join(' ');
+  }
+
+  function decodeOctal(str) {
+    const tokens = str.trim().split(/\s+/);
+    const out = new Uint8Array(tokens.length);
+    for (let i = 0; i < tokens.length; i++) {
+      const v = parseInt(tokens[i], 8);
+      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid octal byte: ' + tokens[i]);
+      out[i] = v;
+    }
+    return out;
+  }
+
+  // ── Base85 / ASCII85 ───────────────────────────────────────────
+  // Groups of 4 bytes → 5 printable chars (ASCII 33–117)
+  // Special: 4 zero bytes → 'z' (single char)
+  // Final incomplete group: pad with 0-bytes, emit (N+1) chars
+  function encodeBase85(bytes) {
+    let out = '';
+    for (let i = 0; i < bytes.length; i += 4) {
+      const remaining = Math.min(4, bytes.length - i);
+      let n = 0;
+      for (let j = 0; j < 4; j++) n = n * 256 + (j < remaining ? bytes[i + j] : 0);
+      if (n === 0 && remaining === 4) {
+        out += 'z';
+      } else {
+        let chunk = '';
+        let tmp = n;
+        for (let j = 0; j < 5; j++) {
+          chunk = String.fromCharCode((tmp % 85) + 33) + chunk;
+          tmp = Math.floor(tmp / 85);
+        }
+        out += remaining === 4 ? chunk : chunk.slice(0, remaining + 1);
+      }
+    }
+    return out;
+  }
+
+  function decodeBase85(str) {
+    str = str.replace(/\s/g, '');
+    // strip optional <~ ~> wrappers
+    if (str.startsWith('<~') && str.endsWith('~>')) str = str.slice(2, -2);
+    const bytes = [];
+    let i = 0;
+    while (i < str.length) {
+      if (str[i] === 'z') {
+        bytes.push(0, 0, 0, 0);
+        i++;
+      } else {
+        const remaining = Math.min(5, str.length - i);
+        if (remaining < 2) throw new Error('Truncated Base85 data at position ' + i);
+        let n = 0;
+        for (let j = 0; j < 5; j++) {
+          const v = j < remaining ? (str.charCodeAt(i + j) - 33) : 84;
+          if (v < 0 || v > 84) throw new Error('Invalid Base85 char "' + str[i + j] + '" at pos ' + (i + j));
+          n = n * 85 + v;
+        }
+        const outBytes = remaining === 5 ? 4 : remaining - 1;
+        // Extract big-endian bytes from n
+        let tmp = n;
+        const chunk = [0, 0, 0, 0];
+        for (let j = 3; j >= 0; j--) { chunk[j] = tmp % 256; tmp = Math.floor(tmp / 256); }
+        for (let j = 0; j < outBytes; j++) bytes.push(chunk[j]);
+        i += remaining;
+      }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  // ── Generic chunked base-N (36 / 58 / 62) ────────────────────
+  // Each 4-byte group → K chars (padded to fixed width)
+  // Format: P{0-3}:{encoded}  (P prefix stores padding count)
+  function _baseNcharsPerGroup(N) {
+    let k = 1;
+    while (Math.pow(N, k) < 4294967296) k++;
+    return k;
+  }
+
+  function encodeChunkedBaseN(bytes, alpha) {
+    const N = alpha.length;
+    const K = _baseNcharsPerGroup(N);
+    const pad = (4 - (bytes.length % 4)) % 4;
+    const padded = new Uint8Array(bytes.length + pad);
+    padded.set(bytes);
+    const view = new DataView(padded.buffer);
+    let out = '';
+    for (let i = 0; i < padded.length; i += 4) {
+      let n = view.getUint32(i, false);
+      let chunk = '';
+      for (let j = 0; j < K; j++) {
+        chunk = alpha[n % N] + chunk;
+        n = Math.floor(n / N);
+      }
+      out += chunk;
+    }
+    return 'P' + pad + ':' + out;
+  }
+
+  function decodeChunkedBaseN(str, alpha) {
+    if (str.length < 3 || str[0] !== 'P' || str[2] !== ':')
+      throw new Error('Invalid format: expected P{0-3}: prefix. Was this encoded by this tool?');
+    const pad = parseInt(str[1]);
+    if (isNaN(pad) || pad < 0 || pad > 3) throw new Error('Invalid padding prefix');
+    const data = str.slice(3);
+    const N = alpha.length;
+    const K = _baseNcharsPerGroup(N);
+    if (data.length % K !== 0) throw new Error('Invalid length for Base' + N + ': expected multiple of ' + K);
+    const alphaMap = {};
+    for (let i = 0; i < alpha.length; i++) alphaMap[alpha[i]] = i;
+    const totalChunks = data.length / K;
+    const bytes = new Uint8Array(totalChunks * 4);
+    const view = new DataView(bytes.buffer);
+    for (let i = 0; i < totalChunks; i++) {
+      let n = 0;
+      for (let j = 0; j < K; j++) {
+        const c = data[i * K + j];
+        if (!(c in alphaMap)) throw new Error('Invalid Base' + N + ' char: "' + c + '"');
+        n = n * N + alphaMap[c];
+      }
+      view.setUint32(i * 4, n, false);
+    }
+    return bytes.slice(0, bytes.length - pad);
+  }
+
+  const ALPHA_B36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const ALPHA_B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  const ALPHA_B62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+  // ── Base91 (Joachim Henke's algorithm) ────────────────────────
+  // ~23% overhead vs Base64's 33% — uses 91 safe printable ASCII chars
+  const B91_TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~"';
+  const B91_DECODE_MAP = new Uint8Array(256).fill(255);
+  for (let i = 0; i < 91; i++) B91_DECODE_MAP[B91_TABLE.charCodeAt(i)] = i;
+
+  function encodeBase91(bytes) {
+    let b = 0, n = 0;
+    let out = '';
+    for (let i = 0; i < bytes.length; i++) {
+      b |= bytes[i] << n;
+      n += 8;
+      if (n > 13) {
+        let v = b & 8191;
+        if (v > 88) { b >>= 13; n -= 13; }
+        else        { v = b & 16383; b >>= 14; n -= 14; }
+        out += B91_TABLE[v % 91] + B91_TABLE[(v / 91) | 0];
+      }
+    }
+    if (n) {
+      out += B91_TABLE[b % 91];
+      if (n > 7 || b > 90) out += B91_TABLE[(b / 91) | 0];
+    }
+    return out;
+  }
+
+  function decodeBase91(str) {
+    str = str.replace(/\s/g, '');
+    const bytes = [];
+    let b = 0, n = 0, v = -1;
+    for (let i = 0; i < str.length; i++) {
+      const c = B91_DECODE_MAP[str.charCodeAt(i)];
+      if (c === 255) throw new Error('Invalid Base91 character: "' + str[i] + '"');
+      if (v < 0) { v = c; }
+      else {
+        v += c * 91;
+        b |= v << n; n += (v & 8191) > 88 ? 13 : 14;
+        v = -1;
+        while (n > 7) { bytes.push(b & 255); b >>= 8; n -= 8; }
+      }
+    }
+    if (v >= 0) bytes.push((b | v << n) & 255);
+    return new Uint8Array(bytes);
+  }
+
+  // ── Base122 ────────────────────────────────────────────────────
+  // Uses a 122-char "web-safe" alphabet of printable ASCII chars
+  // that are safe in JSON, HTML attributes, and most text contexts.
+  // Alphabet excludes: NUL, \t, \n, \r, space, ", ', `, \, <, >
+  // This gives exactly 122 usable chars from printable ASCII range.
+  const B122_TABLE = (function() {
+    const SKIP = new Set([0,9,10,13,32,34,39,60,62,92,96]);
+    let t = '';
+    for (let i = 33; i < 127; i++) if (!SKIP.has(i)) t += String.fromCharCode(i);
+    // pad to ensure we have exactly 122
+    return t.slice(0, 122);
+  })();
+  const B122_DECODE_MAP = new Uint8Array(256).fill(255);
+  for (let i = 0; i < B122_TABLE.length; i++) B122_DECODE_MAP[B122_TABLE.charCodeAt(i)] = i;
+
+  function encodeBase122(bytes) {
+    // Chunked: 2 bytes → 3 chars (122^3 = 1815848 > 65536 = 2^16 ✓)
+    // Padding: 'P{0-1}:' prefix
+    const pad = bytes.length % 2 === 1 ? 1 : 0;
+    const padded = new Uint8Array(bytes.length + pad);
+    padded.set(bytes);
+    let out = 'P' + pad + ':';
+    for (let i = 0; i < padded.length; i += 2) {
+      let n = (padded[i] << 8) | padded[i + 1]; // 0–65535
+      out += B122_TABLE[(n / (122 * 122)) | 0];
+      out += B122_TABLE[((n / 122) | 0) % 122];
+      out += B122_TABLE[n % 122];
+    }
+    return out;
+  }
+
+  function decodeBase122(str) {
+    if (str.length < 3 || str[0] !== 'P' || str[2] !== ':')
+      throw new Error('Invalid Base122: expected P{0-1}: prefix');
+    const pad = parseInt(str[1]);
+    if (isNaN(pad) || pad < 0 || pad > 1) throw new Error('Invalid Base122 padding prefix');
+    const data = str.slice(3);
+    if (data.length % 3 !== 0) throw new Error('Invalid Base122 length (must be multiple of 3)');
+    const bytes = [];
+    for (let i = 0; i < data.length; i += 3) {
+      const c0 = B122_DECODE_MAP[data.charCodeAt(i)];
+      const c1 = B122_DECODE_MAP[data.charCodeAt(i + 1)];
+      const c2 = B122_DECODE_MAP[data.charCodeAt(i + 2)];
+      if (c0 === 255 || c1 === 255 || c2 === 255) throw new Error('Invalid Base122 char near pos ' + i);
+      const n = c0 * 122 * 122 + c1 * 122 + c2;
+      bytes.push((n >> 8) & 0xFF, n & 0xFF);
+    }
+    const result = new Uint8Array(bytes);
+    return pad > 0 ? result.slice(0, result.length - pad) : result;
+  }
+
+  // ── Morse Code ─────────────────────────────────────────────────
+  const MORSE_ENC = {
+    'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+    'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+    'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+    '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
+    '.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':'-..-.','(':'-.--.',')':'-.--.-','&':'.-...',
+    ':':'---...',';':'-.-.-.','=':'-...-','+':'.-.-.', '-':'-....-','_':'..--.-','"':'.-..-.','@':'.--.-.',
+    ' ':'/'
+  };
+  const MORSE_DEC = {};
+  for (const k in MORSE_ENC) MORSE_DEC[MORSE_ENC[k]] = k;
+
+  function encodeMorse(bytes) {
+    const text = new TextDecoder('utf-8', {fatal: false}).decode(bytes).toUpperCase();
+    const tokens = [];
+    for (const ch of text) {
+      tokens.push(MORSE_ENC[ch] !== undefined ? MORSE_ENC[ch] : '........');
+    }
+    return tokens.join(' ');
+  }
+
+  function decodeMorse(str) {
+    const tokens = str.trim().split(/\s+/);
+    let text = '';
+    for (const tok of tokens) {
+      if (tok === '/') { text += ' '; continue; }
+      text += (MORSE_DEC[tok] !== undefined ? MORSE_DEC[tok] : '?');
+    }
+    return new TextEncoder().encode(text);
+  }
+
+  // ── Efficient Base64 ───────────────────────────────────────────
+  function toBase64(bytes) {
+    let s = '';
+    const STEP = 8192; // safe call stack limit
+    for (let i = 0; i < bytes.length; i += STEP) {
+      s += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + STEP, bytes.length)));
+    }
+    return btoa(s);
+  }
+
+  // ── Base32 ─────────────────────────────────────────────────────
+  function encodeBase32(bytes) {
+    let out = '', buf = 0, bits = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      buf = (buf << 8) | bytes[i];
+      bits += 8;
+      while (bits >= 5) { bits -= 5; out += B32_ALPHA[(buf >> bits) & 31]; }
+    }
+    if (bits > 0) out += B32_ALPHA[(buf << (5 - bits)) & 31];
+    while (out.length % 8 !== 0) out += '=';
+    return out;
+  }
+
+  // ── Base32 decode ──────────────────────────────────────────────
+  function decodeBase32(str) {
+    str = str.toUpperCase().replace(/=+$/, '').replace(/\s/g, '');
+    const map = {};
+    for (let i = 0; i < 32; i++) map[B32_ALPHA[i]] = i;
+    const bytes = [];
+    let buf = 0, bits = 0;
+    for (const c of str) {
+      if (!(c in map)) throw new Error('Invalid Base32 char: ' + c);
+      buf = (buf << 5) | map[c];
+      bits += 5;
+      if (bits >= 8) { bits -= 8; bytes.push((buf >> bits) & 0xFF); }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  // ── Quoted-Printable encode ────────────────────────────────────
+  function encodeQP(bytes) {
+    let out = '', lineLen = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      const b = bytes[i];
+      let token;
+      if (b === 13 || b === 10 || (b >= 33 && b <= 126 && b !== 61)) {
+        token = String.fromCharCode(b);
+      } else {
+        token = '=' + HEX_LUT[b];
+      }
+      if (lineLen + token.length > 75) { out += '=\r\n'; lineLen = 0; }
+      out += token;
+      lineLen += token.length;
+    }
+    return out;
+  }
+
+  // ── Quoted-Printable decode ────────────────────────────────────
+  function decodeQP(str) {
+    str = str.replace(/=\r?\n/g, '');
+    const bytes = [];
+    for (let i = 0; i < str.length; ) {
+      if (str[i] === '=' && i + 2 < str.length) {
+        bytes.push(parseInt(str.slice(i+1, i+3), 16));
+        i += 3;
+      } else {
+        bytes.push(str.charCodeAt(i++));
+      }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  // ── URL encode / decode ────────────────────────────────────────
+  function encodeURLPct(bytes) {
+    let out = '';
+    for (let i = 0; i < bytes.length; i++) {
+      const b = bytes[i];
+      // unreserved chars per RFC 3986
+      if ((b >= 0x41 && b <= 0x5A) || (b >= 0x61 && b <= 0x7A) ||
+          (b >= 0x30 && b <= 0x39) || b === 0x2D || b === 0x5F ||
+          b === 0x2E || b === 0x7E) {
+        out += String.fromCharCode(b);
+      } else {
+        out += '%' + HEX_LUT[b];
+      }
+    }
+    return out;
+  }
+
+  function decodeURLPct(str) {
+    str = str.trim();
+    const bytes = [];
+    for (let i = 0; i < str.length; ) {
+      if (str[i] === '%' && i + 2 < str.length) {
+        bytes.push(parseInt(str.slice(i+1, i+3), 16));
+        i += 3;
+      } else if (str[i] === '+') {
+        bytes.push(0x20); i++;
+      } else {
+        bytes.push(str.charCodeAt(i++));
+      }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  // ── Hex dump (xxd format) ──────────────────────────────────────
+  function hexDumpChunk(bytes, startOff) {
+    const lines = [];
+    for (let i = 0; i < bytes.length; i += 16) {
+      const off = (startOff + i).toString(16).padStart(8, '0');
+      const row = bytes.subarray(i, Math.min(i + 16, bytes.length));
+      let hexStr = '', ascii = '';
+      for (let j = 0; j < 16; j++) {
+        if (j < row.length) {
+          hexStr += HEX_LUT[row[j]] + (j === 7 ? '  ' : ' ');
+          const c = row[j];
+          ascii += (c >= 32 && c < 127) ? String.fromCharCode(c) : '.';
+        } else {
+          hexStr += '   ' + (j === 7 ? ' ' : '');
+        }
+      }
+      lines.push(off + '  ' + hexStr + ' |' + ascii + '|');
+    }
+    return lines.join('\n');
+  }
+
+  // ── Deflate + Base64 ──────────────────────────────────────────
+  async function deflateBase64(bytes) {
+    const cs = new CompressionStream('deflate-raw');
+    const writer = cs.writable.getWriter();
+    const reader = cs.readable.getReader();
+    const chunks = [];
+    // Write and read CONCURRENTLY to prevent backpressure deadlock
+    const writeJob = writer.write(bytes).then(() => writer.close());
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
+    }
+    await writeJob;
+    let total = 0; for (const c of chunks) total += c.length;
+    const out = new Uint8Array(total); let off = 0;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    return toBase64(out);
+  }
+
+  // ── Inflate (decompress) ──────────────────────────────────────
+  async function inflateBytes(bytes) {
+    const cs = new DecompressionStream('deflate-raw');
+    const writer = cs.writable.getWriter();
+    const reader = cs.readable.getReader();
+    const chunks = [];
+    const writeJob = writer.write(bytes).then(() => writer.close());
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
+    }
+    await writeJob;
+    let total = 0; for (const c of chunks) total += c.length;
+    const out = new Uint8Array(total); let off = 0;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    return out;
+  }
+
+  // ── GZIP compress + Base64 ────────────────────────────────────
+  async function gzipBase64(bytes) {
+    const cs = new CompressionStream('gzip');
+    const writer = cs.writable.getWriter();
+    const reader = cs.readable.getReader();
+    const chunks = [];
+    const writeJob = writer.write(bytes).then(() => writer.close());
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
+    }
+    await writeJob;
+    let total = 0; for (const c of chunks) total += c.length;
+    const out = new Uint8Array(total); let off = 0;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    return toBase64(out);
+  }
+
+  // ── GZIP decompress ────────────────────────────────────────────
+  async function gunzipBytes(bytes) {
+    const cs = new DecompressionStream('gzip');
+    const writer = cs.writable.getWriter();
+    const reader = cs.readable.getReader();
+    const chunks = [];
+    const writeJob = writer.write(bytes).then(() => writer.close());
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
+    }
+    await writeJob;
+    let total = 0; for (const c of chunks) total += c.length;
+    const out = new Uint8Array(total); let off = 0;
+    for (const c of chunks) { out.set(c, off); off += c.length; }
+    return out;
+  }
+
+  // ── EZ Encoding: Base64 + Run‑Length Encoding ─────────────────
+  // Format: \countCHAR\   e.g. AAAAAAAAA → \9A\
+  // Unambiguous because:
+  //   • Opening \ triggers an RLE token
+  //   • Closing \ terminates it
+  //   • The char BEFORE the closing \ is the repeated character
+  //   • Everything between opening \ and that char is the decimal count
+  //   Example: \39\ = three '9's, \3A\ = three 'A's — no ambiguity!
+  //   (\ never appears in standard Base64: A-Za-z0-9+/=)
+
+  function rleEncode(s) {
+    let out = '';
+    let i = 0;
+    while (i < s.length) {
+      let j = i;
+      while (j < s.length && s[j] === s[i]) j++;
+      const count = j - i;
+      if (count >= 3) {
+        out += '\\' + count + s[i] + '\\';  // e.g. \9A\
+      } else {
+        out += s.slice(i, j);
+      }
+      i = j;
+    }
+    return out;
+  }
+
+  // Decoder: scan for \, find the NEXT \, everything inside is the token.
+  // Last char of token = the repeated character; preceding digits = count.
+  // All other characters are literals (including Base64 digits 0-9).
+  function rleDecode(s) {
+    let out = '';
+    let i = 0;
+    while (i < s.length) {
+      if (s[i] === '\\') {
+        const close = s.indexOf('\\', i + 1);
+        if (close === -1) throw new Error('RLE: unclosed token starting at pos ' + i);
+        const token = s.slice(i + 1, close); // e.g. "9A" or "39" or "4+"
+        if (token.length < 2) throw new Error('RLE: token too short "' + token + '" at pos ' + i);
+        const ch = token[token.length - 1];           // last char = repeated character
+        const countStr = token.slice(0, -1);          // prefix digits = count
+        const count = parseInt(countStr, 10);
+        if (isNaN(count) || count < 1) throw new Error('RLE: bad count "' + countStr + '"');
+        out += ch.repeat(count);
+        i = close + 1;
+      } else {
+        out += s[i++];
+      }
+    }
+    return out;
+  }
+
+  // encodeEZ: receives header so it can be stored for "Use Current" reconstruction
+  function encodeEZ(bytes, header, maxDisplayChars) {
+    const base64Full = toBase64(bytes);
+    const rleFull = rleEncode(base64Full);
+    const MAX = maxDisplayChars || 2000;
+    return JSON.stringify({
+      _ez: true,
+      byteCount: bytes.length,
+      base64Len: base64Full.length,
+      rleLen: rleFull.length,
+      base64Preview: base64Full.slice(0, MAX),
+      rlePreview: rleFull.slice(0, MAX),
+      rleFull: rleFull,
+      header: header   // stored so "Use Current" can reconstruct full encodable string
+    });
+  }
+
+  function decodeEZ(str) {
+    // str is the RLE-encoded Base64 string (BCVT header already stripped by caller)
+    const base64Str = rleDecode(str);
+    return fromBase64(base64Str);
+  }
+
+  // For reverse step display: take RLE string, return base64 preview and byte count
+  function reverseEZSteps(rleStr) {
+    const base64Str = rleDecode(rleStr);
+    const bytes = fromBase64(base64Str);
+    const MAX = 2000;
+    return JSON.stringify({
+      _ezrev: true,
+      byteCount: bytes.length,
+      rlePreview: rleStr.slice(0, MAX),
+      base64Preview: base64Str.slice(0, MAX),
+      rleFullLen: rleStr.length,
+      base64FullLen: base64Str.length
+    });
+  }
+
+  function fromBase64(str) {
+    str = str.replace(/\s/g, '');
+    const bin = atob(str);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function fromBase64URL(str) {
+    return fromBase64(str.replace(/-/g, '+').replace(/_/g, '/'));
+  }
+
+  function hexToBytes(str) {
+    const s = str.replace(/\s+/g, '');
+    if (s.length % 2 !== 0) throw new Error('Hex length must be even');
+    const out = new Uint8Array(s.length / 2);
+    for (let i = 0; i < out.length; i++) {
+      const v = parseInt(s.slice(i*2, i*2+2), 16);
+      if (isNaN(v)) throw new Error('Invalid hex at position ' + (i*2));
+      out[i] = v;
+    }
+    return out;
+  }
+
+  function binToBytes(str) {
+    const tokens = str.trim().split(/\s+/);
+    const out = new Uint8Array(tokens.length);
+    for (let i = 0; i < tokens.length; i++) {
+      if (!/^[01]{1,8}$/.test(tokens[i])) throw new Error('Invalid binary token: ' + tokens[i]);
+      out[i] = parseInt(tokens[i], 2);
+    }
+    return out;
+  }
+
+  function decToBytes(str) {
+    const tokens = str.trim().split(/\s+/);
+    const out = new Uint8Array(tokens.length);
+    for (let i = 0; i < tokens.length; i++) {
+      const v = parseInt(tokens[i], 10);
+      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid decimal byte: ' + tokens[i]);
+      out[i] = v;
+    }
+    return out;
+  }
+
+  // ── SHA-256 ────────────────────────────────────────────────────
+  async function sha256(bytes) {
+    const hash = await crypto.subtle.digest('SHA-256', bytes.buffer);
+    return Array.from(new Uint8Array(hash)).map(b => HEX_LUT[b]).join('').toLowerCase();
+  }
+
+  // ── MAIN MESSAGE HANDLER ───────────────────────────────────────
+  self.onmessage = async function(e) {
+    const { id, op, fmt, buffer, header, raw } = e.data;
+
+    try {
+      // ENCODE ─────────────────────────────────────────────────
+      if (op === 'encode') {
+        const bytes = new Uint8Array(buffer);
+        const n = bytes.length;
+        const CHUNK = 131072; // 128KB chunks
+        let result = '';
+
+        const progress = (pct) => self.postMessage({ id, type: 'progress', pct });
+
+        if (fmt === 'bin' || fmt === 'dec' || fmt === 'hex') {
+          const lut = fmt === 'bin' ? BIN_LUT : fmt === 'dec' ? DEC_LUT : HEX_LUT;
+          const parts = [];
+          for (let i = 0; i < n; i += CHUNK) {
+            const end = Math.min(i + CHUNK, n);
+            const sz = end - i;
+            const arr = new Array(sz);
+            for (let j = 0; j < sz; j++) arr[j] = lut[bytes[i + j]];
+            parts.push(arr.join(' '));
+            progress((end / n) * 100);
+          }
+          result = header + parts.join(' ');
+        } else if (fmt === 'hexdump') {
+          const parts = [];
+          for (let i = 0; i < n; i += CHUNK) {
+            const end = Math.min(i + CHUNK, n);
+            parts.push(hexDumpChunk(bytes.subarray(i, end), i));
+            progress((end / n) * 100);
+          }
+          result = header + parts.join('\n');
+        } else if (fmt === 'b64') {
+          result = header + toBase64(bytes);
+          progress(100);
+        } else if (fmt === 'b64url') {
+          result = header + toBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+          progress(100);
+        } else if (fmt === 'b32') {
+          result = header + encodeBase32(bytes);
+          progress(100);
+        } else if (fmt === 'b85') {
+          result = header + encodeBase85(bytes);
+          progress(100);
+        } else if (fmt === 'b58') {
+          result = header + encodeChunkedBaseN(bytes, ALPHA_B58);
+          progress(100);
+        } else if (fmt === 'b62') {
+          result = header + encodeChunkedBaseN(bytes, ALPHA_B62);
+          progress(100);
+        } else if (fmt === 'b36') {
+          result = header + encodeChunkedBaseN(bytes, ALPHA_B36);
+          progress(100);
+        } else if (fmt === 'b91') {
+          result = header + encodeBase91(bytes);
+          progress(100);
+        } else if (fmt === 'b122') {
+          result = header + encodeBase122(bytes);
+          progress(100);
+        } else if (fmt === 'oct') {
+          const parts = [];
+          for (let i = 0; i < n; i += CHUNK) {
+            const end = Math.min(i + CHUNK, n);
+            const sz = end - i;
+            const arr = new Array(sz);
+            for (let j = 0; j < sz; j++) arr[j] = OCT_LUT[bytes[i + j]];
+            parts.push(arr.join(' '));
+            progress((end / n) * 100);
+          }
+          result = header + parts.join(' ');
+        } else if (fmt === 'deflate') {
+          progress(10);
+          result = header + await deflateBase64(bytes);
+          progress(100);
+        } else if (fmt === 'gzip') {
+          progress(10);
+          result = header + await gzipBase64(bytes);
+          progress(100);
+        } else if (fmt === 'ez') {
+          // EZ returns JSON with pipeline steps + header for reconstruction
+          const ezData = encodeEZ(bytes, header, 2000);
+          result = ezData;
+          progress(100);
+        } else if (fmt === 'qp') {
+          const parts = [];
+          for (let i = 0; i < n; i += CHUNK) {
+            parts.push(encodeQP(bytes.subarray(i, Math.min(i + CHUNK, n))));
+            progress((Math.min(i + CHUNK, n) / n) * 100);
+          }
+          result = header + parts.join('');
+        } else if (fmt === 'url') {
+          const parts = [];
+          for (let i = 0; i < n; i += CHUNK) {
+            parts.push(encodeURLPct(bytes.subarray(i, Math.min(i + CHUNK, n))));
+            progress((Math.min(i + CHUNK, n) / n) * 100);
+          }
+          result = header + parts.join('');
+        } else if (fmt === 'morse') {
+          result = header + encodeMorse(bytes);
+          progress(100);
+        } else if (fmt === 'sha256') {
+          result = await sha256(bytes);
+          progress(100);
+        }
+
+        self.postMessage({ id, type: 'done', result, fmt });
+
+      // DECODE ─────────────────────────────────────────────────
+      } else if (op === 'decode') {
+        let bytes;
+        if (fmt === 'b64')       bytes = fromBase64(raw);
+        else if (fmt === 'b64url') bytes = fromBase64URL(raw);
+        else if (fmt === 'b32')  bytes = decodeBase32(raw);
+        else if (fmt === 'b85')  bytes = decodeBase85(raw);
+        else if (fmt === 'b58')  bytes = decodeChunkedBaseN(raw, ALPHA_B58);
+        else if (fmt === 'b62')  bytes = decodeChunkedBaseN(raw, ALPHA_B62);
+        else if (fmt === 'b36')  bytes = decodeChunkedBaseN(raw, ALPHA_B36);
+        else if (fmt === 'b91')  bytes = decodeBase91(raw);
+        else if (fmt === 'b122') bytes = decodeBase122(raw);
+        else if (fmt === 'oct')  bytes = decodeOctal(raw);
+        else if (fmt === 'morse') bytes = decodeMorse(raw);
+        else if (fmt === 'deflate') {
+          const compressed = fromBase64(raw);
+          bytes = await inflateBytes(compressed);
+        }
+        else if (fmt === 'gzip') {
+          const compressed = fromBase64(raw);
+          bytes = await gunzipBytes(compressed);
+        }
+        else if (fmt === 'ez') {
+          bytes = decodeEZ(raw);
+        }
+        else if (fmt === 'hex')  bytes = hexToBytes(raw);
+        else if (fmt === 'bin')  bytes = binToBytes(raw);
+        else if (fmt === 'dec')  bytes = decToBytes(raw);
+        else if (fmt === 'qp')   bytes = decodeQP(raw);
+        else if (fmt === 'url')  bytes = decodeURLPct(raw);
+        else throw new Error('Unknown format: ' + fmt);
+
+        // Transfer buffer back (zero-copy)
+        self.postMessage({ id, type: 'decoded', buffer: bytes.buffer, length: bytes.length }, [bytes.buffer]);
+      } else if (op === 'ezrev') {
+        // Return all 2 intermediate steps for display
+        const steps = reverseEZSteps(raw);
+        self.postMessage({ id, type: 'done', result: steps, fmt: 'ezrev' });
+      }
+
+    } catch(err) {
+      self.postMessage({ id, type: 'error', error: err.message, fmt });
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  WORKER POOL
+// ═══════════════════════════════════════════════════════════════════════
+const WORKER_BLOB = new Blob(['(' + workerMain.toString() + ')()'], { type: 'application/javascript' });
+const WORKER_URL = URL.createObjectURL(WORKER_BLOB);
+
+// Use up to 4 workers (parallel processing for small/medium files)
+const MAX_WORKERS = Math.min(navigator.hardwareConcurrency || 2, 4);
+let workerPool = [];
+let taskQueue = [];
+let activeWorkers = 0;
+let stopFlag = false;
+
+function spawnWorker() {
+  const w = new Worker(WORKER_URL);
+  w.onmessage = workerMessage;
+  return w;
+}
+
+// Callbacks by task id
+const taskCallbacks = {};
+let taskId = 0;
+
+function postTask(op, fmt, buffer, header, raw, onProgress, onDone, onError) {
+  const id = ++taskId;
+  taskCallbacks[id] = { onProgress, onDone, onError };
+  const msg = { id, op, fmt, header, raw };
+  const transfer = [];
+  if (buffer) { msg.buffer = buffer; transfer.push(buffer); }
+
+  // Get/create worker
+  let w;
+  if (workerPool.length < MAX_WORKERS) {
+    w = spawnWorker();
+    workerPool.push(w);
+    document.getElementById('workerCount').textContent = workerPool.length;
+  } else {
+    w = workerPool[id % workerPool.length];
+  }
+  w.postMessage(msg, transfer);
+  activeWorkers++;
+  return id;
+}
+
+function workerMessage(e) {
+  const { id, type, pct, result, fmt, error, buffer, length } = e.data;
+  const cb = taskCallbacks[id];
+  if (!cb) return;
+  if (type === 'progress') { cb.onProgress && cb.onProgress(pct); }
+  else if (type === 'done') {
+    activeWorkers--;
+    delete taskCallbacks[id];
+    cb.onDone && cb.onDone(result, fmt);
+  } else if (type === 'decoded') {
+    activeWorkers--;
+    delete taskCallbacks[id];
+    cb.onDone && cb.onDone(new Uint8Array(buffer), length);
+  } else if (type === 'error') {
+    activeWorkers--;
+    delete taskCallbacks[id];
+    cb.onError && cb.onError(error);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  FORMAT DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════
+const FORMATS = [
+  { id:'b64',     label:'Base64',           badge:'B64',   icon:'🟣', rev:true,  note:'Standard base64 encoding (RFC 4648)' },
+  { id:'b64url',  label:'Base64 URL',        badge:'B64U',  icon:'🔗', rev:true,  note:'URL-safe base64 (no +/=, RFC 4648 §5)' },
+  { id:'b32',     label:'Base32',            badge:'B32',   icon:'🔷', rev:true,  note:'RFC 4648 Base32 (uppercase)' },
+  { id:'b85',     label:'Base85 / ASCII85',  badge:'B85',   icon:'🟠', rev:true,  note:'ASCII85: 4 bytes → 5 printable chars (~25% overhead)' },
+  { id:'b91',     label:'Base91',            badge:'B91',   icon:'🌸', rev:true,  note:'Henke Base91: ~23% overhead, 91 safe printable chars — most efficient text encoding' },
+  { id:'b122',    label:'Base122',           badge:'B122',  icon:'💠', rev:true,  note:'Web-safe Base122: 2 bytes → 3 chars using 122 safe printable chars' },
+  { id:'b62',     label:'Base62',            badge:'B62',   icon:'🔵', rev:true,  note:'Alphanumeric Base62 (0-9A-Za-z), chunked 4-byte groups' },
+  { id:'b58',     label:'Base58 (Bitcoin)',  badge:'B58',   icon:'🔴', rev:true,  note:'Bitcoin-style Base58 (no 0/O/I/l), chunked 4-byte groups' },
+  { id:'b36',     label:'Base36',            badge:'B36',   icon:'⚪', rev:true,  note:'Base36 (0-9 A-Z), chunked 4-byte groups' },
+  { id:'deflate', label:'Deflate+Base64',    badge:'ZLIB',  icon:'📦', rev:true,  note:'Raw deflate compress then base64 — often 40–80% smaller' },
+  { id:'gzip',    label:'GZIP+Base64',       badge:'GZIP',  icon:'🗜', rev:true,  note:'GZIP compress then base64 — standard HTTP compression' },
+  { id:'ez',      label:'EZ Encoding',       badge:'EZ',    icon:'⚡', rev:true,  note:'Base64 → RLE: runs of 3+ same chars → \\countCHAR\\ (e.g. AAAAAAAAA5YYYY → \\9A\\5\\4Y\\)' },
+  { id:'hex',     label:'Hexadecimal',       badge:'HEX',   icon:'🟡', rev:true,  note:'Two hex digits per byte' },
+  { id:'hexdump', label:'Hex Dump',          badge:'DUMP',  icon:'📊', rev:false, note:'xxd-style: offset | hex | ASCII' },
+  { id:'oct',     label:'Octal',             badge:'OCT',   icon:'🟤', rev:true,  note:'3 octal digits per byte (base 8), space-separated' },
+  { id:'dec',     label:'Decimal',           badge:'DEC',   icon:'🟢', rev:true,  note:'Decimal byte values (0-255)' },
+  { id:'bin',     label:'Binary',            badge:'BIN',   icon:'🔵', rev:true,  note:'8-bit binary per byte' },
+  { id:'qp',      label:'Quoted-Printable',  badge:'QP',    icon:'✉', rev:true,  note:'Email encoding (RFC 2045)' },
+  { id:'url',     label:'URL Encoding',      badge:'URL',   icon:'🌐', rev:true,  note:'Percent-encoding (RFC 3986)' },
+  { id:'morse',   label:'Morse Code',        badge:'MORSE', icon:'📡', rev:true,  note:'Morse code (text — dots and dashes, reversible)' },
+  { id:'sha256',  label:'SHA-256 Hash',      badge:'HASH',  icon:'🔑', rev:false, note:'Cryptographic integrity hash (not reversible)' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════════
+let currentFile = null;
+let outputs = {}; // fmt -> full string (or truncated for very large)
+let outputBlobs = {}; // fmt -> Blob (for large outputs)
+let outputFullSizes = {}; // fmt -> exact byte size of full output
+const DISPLAY_LIMIT = 800_000;
+const STORE_LIMIT = 50_000_000; // 50M chars: use blob above this
+
+// ═══════════════════════════════════════════════════════════════════════
+//  HEADER FORMAT: BCVT1|name=...|mime=...|size=...|fmt=...\n
+// ═══════════════════════════════════════════════════════════════════════
+const HEADER_MAGIC = 'BCVT1';
+
+function buildHeader(name, mime, size, fmt) {
+  return `${HEADER_MAGIC}|name=${name}|mime=${mime}|size=${size}|fmt=${fmt}\n`;
+}
+
+function parseHeader(str) {
+  const nl = str.indexOf('\n');
+  if (nl === -1) return null;
+  const line = str.slice(0, nl);
+  if (!line.startsWith(HEADER_MAGIC + '|')) return null;
+  const meta = {};
+  line.split('|').slice(1).forEach(part => {
+    const eq = part.indexOf('=');
+    if (eq > 0) meta[part.slice(0, eq)] = part.slice(eq + 1);
+  });
+  return { meta, body: str.slice(nl + 1) };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  UI INIT
+// ═══════════════════════════════════════════════════════════════════════
+(function initUI() {
+  const grid = document.getElementById('fmtGrid');
+  FORMATS.forEach(f => {
+    const label = document.createElement('label');
+    label.className = 'fmt-check checked';
+    label.dataset.fmt = f.id;
+    label.title = f.note;
+    label.innerHTML = `<input type="checkbox" checked>
+      <span class="ficon">${f.icon}</span>
+      <span class="flabel">${f.label}</span>
+      <span class="fbadge">${f.badge}</span>`;
+    label.querySelector('input').addEventListener('change', e => {
+      label.classList.toggle('checked', e.target.checked);
+    });
+    grid.appendChild(label);
+  });
+
+  // Build output blocks
+  const area = document.getElementById('outputArea');
+  FORMATS.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'out-block';
+    div.id = 'block-' + f.id;
+    div.style.display = 'none';
+    div.innerHTML = `
+      <div class="out-head">
+        <div class="out-title">
+          <div class="status-dot" id="dot-${f.id}"></div>
+          ${f.icon} <span>${f.label}</span>
+          <span class="badge" id="badge-${f.id}">${f.badge}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="out-meta" id="meta-${f.id}"></div>
+          <div class="out-actions">
+            <button class="btn btn-ghost btn-sm" onclick="copyOut('${f.id}')">📋 COPY</button>
+            <button class="btn btn-ghost btn-sm" onclick="saveOut('${f.id}')">💾 SAVE</button>
+          </div>
+        </div>
+      </div>
+      <div class="out-body" id="body-${f.id}"><div class="out-placeholder">Processing…</div></div>`;
+    area.appendChild(div);
+  });
+
+  // File drag/drop
+  const dz = document.getElementById('dz');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+  document.getElementById('fileInput').addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+
+  document.getElementById('workerCount').textContent = '0';
+})();
+
+// ═══════════════════════════════════════════════════════════════════════
+//  FILE HANDLING
+// ═══════════════════════════════════════════════════════════════════════
+function setFile(f) {
+  currentFile = f;
+  const badge = document.getElementById('fileBadge');
+  badge.classList.add('show');
+  document.getElementById('fileBadgeText').textContent = `${f.name} — ${fmtSize(f.size)} — ${f.type || 'unknown'}`;
+  document.getElementById('hdrFile').textContent = f.name.slice(0, 20);
+  document.getElementById('hdrSize').textContent = fmtSize(f.size);
+  const warn = document.getElementById('sizeWarn');
+  warn.classList.toggle('show', f.size > 10 * 1024 * 1024);
+}
+
+function fmtSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  if (b < 1073741824) return (b/1048576).toFixed(2) + ' MB';
+  return (b/1073741824).toFixed(2) + ' GB';
+}
+
+function fmtNum(n) { return n.toLocaleString(); }
+
+// ═══════════════════════════════════════════════════════════════════════
+//  FORMAT SELECTION
+// ═══════════════════════════════════════════════════════════════════════
+function getSelected() {
+  return [...document.querySelectorAll('#fmtGrid .fmt-check input:checked')]
+    .map(i => i.closest('.fmt-check').dataset.fmt);
+}
+
+function selectAll() {
+  document.querySelectorAll('#fmtGrid .fmt-check input').forEach(i => { i.checked = true; i.closest('.fmt-check').classList.add('checked'); });
+}
+
+function selectNone() {
+  document.querySelectorAll('#fmtGrid .fmt-check input').forEach(i => { i.checked = false; i.closest('.fmt-check').classList.remove('checked'); });
+}
+
+function selectSmart() {
+  selectNone();
+  ['b64', 'hex', 'gzip', 'sha256'].forEach(id => {
+    const el = document.querySelector(`#fmtGrid .fmt-check[data-fmt="${id}"] input`);
+    if (el) { el.checked = true; el.closest('.fmt-check').classList.add('checked'); }
+  });
+}
+// ═══════════════════════════════════════════════════════════════════════
+//  PROGRESS HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+// Track per-format progress for aggregate display
+const fmtProgress = {};
+let totalFmts = 0;
+
+function updateOverallProgress() {
+  let sum = 0, count = 0;
+  for (const k in fmtProgress) { sum += fmtProgress[k]; count++; }
+  const pct = count ? sum / count : 0;
+  document.getElementById('progBar').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('progPct').textContent = Math.round(pct) + '%';
+}
+
+function setFmtProgress(fmt, pct) {
+  fmtProgress[fmt] = pct;
+  updateOverallProgress();
+}
+
+function setDot(fmt, state) {
+  const d = document.getElementById('dot-' + fmt);
+  if (!d) return;
+  d.className = 'status-dot' + (state ? ' ' + state : '');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MAIN CONVERSION
+// ═══════════════════════════════════════════════════════════════════════
+let pendingFmts = 0;
+
+async function startConversion() {
+  stopFlag = false;
+  const selected = getSelected();
+  if (!selected.length) { showToast('⚠ Select at least one format'); return; }
+
+  // Get bytes
+  let bytes;
+  const activePane = document.querySelector('.tab-pane.active').id;
+  if (activePane === 'pane-file') {
+    if (!currentFile) { showToast('⚠ Please select a file first'); return; }
+    bytes = new Uint8Array(await currentFile.arrayBuffer());
+  } else {
+    const txt = document.getElementById('textInput').value;
+    if (!txt) { showToast('⚠ Please enter some text'); return; }
+    bytes = new TextEncoder().encode(txt);
+  }
+
+  // Reset state
+  outputs = {};
+  outputBlobs = {};
+  outputFullSizes = {};
+  Object.keys(fmtProgress).forEach(k => delete fmtProgress[k]);
+
+  const fileName = currentFile ? currentFile.name : 'input.txt';
+  const mimeType = currentFile ? (currentFile.type || 'application/octet-stream') : 'text/plain';
+  const fileSize = bytes.length;
+
+  // Show blocks
+  FORMATS.forEach(f => {
+    const block = document.getElementById('block-' + f.id);
+    if (selected.includes(f.id)) {
+      block.style.display = 'block';
+      document.getElementById('body-' + f.id).innerHTML = '<div class="out-placeholder">Waiting…</div>';
+      document.getElementById('meta-' + f.id).innerHTML = '';
+      setDot(f.id, '');
+    } else {
+      block.style.display = 'none';
+    }
+  });
+
+  document.getElementById('convertBtn').disabled = true;
+  document.getElementById('stopBtn').style.display = 'flex';
+  document.getElementById('progWrap').classList.add('show');
+
+  // Determine parallelism: parallel if file <= 15MB
+  const useParallel = fileSize <= 15 * 1024 * 1024;
+  document.getElementById('workerStatus').textContent = useParallel ? `⚡ Parallel (${Math.min(selected.length, MAX_WORKERS)} workers)` : '⏩ Sequential';
+
+  pendingFmts = selected.length;
+
+  if (useParallel) {
+    // Launch all formats concurrently
+    selected.forEach(fmt => {
+      launchFormat(fmt, bytes.slice(), fileName, mimeType, fileSize);
+    });
+  } else {
+    // Sequential to avoid OOM on huge files
+    (async () => {
+      for (const fmt of selected) {
+        if (stopFlag) break;
+        await launchFormat(fmt, bytes.slice(), fileName, mimeType, fileSize);
+      }
+    })();
+  }
+}
+
+function launchFormat(fmt, bytes, fileName, mimeType, fileSize) {
+  return new Promise(resolve => {
+    setDot(fmt, 'spin');
+    document.getElementById('body-' + fmt).innerHTML = '<div class="out-placeholder">Processing…</div>';
+    setFmtProgress(fmt, 0);
+    document.getElementById('progText').textContent = `Encoding ${fmt.toUpperCase()}…`;
+
+    const header = fmt === 'sha256' ? '' : buildHeader(fileName, mimeType, fileSize, fmt);
+
+    postTask(
+      'encode', fmt,
+      bytes.buffer, // transferable
+      header, null,
+      (pct) => { setFmtProgress(fmt, pct); },
+      (result, f) => {
+        if (stopFlag) { setDot(f, 'err'); resolve(); return; }
+        storeOutput(f, result);
+        renderOutput(f, fileSize);
+        setDot(f, 'ok');
+        setFmtProgress(f, 100);
+        pendingFmts--;
+        if (pendingFmts <= 0) {
+          document.getElementById('progText').textContent = '✓ All conversions complete';
+          resetButtons();
+        }
+        resolve();
+      },
+      (err) => {
+        setDot(fmt, 'err');
+        document.getElementById('body-' + fmt).innerHTML = `<div class="out-placeholder" style="color:var(--red)">Error: ${err}</div>`;
+        pendingFmts--;
+        if (pendingFmts <= 0) resetButtons();
+        resolve();
+      }
+    );
+  });
+}
+
+function storeOutput(fmt, str) {
+  if (fmt === 'ez') {
+    try { outputs[fmt] = JSON.parse(str); } catch(e) { outputs[fmt] = str; }
+    // EZ size is the RLE string length (stored in the JSON)
+    const ez = outputs[fmt];
+    outputFullSizes[fmt] = ez && ez.rleLen ? ez.rleLen : 0;
+    return;
+  }
+  // Calculate byte size BEFORE any truncation
+  outputFullSizes[fmt] = new Blob([str]).size;
+  if (str.length > STORE_LIMIT) {
+    outputBlobs[fmt] = new Blob([str], { type: 'text/plain' });
+    outputs[fmt] = str.slice(0, DISPLAY_LIMIT);
+  } else {
+    outputs[fmt] = str;
+  }
+}
+
+function renderOutput(fmt, origBytes) {
+  // ── EZ special render ──────────────────────────────────────────
+  if (fmt === 'ez') {
+    const ez = outputs['ez'];
+    const body = document.getElementById('body-ez');
+    const byteCount = ez.byteCount || 0;
+
+    body.innerHTML = `<div class="ez-pipeline">
+      <div class="ez-step">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')">
+          <div class="ez-step-label">
+            <span class="badge ez-badge-b64">STEP 1</span>
+            🔤 Base64 (intermediate)
+          </div>
+          <div class="ez-step-meta">
+            <span>Length: <em>${fmtNum(ez.base64Len)} chars</em></span>
+            <span style="color:var(--red)">Ratio: <em>${(ez.base64Len / byteCount).toFixed(1)}×</em></span>
+          </div>
+        </div>
+        <div class="ez-step-body">${ez.base64Preview || ''}</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')">
+          <div class="ez-step-label">
+            <span class="badge ez-badge-rle">STEP 2</span>
+            🔢 Run‑Length Encoded — format: <code style="color:var(--amber)">\countCHAR\</code>
+          </div>
+          <div class="ez-step-meta">
+            <span>Length: <em>${fmtNum(ez.rleLen)} chars</em></span>
+            <span style="color:var(--red)">Compression: <em>${ez.base64Len ? Math.round((1 - ez.rleLen/ez.base64Len)*100) : 0}%</em></span>
+          </div>
+        </div>
+        <div class="ez-step-body open">${ez.rlePreview || ''}</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="showEZReverse()">🔄 SHOW REVERSE STEPS</button>
+    </div>
+    <div id="ez-rev-panel" style="display:none;margin-top:12px"></div>`;
+
+    document.getElementById('meta-ez').innerHTML =
+      `<span>Bytes: <em>${fmtNum(byteCount)}</em></span>
+       <span>RLE chars: <em>${fmtNum(ez.rleLen)}</em></span>
+       <span>Original: <em>${fmtSize(origBytes)}</em></span>`;
+    return;
+  }
+
+  const str = outputs[fmt];
+  const isBlob = !!outputBlobs[fmt];
+  // Full output size in bytes — always from outputFullSizes (set before any truncation)
+  const fullBytes = outputFullSizes[fmt] || 0;
+  // Full char count: blob.size ≈ bytes for ASCII outputs, use fullBytes as proxy
+  const fullLen = isBlob ? outputBlobs[fmt].size : (str ? str.length : 0);
+  const displayStr = str && str.length > DISPLAY_LIMIT ? str.slice(0, DISPLAY_LIMIT) : str;
+
+  // Parse header for meta display
+  const parsed = parseHeader(displayStr || '');
+  const bodyStr = parsed ? parsed.body : (displayStr || '');
+
+  const body = document.getElementById('body-' + fmt);
+  body.textContent = bodyStr.slice(0, DISPLAY_LIMIT);
+
+  if (isBlob || (str && str.length > DISPLAY_LIMIT)) {
+    const note = document.createElement('div');
+    note.className = 'trunc-note';
+    note.textContent = `⚠ Displaying first ${fmtNum(DISPLAY_LIMIT)} chars of ${fmtNum(fullLen)} total — use SAVE to get full output.`;
+    body.appendChild(note);
+  }
+
+  // Meta — use outputFullSizes for accurate output byte count
+  const parsed2 = parseHeader(str || '');
+  const origSize = parseInt(parsed2?.meta?.size || origBytes || 0);
+  const isCompressed = fmt === 'deflate' || fmt === 'gzip';
+  let compressionInfo = '';
+  if (isCompressed && origSize > 0) {
+    // base64 of compressed bytes; strip header length
+    const headerLen = parsed2?.meta ? buildHeader(parsed2.meta.name||'', parsed2.meta.mime||'', parsed2.meta.size||'', fmt).length : 0;
+    const b64Len = fullBytes - headerLen;
+    const compressedBytes = Math.round(b64Len * 0.75);
+    const ratio = (1 - compressedBytes / origSize) * 100;
+    compressionInfo = `<span style="color:var(--green)">Saved: <em>${Math.max(0, Math.round(ratio))}%</em></span>`;
+  }
+
+  document.getElementById('meta-' + fmt).innerHTML =
+    `<span>Output: <em>${fmtSize(fullBytes)}</em></span>
+     <span>Chars: <em>${fmtNum(fullLen)}</em></span>
+     <span>Original: <em>${fmtSize(origSize)}</em></span>
+     ${compressionInfo}`;
+}
+
+function stopConversion() {
+  stopFlag = true;
+  resetButtons();
+  showToast('⏹ Stopped');
+}
+
+function resetButtons() {
+  document.getElementById('convertBtn').disabled = false;
+  document.getElementById('stopBtn').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COPY / SAVE
+// ═══════════════════════════════════════════════════════════════════════
+function copyOut(fmt) {
+  if (fmt === 'ez') {
+    const ez = outputs['ez'];
+    if (!ez) { showToast('Nothing to copy'); return; }
+    navigator.clipboard.writeText((ez.header || '') + ez.rleFull || '').then(() => showToast('📋 Copied EZ RLE!'));
+    return;
+  }
+  const str = outputs[fmt];
+  if (!str) { showToast('Nothing to copy'); return; }
+  if (outputBlobs[fmt]) { showToast('⚠ Output too large to copy — use SAVE instead'); return; }
+  navigator.clipboard.writeText(str).then(() => showToast('📋 Copied!'));
+}
+
+function saveOut(fmt) {
+  if (fmt === 'ez') {
+    const ez = outputs['ez'];
+    if (!ez) { showToast('Nothing to save'); return; }
+    const blob = new Blob([(ez.header || '') + ez.rleFull || ''], { type: 'text/plain' });
+    triggerDownload(blob, 'ez_rle.txt');
+    return;
+  }
+  const blob = outputBlobs[fmt] || (outputs[fmt] ? new Blob([outputs[fmt]], { type: 'text/plain' }) : null);
+  if (!blob) { showToast('Nothing to save'); return; }
+  const ext = { bin:'bin.txt', dec:'dec.txt', hex:'hex.txt', hexdump:'hexdump.txt', b64:'base64.txt', b64url:'base64url.txt', b32:'base32.txt', b85:'base85.txt', b91:'base91.txt', b122:'base122.txt', b58:'base58.txt', b62:'base62.txt', b36:'base36.txt', oct:'octal.txt', morse:'morse.txt', deflate:'deflate_b64.txt', gzip:'gzip_b64.txt', sha256:'sha256.txt', qp:'quoted-printable.txt', url:'url-encoded.txt' }[fmt] || 'output.txt';
+  triggerDownload(blob, ext);
+}
+
+function triggerDownload(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  EZ REVERSE STEPS DISPLAY
+// ═══════════════════════════════════════════════════════════════════════
+function showEZReverse() {
+  const ez = outputs['ez'];
+  if (!ez || !ez.rleFull) { showToast('⚠ No EZ output yet'); return; }
+  const panel = document.getElementById('ez-rev-panel');
+  if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  let base64Preview = '', byteCount = 0;
+  try {
+    const base64Full = rleDecode(ez.rleFull);
+    base64Preview = base64Full.slice(0, 2000);
+    byteCount = fromBase64(base64Full).length;
+  } catch (e) {
+    base64Preview = 'Error decoding RLE: ' + e.message;
+  }
+
+  panel.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-transform:uppercase">🔄 Reverse Path — RLE → Base64 → Bytes</div>
+  <div class="ez-pipeline ez-rev-pipeline">
+    <div class="ez-step">
+      <div class="ez-step-head">
+        <div class="ez-step-label"><span class="badge ez-badge-rle">STEP A</span> 🔢 RLE string — format: <code>\\countCHAR\\</code> (e.g. <code>\\9A\\</code> = 9×A)</div>
+        <div class="ez-step-meta"><span>Chars: <em>${fmtNum(ez.rleLen)}</em></span></div>
+      </div>
+      <div class="ez-step-body open">${(ez.rlePreview || '').slice(0, 1200)}</div>
+    </div>
+    <div class="ez-arrow">↓ expand \\count CHAR\\ runs → Base64</div>
+    <div class="ez-step">
+      <div class="ez-step-head">
+        <div class="ez-step-label"><span class="badge ez-badge-b64">STEP B</span> 🔤 Base64 intermediate</div>
+        <div class="ez-step-meta"><span>Chars: <em>${fmtNum(ez.base64Len)}</em></span></div>
+      </div>
+      <div class="ez-step-body open">${base64Preview}</div>
+    </div>
+    <div class="ez-arrow">↓ Base64 decode → original bytes</div>
+    <div class="ez-step" style="border-color:var(--green)">
+      <div class="ez-step-head" style="background:rgba(52,211,153,.08)">
+        <div class="ez-step-label" style="color:var(--green)">✓ Original bytes restored (${fmtSize(byteCount)})</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Main-thread rleDecode — mirrors worker version exactly
+// Format: \countCHAR\ — e.g. \9A\ = 9 A's, \39\ = 3 nines
+// The last char before the closing \ is the repeated character; digits before it are the count.
+function rleDecode(s) {
+  let out = '';
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] === '\\') {
+      const close = s.indexOf('\\', i + 1);
+      if (close === -1) throw new Error('RLE: unclosed token at pos ' + i);
+      const token = s.slice(i + 1, close);
+      if (token.length < 2) throw new Error('RLE: token too short "' + token + '"');
+      const ch = token[token.length - 1];
+      const count = parseInt(token.slice(0, -1), 10);
+      if (isNaN(count) || count < 1) throw new Error('RLE: bad count in "' + token + '"');
+      out += ch.repeat(count);
+      i = close + 1;
+    } else {
+      out += s[i++];
+    }
+  }
+  return out;
+}
+
+function fromBase64(str) {
+  str = str.replace(/\s/g, '');
+  const bin = atob(str);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CLEAR
+// ═══════════════════════════════════════════════════════════════════════
+function clearAll() {
+  currentFile = null;
+  outputs = {};
+  outputBlobs = {};
+  outputFullSizes = {};
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileBadge').classList.remove('show');
+  document.getElementById('textInput').value = '';
+  document.getElementById('sizeWarn').classList.remove('show');
+  document.getElementById('hdrFile').textContent = '—';
+  document.getElementById('hdrSize').textContent = '—';
+  document.getElementById('progWrap').classList.remove('show');
+  document.getElementById('progBar').style.width = '0';
+  document.getElementById('workerStatus').textContent = '';
+  FORMATS.forEach(f => { document.getElementById('block-' + f.id).style.display = 'none'; });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['file','text'][i] === id));
+  document.querySelectorAll('.tab-pane').forEach((p, i) => p.classList.toggle('active', ['pane-file','pane-text'][i] === 'pane-' + id));
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  REVERSE DECODE — FILE UPLOAD + PASTE + AUTO-DETECT
+// ═══════════════════════════════════════════════════════════════════════
+
+// Tracks whether we're in file mode (rawBytes from file) or text mode
+let revFileRaw = null;     // Uint8Array: raw bytes of the loaded encoded file
+let revFileName = null;    // loaded filename for display
+
+// ── Tab switching ──────────────────────────────────────────────
+function switchRevTab(tab) {
+  const isPaste = tab === 'paste';
+  document.getElementById('revTabPaste').classList.toggle('active', isPaste);
+  document.getElementById('revTabFile').classList.toggle('active', !isPaste);
+  document.getElementById('revPaneText').style.display = isPaste ? 'block' : 'none';
+  document.getElementById('revPaneFile').style.display = isPaste ? 'none'  : 'block';
+  if (isPaste) {
+    revFileRaw = null; revFileName = null;
+    document.getElementById('revFileBadge').classList.remove('show');
+  }
+}
+
+// ── Char counter for paste textarea ───────────────────────────
+document.getElementById('revInput').addEventListener('input', function() {
+  const n = this.value.length;
+  const stats = document.getElementById('revInputStats');
+  if (n > 0) {
+    stats.textContent = n.toLocaleString() + ' chars  ≈ ' + fmtSize(new Blob([this.value]).size);
+    // Live auto-detect format from header
+    revAutoDetect(this.value);
+  } else {
+    stats.textContent = '';
+    document.getElementById('revDetectHint').style.display = 'none';
+  }
+});
+
+// ── Drag-and-drop on decode drop zone ─────────────────────────
+(function initRevDropZone() {
+  const dz = document.getElementById('revDz');
+  const fi = document.getElementById('revFileInput');
+
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer.files[0]) loadRevFile(e.dataTransfer.files[0]);
+  });
+  fi.addEventListener('change', e => {
+    if (e.target.files[0]) loadRevFile(e.target.files[0]);
+  });
+})();
+
+// ── Load an encoded file into the decode pipeline ─────────────
+function loadRevFile(file) {
+  revFileName = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    revFileRaw = new Uint8Array(e.target.result);
+
+    // Convert bytes to string (encoded files are always text)
+    let text;
+    try {
+      text = new TextDecoder('utf-8', { fatal: true }).decode(revFileRaw);
+    } catch(_) {
+      try {
+        text = new TextDecoder('latin-1').decode(revFileRaw);
+      } catch(e2) {
+        showToast('⚠ Could not read file as text');
+        return;
+      }
+    }
+
+    // Show badge
+    const badge = document.getElementById('revFileBadge');
+    document.getElementById('revFileBadgeText').textContent =
+      `✓ ${file.name}  —  ${fmtSize(file.size)}  —  ${text.length.toLocaleString()} chars`;
+    badge.classList.add('show');
+
+    // Auto-detect format from BCVT header or file extension
+    revAutoDetect(text, file.name);
+
+    showToast(`📄 Loaded "${file.name}" — ${fmtSize(file.size)}`);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── Clear the loaded file ──────────────────────────────────────
+function clearRevFile() {
+  revFileRaw = null; revFileName = null;
+  document.getElementById('revFileInput').value = '';
+  document.getElementById('revFileBadge').classList.remove('show');
+  document.getElementById('revDetectHint').style.display = 'none';
+}
+
+// ── Clear the entire decode input ─────────────────────────────
+function clearRevInput() {
+  document.getElementById('revInput').value = '';
+  document.getElementById('revInputStats').textContent = '';
+  document.getElementById('revDetectHint').style.display = 'none';
+  document.getElementById('revErr').classList.remove('show');
+  document.getElementById('revResult').classList.remove('show');
+  clearRevFile();
+}
+
+// ── Auto-detect format from BCVT header or file extension ─────
+function revAutoDetect(text, filename) {
+  const hintEl = document.getElementById('revDetectHint');
+  let detectedFmt = null;
+  let hints = [];
+
+  // 1. Try BCVT header — definitive
+  const parsed = parseHeader(text);
+  if (parsed && parsed.meta) {
+    const m = parsed.meta;
+    if (m.fmt) {
+      detectedFmt = m.fmt;
+      hints.push(`🔖 BCVT header detected`);
+      if (m.name) hints.push(`📄 Original file: <strong style="color:var(--cyan)">${m.name}</strong>`);
+      if (m.mime) hints.push(`🏷 MIME: ${m.mime}`);
+      if (m.size) hints.push(`📦 Original size: ${fmtSize(parseInt(m.size))}`);
+    }
+  }
+
+  // 2. Extension hints (only if no header)
+  if (!detectedFmt && filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const extMap = {
+      b64:'b64', base64:'b64', b64url:'b64url',
+      b32:'b32', base32:'b32',
+      b85:'b85', ascii85:'b85',
+      b91:'b91', base91:'b91',
+      b122:'b122', base122:'b122',
+      b58:'b58', base58:'b58',
+      b62:'b62', base62:'b62',
+      b36:'b36', base36:'b36',
+      hex:'hex', hexdump:'hexdump',
+      oct:'oct', octal:'oct',
+      bin:'bin', binary:'bin',
+      dec:'dec',
+      qp:'qp',
+      gz:'gzip', gzip:'gzip',
+      deflate:'deflate',
+      url:'url',
+      morse:'morse',
+      ez:'ez'
+    };
+    if (extMap[ext]) {
+      detectedFmt = extMap[ext];
+      hints.push(`📁 Format guessed from extension <strong>.${ext}</strong>`);
+    }
+  }
+
+  // 3. Content sniffing (only if still no match)
+  if (!detectedFmt) {
+    const sample = text.slice(0, 500).trim();
+    if (/^[A-Za-z0-9+/]+=*$/.test(sample.replace(/\s/g,''))) {
+      detectedFmt = 'b64'; hints.push('🔍 Looks like Base64 (A-Za-z0-9+/=)');
+    } else if (/^[A-Z2-7=]+$/.test(sample.replace(/\s/g,''))) {
+      detectedFmt = 'b32'; hints.push('🔍 Looks like Base32 (A-Z 2-7)');
+    } else if (/^([0-9a-fA-F]{2}\s*)+$/.test(sample.replace(/\n/g,' '))) {
+      detectedFmt = 'hex'; hints.push('🔍 Looks like Hex (0-9 A-F pairs)');
+    } else if (/^([01]{8}\s*)+$/.test(sample.replace(/\n/g,' '))) {
+      detectedFmt = 'bin'; hints.push('🔍 Looks like Binary (8-bit groups)');
+    } else if (/^([0-9]{3}\s*)+$/.test(sample.replace(/\n/g,' '))) {
+      detectedFmt = 'oct'; hints.push('🔍 Looks like Octal (3-digit groups)');
+    } else if (/^([0-9]{1,3}\s*)+$/.test(sample.replace(/\n/g,' '))) {
+      detectedFmt = 'dec'; hints.push('🔍 Looks like Decimal byte values');
+    } else if (/[.\-]{2,}\s/.test(sample)) {
+      detectedFmt = 'morse'; hints.push('🔍 Looks like Morse Code (dots & dashes)');
+    } else if (sample.includes('\\') && /\\[0-9]+[A-Za-z0-9+/=]\\/.test(sample)) {
+      detectedFmt = 'ez'; hints.push('🔍 Looks like EZ Encoding (\\count CHAR\\)');
+    } else if (sample.includes('=') && sample.includes('_')) {
+      detectedFmt = 'qp'; hints.push('🔍 Looks like Quoted-Printable');
+    } else if (sample.includes('%') && /%[0-9A-Fa-f]{2}/.test(sample)) {
+      detectedFmt = 'url'; hints.push('🔍 Looks like URL encoding (%XX)');
+    }
+  }
+
+  if (detectedFmt) {
+    document.getElementById('revFmt').value = detectedFmt;
+    const label = document.getElementById('revFmt').options[document.getElementById('revFmt').selectedIndex].text;
+    hintEl.innerHTML = `<strong style="color:var(--amber)">Auto-detected: ${label}</strong><br>` + hints.join('<br>');
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
+}
+
+// ── Get the raw encoded text (from file or textarea) ──────────
+function getRevRawText() {
+  const activeTab = document.getElementById('revTabFile').classList.contains('active') ? 'file' : 'paste';
+  if (activeTab === 'file') {
+    if (!revFileRaw) return null;
+    try {
+      return new TextDecoder('utf-8', { fatal: true }).decode(revFileRaw);
+    } catch(_) {
+      return new TextDecoder('latin-1').decode(revFileRaw);
+    }
+  } else {
+    return document.getElementById('revInput').value || null;
+  }
+}
+
+function useCurrentOut() {
+  const available = FORMATS.filter(f => {
+    if (f.id === 'ez') return !!(outputs['ez'] && outputs['ez'].rleFull);
+    return !!outputs[f.id];
+  });
+  if (!available.length) { showToast('⚠ No encoded output yet — convert something first'); return; }
+
+  const selectedFmt = document.getElementById('revFmt').value;
+  const fmt = available.find(f => f.id === selectedFmt) ? selectedFmt : available[0].id;
+
+  let fullStr;
+  if (fmt === 'ez') {
+    const ez = outputs['ez'];
+    fullStr = (ez.header || '') + ez.rleFull;
+  } else {
+    fullStr = outputs[fmt] || '';
+  }
+  if (!fullStr) { showToast('⚠ Output is empty'); return; }
+
+  // Switch to paste tab and populate
+  switchRevTab('paste');
+  document.getElementById('revInput').value = fullStr;
+  document.getElementById('revInput').dispatchEvent(new Event('input'));
+
+  const fmtLabel = FORMATS.find(f => f.id === fmt)?.label || fmt.toUpperCase();
+  const parsed = parseHeader(fullStr);
+  const hint = parsed?.meta?.name ? ` — "${parsed.meta.name}"` : '';
+  showToast(`↑ Loaded ${fmtLabel}${hint} — ready to decode`);
+}
+
+function startReverse() {
+  const errBox = document.getElementById('revErr');
+  errBox.classList.remove('show');
+  document.getElementById('revResult').classList.remove('show');
+
+  let raw = getRevRawText();
+  if (!raw || !raw.trim()) {
+    showToast('⚠ No encoded data — paste text or upload a file first');
+    return;
+  }
+  raw = raw.trim();
+
+  // Parse BCVT header
+  let meta = null;
+  const parsed = parseHeader(raw);
+  if (parsed) {
+    meta = parsed.meta;
+    raw = parsed.body;
+    if (meta.fmt) document.getElementById('revFmt').value = meta.fmt;
+  }
+
+  const actualFmt = document.getElementById('revFmt').value;
+
+  postTask(
+    'decode', actualFmt,
+    null, null, raw, null,
+    (bytesArr, len) => { showReverseResult(bytesArr, len, meta); },
+    (err) => {
+      errBox.textContent = '❌ Decode error: ' + err;
+      errBox.classList.add('show');
+    }
+  );
+}
+
+function showReverseResult(bytes, len, meta) {
+  const infoEl  = document.getElementById('revInfoText');
+  const preview = document.getElementById('revPreview');
+  const actions = document.getElementById('revActions');
+  const result  = document.getElementById('revResult');
+
+  let text = null;
+  try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch(e) {}
+
+  const origName = meta?.name || revFileName?.replace(/\.(b64|b32|b85|b91|b122|b58|b62|b36|hex|oct|bin|dec|qp|url|morse|ez|txt)$/i, '') || null;
+  const origMime = meta?.mime || 'application/octet-stream';
+  const origSize = meta?.size ? parseInt(meta.size) : len;
+
+  infoEl.innerHTML = `
+    ${origName ? `<strong>Filename:</strong> <span style="color:var(--cyan)">${origName}</span> &nbsp;|&nbsp;` : ''}
+    <strong>Size:</strong> ${fmtSize(origSize)} &nbsp;|&nbsp;
+    <strong>Type:</strong> ${origMime} &nbsp;|&nbsp;
+    <strong>Content:</strong> ${text !== null ? '✓ UTF-8 text' : '⬛ Binary'}`;
+
+  preview.textContent = text !== null
+    ? (text.length > 3000 ? text.slice(0, 3000) + '\n…(truncated)' : text)
+    : `[Binary data — ${len} bytes — use DOWNLOAD to save]`;
+
+  actions.innerHTML = '';
+
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'btn btn-amber btn-sm';
+  dlBtn.innerHTML = `💾 DOWNLOAD${origName ? ' "' + origName + '"' : ' FILE'}`;
+  dlBtn.onclick = () => triggerDownload(new Blob([bytes], { type: origMime }), origName || 'decoded_file');
+  actions.appendChild(dlBtn);
+
+  if (text !== null) {
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-ghost btn-sm';
+    copyBtn.textContent = '📋 COPY TEXT';
+    copyBtn.onclick = () => navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+    actions.appendChild(copyBtn);
+  }
+
+  result.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  BASE-TO-BASE CONVERTER (BigInt — works for arbitrarily large numbers)
+// ═══════════════════════════════════════════════════════════════════════
+const B2B_BASES = [
+  { label: 'Base 2  (Binary)',         base: 2,  color: '#60a5fa', alpha: '01' },
+  { label: 'Base 8  (Octal)',          base: 8,  color: '#2dd4bf', alpha: '01234567' },
+  { label: 'Base 10 (Decimal)',        base: 10, color: '#4ade80', alpha: '0123456789' },
+  { label: 'Base 16 (Hex)',            base: 16, color: '#fbbf24', alpha: '0123456789ABCDEF' },
+  { label: 'Base 32',                  base: 32, color: '#c084fc', alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567' },
+  { label: 'Base 36',                  base: 36, color: '#94a3b8', alpha: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+  { label: 'Base 58 (Bitcoin)',        base: 58, color: '#f87171', alpha: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz' },
+  { label: 'Base 62',                  base: 62, color: '#38bdf8', alpha: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' },
+  { label: 'Base 64 (Std)',            base: 64, color: '#f472b6', alpha: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' },
+  { label: 'Base 85 (Z85)',            base: 85, color: '#fb923c', alpha: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#' },
+];
+
+function bigIntToBase(n, alpha) {
+  if (n === 0n) return alpha[0];
+  const B = BigInt(alpha.length);
+  let result = '';
+  let tmp = n < 0n ? -n : n;
+  while (tmp > 0n) {
+    result = alpha[Number(tmp % B)] + result;
+    tmp /= B;
+  }
+  return (n < 0n ? '-' : '') + result;
+}
+
+function baseToB2BAlpha(str, alpha) {
+  // Parse string in given alphabet → BigInt
+  const B = BigInt(alpha.length);
+  let result = 0n;
+  let neg = false;
+  let s = str.trim();
+  if (s.startsWith('-')) { neg = true; s = s.slice(1); }
+  for (const ch of s.toUpperCase()) {
+    const idx = alpha.toUpperCase().indexOf(ch);
+    if (idx < 0) throw new Error('Invalid char "' + ch + '" for this base');
+    result = result * B + BigInt(idx);
+  }
+  return neg ? -result : result;
+}
+
+function baseToInt(str, base) {
+  // Use standard JS parseInt for bases 2-36
+  if (base <= 36) {
+    const n = BigInt('0x' + parseInt(str.trim().replace(/^0+/, '') || '0', base).toString(16));
+    // Better: parse manually for accuracy with BigInt
+    const ALPHA = '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, base);
+    return baseToB2BAlpha(str.toLowerCase(), ALPHA);
+  }
+  return baseToB2BAlpha(str, B2B_BASES.find(b => b.base === base)?.alpha || '');
+}
+
+// Build result cards
+(function initB2BCards() {
+  const container = document.getElementById('b2bResults');
+  B2B_BASES.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'b2b-result-card';
+    card.id = 'b2b-card-' + b.base;
+    card.innerHTML = `
+      <div class="b2b-card-head">
+        <div class="b2b-card-label" style="color:${b.color}">${b.label}</div>
+        <button class="b2b-copy-btn" onclick="b2bCopy(${b.base})">Copy</button>
+      </div>
+      <div class="b2b-card-body empty" id="b2b-out-${b.base}">—</div>`;
+    container.appendChild(card);
+  });
+})();
+
+function setB2BFrom(base) {
+  document.getElementById('b2bFromSlider').value = base;
+  document.getElementById('b2bFromVal').textContent = base;
+  b2bConvert();
+}
+
+function b2bConvert() {
+  const input = document.getElementById('b2bInput').value.trim();
+  const fromBase = parseInt(document.getElementById('b2bFromSlider').value);
+  const toBase   = parseInt(document.getElementById('b2bToSlider').value);
+  const errEl    = document.getElementById('b2bErr');
+  const customEl = document.getElementById('b2bCustomResult');
+
+  // Clear
+  B2B_BASES.forEach(b => {
+    const el = document.getElementById('b2b-out-' + b.base);
+    el.textContent = '—';
+    el.classList.add('empty');
+  });
+  errEl.style.display = 'none';
+  customEl.textContent = '';
+
+  if (!input) return;
+
+  try {
+    // Find the source alphabet
+    let srcAlpha;
+    const known = B2B_BASES.find(b => b.base === fromBase);
+    if (known) {
+      srcAlpha = known.alpha;
+    } else {
+      // Generic base 2-36
+      srcAlpha = '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, fromBase);
+    }
+
+    let n;
+    try {
+      n = baseToB2BAlpha(input, srcAlpha);
+    } catch(e) {
+      throw new Error('Input error (base ' + fromBase + '): ' + e.message);
+    }
+
+    // Convert to all known bases
+    B2B_BASES.forEach(b => {
+      try {
+        const result = bigIntToBase(n, b.alpha);
+        const el = document.getElementById('b2b-out-' + b.base);
+        el.textContent = result;
+        el.classList.remove('empty');
+      } catch(e) {}
+    });
+
+    // Custom base output
+    try {
+      let destAlpha;
+      const knownDest = B2B_BASES.find(b => b.base === toBase);
+      if (knownDest) {
+        destAlpha = knownDest.alpha;
+      } else {
+        destAlpha = '0123456789abcdefghijklmnopqrstuvwxyz'.slice(0, toBase);
+      }
+      const customResult = bigIntToBase(n, destAlpha);
+      customEl.textContent = 'Base ' + fromBase + ' → Base ' + toBase + ':  ' + customResult;
+    } catch(e) {
+      customEl.textContent = 'Error: ' + e.message;
+    }
+
+  } catch(e) {
+    errEl.textContent = '❌ ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function b2bCopy(base) {
+  const el = document.getElementById('b2b-out-' + base);
+  if (!el || el.classList.contains('empty')) { showToast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('📋 Copied Base ' + base + '!'));
+}
+
+// Live convert on input
+document.getElementById('b2bInput').addEventListener('input', b2bConvert);
+</script>
+</body>
+</html>
