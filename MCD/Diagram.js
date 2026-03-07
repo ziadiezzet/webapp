@@ -112,36 +112,6 @@ function scaledPositions(nodes, factor) {
   return map;
 }
 
-/**
- * Compute the intersection of the line from (cx,cy)->(tx,ty)
- * with the border of a rectangle centered at (cx,cy) with half-widths (hw, hh).
- * This ensures edges connect to box borders, not box centres.
- */
-function boxBorderPoint(cx, cy, tx, ty, hw, hh) {
-  const dx = tx - cx, dy = ty - cy;
-  if (Math.abs(dx) < 0.001 && Math.abs(dy) < 0.001) return { x: cx, y: cy };
-  const scaleX = Math.abs(dx) > 0.001 ? hw / Math.abs(dx) : Infinity;
-  const scaleY = Math.abs(dy) > 0.001 ? hh / Math.abs(dy) : Infinity;
-  const s = Math.min(scaleX, scaleY);
-  return { x: cx + dx * s, y: cy + dy * s };
-}
-
-/**
- * Build a smooth SVG path (straight line) between two border points,
- * with a small orthogonal offset to avoid overlapping parallel edges.
- */
-function edgePath(x1, y1, x2, y2, offset) {
-  if (!offset) return `M ${x1} ${y1} L ${x2} ${y2}`;
-  // perpendicular offset
-  const dx = x2 - x1, dy = y2 - y1;
-  const len = Math.hypot(dx, dy) || 1;
-  const ox = -dy / len * offset;
-  const oy = dx / len * offset;
-  // bezier with slight curve
-  const mx = (x1 + x2) / 2 + ox, my = (y1 + y2) / 2 + oy;
-  return `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
-}
-
 // Ensure a single reusable arrow marker exists and matches current color
 function ensureArrowMarker(svgRoot, color) {
   let defs = svgRoot.querySelector('defs');
@@ -514,34 +484,24 @@ function showPDMDiagramModal(encdiagramName, encmodelName) {
         rect.setAttribute('ry', 10);
         rect.setAttribute('class', 'node-box');
 
-        // Coloured header band (title area tint)
-        const band = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        band.setAttribute('x', -NODE_W / 2);
-        band.setAttribute('y', -NODE_H / 2);
-        band.setAttribute('width', NODE_W);
-        band.setAttribute('height', 28);
-        band.setAttribute('rx', 10);
-        band.setAttribute('ry', 10);
-        band.setAttribute('class', 'node-header-band');
-
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         title.setAttribute('class', 'node-title');
         title.setAttribute('text-anchor', 'middle');
-        title.setAttribute('y', -NODE_H / 2 + 19);
+        title.setAttribute('y', -NODE_H / 2 + 20);
         title.textContent = `${n.name}${n.code ? ` [${n.code}]` : ''}`;
 
         const sep = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         sep.setAttribute('x1', -NODE_W / 2 + 10);
-        sep.setAttribute('y1', -NODE_H / 2 + 28);
+        sep.setAttribute('y1', -NODE_H / 2 + 26);
         sep.setAttribute('x2', NODE_W / 2 - 10);
-        sep.setAttribute('y2', -NODE_H / 2 + 28);
+        sep.setAttribute('y2', -NODE_H / 2 + 26);
         sep.setAttribute('class', 'node-sep');
 
         const lines = buildBoxLines(n);
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('class', 'node-lines');
         text.setAttribute('text-anchor', 'middle');
-        let y0 = -NODE_H / 2 + 44;
+        let y0 = -NODE_H / 2 + 42;
         lines.forEach((line, i) => {
           const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
           tspan.setAttribute('x', '0'); 
@@ -590,9 +550,8 @@ function showPDMDiagramModal(encdiagramName, encmodelName) {
         g.addEventListener('dblclick', () => showTableModal(n.table));
 
         g.appendChild(rect); 
-        g.appendChild(band);
-        g.appendChild(sep);
         g.appendChild(title); 
+        g.appendChild(sep); 
         g.appendChild(text);
         nodesLayer.appendChild(g);
 
@@ -816,17 +775,12 @@ function showPDMDiagramModal(encdiagramName, encmodelName) {
         const tgt = coordMap.get(e.target);
         if (!src || !tgt) return;
 
-        // Compute border-intersection points so edges start/end at box edges, not centres
-        const hw = NODE_W / 2, hh = NODE_H / 2;
-        const sp = boxBorderPoint(src.x, src.y, tgt.x, tgt.y, hw, hh);
-        const tp = boxBorderPoint(tgt.x, tgt.y, src.x, src.y, hw, hh);
-
         // Create the line - MAKE IT CLICKABLE
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', sp.x);
-        line.setAttribute('y1', sp.y);
-        line.setAttribute('x2', tp.x);
-        line.setAttribute('y2', tp.y);
+        line.setAttribute('x1', src.x);
+        line.setAttribute('y1', src.y);
+        line.setAttribute('x2', tgt.x);
+        line.setAttribute('y2', tgt.y);
         line.setAttribute('class', 'edge relationship clickable-edge');
         line.setAttribute('data-reference-name', e.referenceName || '');
         line.setAttribute('data-source', e.source);
@@ -854,13 +808,13 @@ function showPDMDiagramModal(encdiagramName, encmodelName) {
         styleEdgeElement(line, 'relationship', svg);
         edgesLayer.appendChild(line);
 
-        // Calculate positions for labels (using border points for accuracy)
-        const midX = (sp.x + tp.x) / 2;
-        const midY = (sp.y + tp.y) / 2;
-        const quarterX = sp.x + (tp.x - sp.x) * 0.25;
-        const quarterY = sp.y + (tp.y - sp.y) * 0.25;
-        const threeQuarterX = sp.x + (tp.x - sp.x) * 0.75;
-        const threeQuarterY = sp.y + (tp.y - sp.y) * 0.75;
+        // Calculate positions for labels
+        const midX = (src.x + tgt.x) / 2;
+        const midY = (src.y + tgt.y) / 2;
+        const quarterX = src.x + (tgt.x - src.x) * 0.25;
+        const quarterY = src.y + (tgt.y - src.y) * 0.25;
+        const threeQuarterX = src.x + (tgt.x - src.x) * 0.75;
+        const threeQuarterY = src.y + (tgt.y - src.y) * 0.75;
 
         // Compute cardinalities per-edge (was using undefined outer-scope vars)
         const childParsed = parseCardinalityString(e.childCardinality);
@@ -874,19 +828,21 @@ function showPDMDiagramModal(encdiagramName, encmodelName) {
         const parentCardinality = isMandatoryEdge ? '1..1' : '0..1';
         const parentParsed = parseCardinalityString(parentCardinality);
         const parentCardinalityDisplay = fmtCard(parentParsed);
-        const dx = tp.x - sp.x;
-        const dy = tp.y - sp.y;
+        // FOR PDM: Source is always CHILD (FK side), Target is always PARENT (PK side)
+        // Position labels near the extremities of the table boxes (outside the rectangle)
+        const dx = tgt.x - src.x;
+        const dy = tgt.y - src.y;
         const dist = Math.hypot(dx, dy) || 1;
         const nx = dx / dist;
         const ny = dy / dist;
-        const LABEL_OFFSET = 18; // px outside the node box edge
+        const LABEL_OFFSET = 12; // px outside the node box
         const childSidePosition = {
-          x: sp.x + nx * LABEL_OFFSET,
-          y: sp.y + ny * LABEL_OFFSET
+          x: src.x + nx * (NODE_W / 2 + LABEL_OFFSET),
+          y: src.y + ny * (NODE_H / 2 + LABEL_OFFSET)
         };
         const parentSidePosition = {
-          x: tp.x - nx * LABEL_OFFSET,
-          y: tp.y - ny * LABEL_OFFSET
+          x: tgt.x - nx * (NODE_W / 2 + LABEL_OFFSET),
+          y: tgt.y - ny * (NODE_H / 2 + LABEL_OFFSET)
         };
 
         // Child cardinality label (always on child/source side near quarter position)
@@ -1695,34 +1651,24 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
         rect.setAttribute('ry', 10);
         rect.setAttribute('class', 'node-box');
 
-        // Coloured header band (title area background)
-        const band = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        band.setAttribute('x', -NODE_W / 2);
-        band.setAttribute('y', -NODE_H / 2);
-        band.setAttribute('width', NODE_W);
-        band.setAttribute('height', 28);
-        band.setAttribute('rx', 10);
-        band.setAttribute('ry', 10);
-        band.setAttribute('class', 'node-header-band');
-
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         title.setAttribute('class', 'node-title');
         title.setAttribute('text-anchor', 'middle');
-        title.setAttribute('y', -NODE_H / 2 + 19);
+        title.setAttribute('y', -NODE_H / 2 + 20);
         title.textContent = n.name;
 
         const sep = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         sep.setAttribute('x1', -NODE_W / 2 + 10); 
-        sep.setAttribute('y1', -NODE_H / 2 + 28);
+        sep.setAttribute('y1', -NODE_H / 2 + 26);
         sep.setAttribute('x2', NODE_W / 2 - 10); 
-        sep.setAttribute('y2', -NODE_H / 2 + 28);
+        sep.setAttribute('y2', -NODE_H / 2 + 26);
         sep.setAttribute('class', 'node-sep');
 
         const lines = buildBoxLines(n);
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('class', 'node-lines');
         text.setAttribute('text-anchor', 'middle');
-        let y0 = -NODE_H / 2 + 44;
+        let y0 = -NODE_H / 2 + 42;
         lines.forEach((line, i) => {
           const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
           tspan.setAttribute('x', '0'); 
@@ -1731,7 +1677,6 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
           text.appendChild(tspan);
         });
 
-        // Node drag support
         let dragging = false, lastX = 0, lastY = 0;
         g.addEventListener('mousedown', (e) => { 
           dragging = true; 
@@ -1740,16 +1685,20 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
           svg.style.cursor = 'grabbing'; 
           e.stopPropagation(); 
         });
+        
         document.addEventListener('mousemove', (e) => {
           if (!dragging) return;
           const dx = e.clientX - lastX, dy = e.clientY - lastY; 
-          lastX = e.clientX; lastY = e.clientY;
+          lastX = e.clientX; 
+          lastY = e.clientY;
           const nx = p.x + dx / scale, ny = p.y + dy / scale; 
-          p.x = nx; p.y = ny;
+          p.x = nx; 
+          p.y = ny;
           g.setAttribute('transform', `translate(${nx}, ${ny})`);
           nodeMap.set(n.name, { x: nx, y: ny }); 
           drawCDMEdges(nodeMap);
         });
+        
         document.addEventListener('mouseup', () => {
           if (dragging) {
             dragging = false; 
@@ -1764,11 +1713,9 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
 
         g.addEventListener('dblclick', () => showParentEntityDetails(n.name, n.entity));
 
-        // Render order: box, band, separator, title, body-text
-        g.appendChild(rect);
-        g.appendChild(band);
-        g.appendChild(sep);
+        g.appendChild(rect); 
         g.appendChild(title); 
+        g.appendChild(sep); 
         g.appendChild(text);
         nodesLayer.appendChild(g);
         nodeMap.set(n.name, { x: p.x, y: p.y });
@@ -1791,15 +1738,11 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
         const tgt = nodeMap.get(e.target);
         if (!src || !tgt) return;
 
-        const hw = NODE_W / 2, hh = NODE_H / 2;
-        const sp = boxBorderPoint(src.x, src.y, tgt.x, tgt.y, hw, hh);
-        const tp = boxBorderPoint(tgt.x, tgt.y, src.x, src.y, hw, hh);
-
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', sp.x); 
-        line.setAttribute('y1', sp.y);
-        line.setAttribute('x2', tp.x); 
-        line.setAttribute('y2', tp.y);
+        line.setAttribute('x1', src.x); 
+        line.setAttribute('y1', src.y);
+        line.setAttribute('x2', tgt.x); 
+        line.setAttribute('y2', tgt.y);
         // line.setAttribute('class', `edge ${e.type}`);
         line.style.color = state.settings.diagram?.edgeColorRel || 'var(--accent-cdm)';
         
@@ -1836,21 +1779,21 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
           const sourceSymbols = parseCardinality(sourceCardinality);
           const targetSymbols = parseCardinality(targetCardinality);
 
-          // Add source cardinality label (near source border)
+          // Add source cardinality label
           const labelSrc = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           labelSrc.setAttribute('class', 'card-label');
           labelSrc.textContent = sourceSymbols.left || '';
-          labelSrc.setAttribute('x', sp.x + (tp.x - sp.x) * 0.12);
-          labelSrc.setAttribute('y', sp.y + (tp.y - sp.y) * 0.12 - 8);
+          labelSrc.setAttribute('x', src.x + (tgt.x - src.x) * 0.25);
+          labelSrc.setAttribute('y', src.y + (tgt.y - src.y) * 0.25 - 6);
           labelSrc.style.pointerEvents = 'none';
           edgesLayer.appendChild(labelSrc);
 
-          // Add target cardinality label (near target border)
+          // Add target cardinality label
           const labelTgt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           labelTgt.setAttribute('class', 'card-label');
           labelTgt.textContent = targetSymbols.right || '';
-          labelTgt.setAttribute('x', sp.x + (tp.x - sp.x) * 0.88);
-          labelTgt.setAttribute('y', sp.y + (tp.y - sp.y) * 0.88 + 14);
+          labelTgt.setAttribute('x', src.x + (tgt.x - src.x) * 0.75);
+          labelTgt.setAttribute('y', src.y + (tgt.y - src.y) * 0.75 + 14);
           labelTgt.style.pointerEvents = 'none';
           edgesLayer.appendChild(labelTgt);
 
@@ -1864,8 +1807,8 @@ function showCDMDiagramModal(diagramEncoded, modelEncoded) {
           }
           
           mid.textContent = middleText;
-          mid.setAttribute('x', (sp.x + tp.x) / 2);
-          mid.setAttribute('y', (sp.y + tp.y) / 2 - 6);
+          mid.setAttribute('x', (src.x + tgt.x) / 2);
+          mid.setAttribute('y', (src.y + tgt.y) / 2 - 6);
           mid.style.pointerEvents = 'none';
           mid.setAttribute('font-size', '11');
           edgesLayer.appendChild(mid);
