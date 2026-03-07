@@ -341,6 +341,12 @@ textarea.code.rev { height: 130px; }
 .fmt-check[data-fmt="morse"].checked { border-color: #a3e635; }
 .fmt-check[data-fmt="morse"].checked .flabel { color:#a3e635; }
 .fmt-check[data-fmt="morse"].checked .fbadge { background:#1a2e05; color:#a3e635; }
+.fmt-check[data-fmt="lzw"].checked { border-color: #34d399; }
+.fmt-check[data-fmt="lzw"].checked .flabel { color:#34d399; }
+.fmt-check[data-fmt="lzw"].checked .fbadge { background:#064e3b; color:#34d399; }
+.fmt-check[data-fmt="huffman"].checked { border-color: #a78bfa; }
+.fmt-check[data-fmt="huffman"].checked .flabel { color:#a78bfa; }
+.fmt-check[data-fmt="huffman"].checked .fbadge { background:#1e1b4b; color:#a78bfa; }
 
 /* ── Base-to-Base converter panel ─── */
 .b2b-grid {
@@ -487,6 +493,69 @@ textarea.code.rev { height: 130px; }
 .ez-badge-bin  { background:#1e3a5f; color:#60a5fa; }
 .ez-badge-b64  { background:#1a3a3a; color:#4ade80; }
 .ez-badge-rle  { background:#3a1a3a; color:#facc15; }
+.ez-badge-wf   { background:#0a2a1a; color:#34d399; }
+.ez-badge-rle6 { background:#1a0a2a; color:#e879f9; }
+
+/* ── EZ Help Modal ───────────────────────────── */
+#ez-help-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.ez-help-box {
+  background: var(--bg1);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  max-width: 740px; width: 100%;
+  max-height: 88vh; overflow-y: auto;
+  padding: 28px 32px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(34,211,238,.12);
+}
+.ez-help-box h2 {
+  font-family: var(--mono); font-size: 1rem; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 20px;
+}
+.ez-help-step {
+  border: 1px solid var(--border2); border-radius: 8px;
+  overflow: hidden; margin-bottom: 12px;
+  background: var(--bg0);
+}
+.ez-help-step-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.ez-help-step-body {
+  padding: 12px 14px;
+  font-family: var(--mono); font-size: 0.72rem; line-height: 1.8;
+  color: var(--text2);
+}
+.ez-help-step-body code {
+  background: var(--bg3); padding: 1px 5px; border-radius: 3px;
+  color: var(--amber); font-size: 0.7rem;
+}
+.ez-help-example {
+  margin-top: 8px; padding: 8px 12px;
+  background: var(--bg3); border-left: 3px solid var(--cyan);
+  border-radius: 0 4px 4px 0;
+  font-family: var(--mono); font-size: 0.68rem;
+  color: var(--text);
+}
+.ez-help-example b { color: var(--amber); }
+.ez-help-arrow { color: var(--cyan); margin: 0 6px; }
+.ez-help-close {
+  position: absolute; top: 14px; right: 16px;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text3); font-family: var(--mono);
+  font-size: 0.75rem; padding: 4px 10px; cursor: pointer;
+}
+.ez-help-close:hover { border-color: var(--red); color: var(--red); }
 .ez-rev-pipeline .ez-step-head { cursor: default; }
 .ez-rev-pipeline .ez-step-head:hover { background: var(--bg2); }
 
@@ -511,6 +580,8 @@ button.btn {
 .btn-amber:hover { background: var(--amber2); box-shadow: 0 0 16px rgba(245,158,11,.3); }
 .btn-ghost { background: transparent; border-color: var(--border2); color: var(--text2); }
 .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+.btn-ghost.sep-active { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,.08); }
+.btn-ghost.sep-active:hover { border-color: var(--amber2); color: var(--amber2); }
 .btn-danger { background: transparent; border-color: #7f1d1d; color: var(--red); }
 .btn-danger:hover { background: rgba(248,113,113,.1); }
 .btn-sm { padding: 5px 12px; font-size: 0.65rem; }
@@ -805,10 +876,33 @@ select.sel:focus { border-color: var(--cyan); }
 
 /* ── Responsive ──────────────────────── */
 @media (max-width: 600px) {
-  header { padding: 14px 16px; }
+  header { padding: 12px 14px; flex-wrap: wrap; gap: 10px; }
   .header-stats { display: none; }
-  .wrap { padding: 16px 12px; }
-  .panel-body { padding: 14px; }
+  .logo-icon { width: 36px; height: 36px; font-size: 1.1rem; }
+  .logo-text h1 { font-size: 0.9rem; }
+  .logo-text p { display: none; }
+  .wrap { padding: 12px 10px 32px; }
+  .panel-body { padding: 12px; }
+  .tabs { width: 100%; overflow-x: auto; }
+  .btn-row { gap: 8px; }
+  .btn-row .btn { padding: 8px 12px; font-size: 0.65rem; }
+  .format-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
+  .fmt-check { padding: 6px 8px; }
+  .out-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .out-actions { flex-wrap: wrap; gap: 4px; }
+  .out-actions .btn { padding: 5px 10px; font-size: 0.6rem; }
+  .out-meta { flex-wrap: wrap; gap: 6px; }
+  .ez-step-meta { flex-direction: column; gap: 4px; }
+  .ez-step-label { font-size: 0.6rem; flex-wrap: wrap; }
+  .panel-header { padding: 10px 14px; }
+  .rev-grid { grid-template-columns: 1fr; }
+  textarea.code { font-size: 0.72rem; }
+  .b2b-results { grid-template-columns: 1fr; }
+  .fmt-controls { flex-wrap: wrap; }
+}
+@media (max-width: 400px) {
+  .format-grid { grid-template-columns: repeat(2, 1fr); }
+  .btn-row { gap: 6px; }
 }
 
 .divider {
@@ -816,6 +910,171 @@ select.sel:focus { border-color: var(--cyan); }
   background: linear-gradient(90deg, transparent, var(--border2), transparent);
   margin: 24px 0;
 }
+
+/* ── ASCII Modal ─────────────────────── */
+#ascii-modal {
+  display: none; position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 16px;
+}
+.ascii-box {
+  background: var(--bg1); border: 1px solid var(--border2);
+  border-radius: 12px; width: 100%; max-width: 820px;
+  max-height: 90vh; display: flex; flex-direction: column;
+  overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,.6);
+}
+.ascii-box-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; background: var(--bg2);
+  border-bottom: 1px solid var(--border2); gap: 12px; flex-wrap: wrap;
+}
+.ascii-box-head h2 { font-family: var(--mono); font-size: 0.85rem; font-weight: 700; color: var(--cyan); letter-spacing: 2px; }
+.ascii-close { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; padding: 5px 12px; background: transparent; border: 1px solid var(--border2); border-radius: 4px; color: var(--text3); cursor: pointer; transition: all .2s; }
+.ascii-close:hover { border-color: var(--red); color: var(--red); }
+.ascii-filter-row { display: flex; gap: 8px; padding: 12px 20px; background: var(--bg2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.ascii-filter-row input { font-family: var(--mono); font-size: 0.7rem; padding: 5px 10px; background: var(--bg0); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); outline: none; width: 180px; }
+.ascii-filter-row input:focus { border-color: var(--cyan); }
+.ascii-filter-row select { font-family: var(--mono); font-size: 0.7rem; padding: 5px 10px; background: var(--bg0); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); outline: none; cursor: pointer; }
+.ascii-table-wrap { overflow-y: auto; flex: 1; }
+.ascii-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.7rem; }
+.ascii-table th { position: sticky; top: 0; background: var(--bg3); color: var(--text3); font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--border2); text-align: left; }
+.ascii-table td { padding: 5px 10px; border-bottom: 1px solid var(--border); color: var(--text2); transition: background .1s; }
+.ascii-table tr:hover td { background: var(--bg2); }
+.ascii-table .td-char { color: var(--cyan); font-weight: 700; font-size: 0.85rem; min-width: 28px; text-align: center; }
+.ascii-table .td-dec { color: var(--amber); }
+.ascii-table .td-hex { color: var(--green); }
+.ascii-table .td-bin { color: #60a5fa; font-size: 0.62rem; letter-spacing: 0.5px; }
+.ascii-table .td-name { color: var(--text3); font-size: 0.62rem; font-style: italic; }
+
+/* ── Comparative table ───────────────── */
+#comparePanel {
+  display: none;
+  margin-bottom: 20px;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg1);
+}
+#comparePanel.show { display: block; }
+.compare-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+}
+.compare-head-title { font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+.compare-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.72rem; }
+.compare-table th { background: var(--bg3); color: var(--text3); font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 14px; border-bottom: 1px solid var(--border2); text-align: left; }
+.compare-table td { padding: 7px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:hover td { background: var(--bg2); }
+.compare-table .td-fmt { display: flex; align-items: center; gap: 8px; color: var(--text); }
+.compare-table .td-len { color: var(--amber); font-weight: 600; }
+.compare-table .td-chars { color: var(--cyan); }
+.compare-table .td-ratio { color: var(--green); }
+.compare-table tr.best td { background: rgba(52,211,153,.04); }
+.compare-table tr.best .td-len { color: var(--green); }
+
+/* ── EZ sub-stage format colors ─────── */
+.fmt-check[data-fmt="ez_bits"].checked { border-color: #60a5fa; }
+.fmt-check[data-fmt="ez_bits"].checked .flabel { color: #60a5fa; }
+.fmt-check[data-fmt="ez_bits"].checked .fbadge { background:#1e3a5f; color:#60a5fa; }
+.fmt-check[data-fmt="ez_abcd"].checked { border-color: #4ade80; }
+.fmt-check[data-fmt="ez_abcd"].checked .flabel { color: #4ade80; }
+.fmt-check[data-fmt="ez_abcd"].checked .fbadge { background:#14532d; color:#4ade80; }
+.fmt-check[data-fmt="ez_top9"].checked { border-color: #facc15; }
+.fmt-check[data-fmt="ez_top9"].checked .flabel { color: #facc15; }
+.fmt-check[data-fmt="ez_top9"].checked .fbadge { background:#422006; color:#facc15; }
+.fmt-check[data-fmt="ez_doubles"].checked { border-color: #c084fc; }
+.fmt-check[data-fmt="ez_doubles"].checked .flabel { color: #c084fc; }
+.fmt-check[data-fmt="ez_doubles"].checked .fbadge { background:#2e1065; color:#c084fc; }
+.fmt-check[data-fmt="ez_rle"].checked { border-color: #f472b6; }
+.fmt-check[data-fmt="ez_rle"].checked .flabel { color: #f472b6; }
+.fmt-check[data-fmt="ez_rle"].checked .fbadge { background:#500724; color:#f472b6; }
+
+/* ── EZ group separator in format grid ─ */
+.fmt-group-sep {
+  grid-column: 1 / -1;
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text3); padding: 6px 2px 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+/* ══════════════════════════════════════
+   CHAIN ENCODING
+══════════════════════════════════════ */
+.chain-empty {
+  text-align: center; color: var(--text3);
+  font-family: var(--mono); font-size: 0.7rem;
+  padding: 20px; border: 2px dashed var(--border2);
+  border-radius: 6px; background: var(--bg0);
+}
+.chain-list { display: flex; flex-direction: column; gap: 6px; min-height: 44px; }
+.chain-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg0); border: 1px solid var(--border2);
+  border-radius: 6px; transition: border-color .2s;
+}
+.chain-item:hover { border-color: var(--amber); }
+.chain-num {
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); min-width: 18px; text-align: right;
+}
+.chain-arrow { font-size: 0.9rem; color: var(--amber); }
+.chain-icon { font-size: 1rem; }
+.chain-label { flex: 1; font-family: var(--mono); font-size: 0.72rem; color: var(--text); }
+.chain-item-btns { display: flex; gap: 3px; }
+.chain-result-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.7rem;
+}
+.chain-result-step:last-child { border-bottom: none; }
+.chain-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chain-preset-btn {
+  font-family: var(--mono); font-size: 0.62rem; padding: 4px 10px;
+  border: 1px solid var(--border2); border-radius: 4px;
+  background: var(--bg0); color: var(--text3); cursor: pointer;
+  transition: all .15s; letter-spacing: .5px;
+}
+.chain-preset-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+/* Saved presets */
+.chain-saved-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; min-height: 0; }
+.chain-saved-btn {
+  font-family: var(--mono); font-size: 0.62rem; padding: 4px 8px;
+  border: 1px solid var(--cyan); border-radius: 4px;
+  background: rgba(34,211,238,.07); color: var(--cyan); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: all .15s;
+}
+.chain-saved-btn:hover { background: rgba(34,211,238,.15); }
+.chain-saved-btn .preset-del {
+  font-size: 0.75rem; color: var(--text3); line-height: 1;
+  padding: 0 1px; background: none; border: none; cursor: pointer;
+}
+.chain-saved-btn .preset-del:hover { color: var(--red); }
+.preset-save-row {
+  display: flex; gap: 6px; align-items: center; margin-bottom: 8px;
+}
+.preset-save-row input[type=text] {
+  font-family: var(--mono); font-size: 0.68rem;
+  background: var(--bg0); border: 1px solid var(--border2);
+  border-radius: 4px; color: var(--text); padding: 5px 10px;
+  outline: none; width: 160px; transition: border .2s;
+}
+.preset-save-row input[type=text]:focus { border-color: var(--cyan); }
+.preset-save-row input[type=text]::placeholder { color: var(--text3); }
+
+/* chain decode within reverse panel */
+.chain-dec-step {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 10px; background:var(--bg0);
+  border:1px solid var(--border2); border-radius:5px;
+  font-family:var(--mono); font-size:0.7rem;
+}
+.chain-dec-step .cd-num { color:var(--text3); min-width:16px; text-align:right; }
+.chain-dec-step .cd-label { flex:1; color:var(--text); }
 </style>
 </head>
 <body>
@@ -883,6 +1142,11 @@ select.sel:focus { border-color: var(--cyan); }
         <button class="btn btn-primary" id="convertBtn" onclick="startConversion()">▶ CONVERT</button>
         <button class="btn btn-danger" id="stopBtn" onclick="stopConversion()" style="display:none">⏹ STOP</button>
         <button class="btn btn-ghost" onclick="clearAll()">🗑 CLEAR</button>
+        <button class="btn btn-ghost" onclick="showAsciiModal()" title="ASCII Character Table">📋 ASCII</button>
+        <label id="rawBytesLabel" style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:0.68rem;color:var(--text2);cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:6px;background:var(--bg0);transition:all .2s;user-select:none" title="Save encoded output as a raw binary file with proper filename (e.g. file.txt → file.txt.ez). No BCVT header embedded.">
+          <input type="checkbox" id="rawBytesChk" onchange="onRawBytesToggle()" style="accent-color:var(--amber);width:13px;height:13px;cursor:pointer">
+          <span>💾 Save as raw bytes</span>
+        </label>
         <span style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-left:auto" id="workerStatus"></span>
       </div>
 
@@ -896,8 +1160,73 @@ select.sel:focus { border-color: var(--cyan); }
     </div>
   </div>
 
+  <!-- ═══ COMPARATIVE TABLE ══════════════════════════════════ -->
+  <div id="comparePanel">
+    <div class="compare-head">
+      <div class="compare-head-title">📊 <span>Format Comparison</span></div>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)">Sorted by output size</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="compare-table" id="compareTable">
+        <thead><tr><th>Format</th><th>Output Size</th><th>Char Count</th><th>vs Original</th></tr></thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ═══ OUTPUTS ══════════════════════════════════════ -->
   <div id="outputArea"></div>
+
+  <!-- ═══ CHAIN ENCODING ══════════════════════════════════════ -->
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-header">
+      <div class="panel-title">⛓ <span style="color:var(--amber)">Chain Encoding</span></div>
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)">Stack formats sequentially · each output feeds the next · final result saved as raw bytes</span>
+    </div>
+    <div class="panel-body">
+      <!-- Presets -->
+      <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Quick Presets</div>
+      <div class="chain-presets">
+        <button class="chain-preset-btn" onclick="loadChainPreset(['deflate','ez'])">📦 DEFLATE → EZ</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['gzip','ez'])">🗜 GZIP → EZ</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['deflate','b64'])">📦 DEFLATE → B64</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['gzip','b64','ez'])">🗜 GZIP → B64 → EZ</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['deflate','b85'])">📦 DEFLATE → B85</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['ez','deflate'])">⚡ EZ → DEFLATE</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['lzw','b64'])">🗜 LZW → B64</button>
+        <button class="chain-preset-btn" onclick="loadChainPreset(['huffman','b64'])">🌿 HUFFMAN → B64</button>
+      </div>
+
+      <!-- Saved presets -->
+      <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;margin-top:4px">💾 Saved Presets</div>
+      <div class="chain-saved-presets" id="chainSavedPresets"><span style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);font-style:italic">No saved presets yet</span></div>
+      <div class="preset-save-row">
+        <input type="text" id="presetNameInput" placeholder="Preset name…" maxlength="32" onkeydown="if(event.key==='Enter')saveChainAsPreset()">
+        <button class="btn btn-ghost btn-sm" onclick="saveChainAsPreset()">💾 SAVE CHAIN</button>
+      </div>
+
+      <!-- Builder -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <select id="chainAddSelect" class="sel" style="min-width:170px">
+          <option value="">— Add a step —</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="addToChain()">＋ ADD</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearChain()">🗑 CLEAR</button>
+      </div>
+
+      <!-- Ordered chain list -->
+      <div id="chainListEl" class="chain-empty">No steps added — pick a preset or build your own chain above</div>
+
+      <!-- Run button -->
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-amber" id="chainEncodeBtn" onclick="startChainEncode()">⛓ CHAIN ENCODE</button>
+        <span id="chainStatus" style="font-family:var(--mono);font-size:0.65rem;color:var(--text3)"></span>
+      </div>
+
+      <!-- Results -->
+      <div id="chainResult" style="display:none;margin-top:14px;padding:14px 16px;background:var(--bg0);border:1px solid var(--border2);border-radius:8px"></div>
+    </div>
+  </div>
 
   <div class="divider"></div>
 
@@ -905,78 +1234,137 @@ select.sel:focus { border-color: var(--cyan); }
   <div class="panel">
     <div class="panel-header">
       <div class="panel-title">🔄 <span style="color:var(--amber)">Reverse Decode — Restore Original File</span></div>
-      <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3)">BCVT header auto-detected → filename &amp; MIME restored automatically</div>
+      <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3)">Single format decode or full chain decode in reverse order</div>
     </div>
     <div class="panel-body">
-      <div class="rev-grid">
 
-        <!-- Left col: format + actions -->
-        <div>
-          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:6px">INPUT FORMAT</div>
-          <select class="sel" id="revFmt" style="width:100%;margin-bottom:14px">
-            <option value="b64">Base64</option>
-            <option value="b64url">Base64 URL-safe</option>
-            <option value="b32">Base32</option>
-            <option value="b85">Base85 / ASCII85</option>
-            <option value="b91">Base91</option>
-            <option value="b122">Base122</option>
-            <option value="b62">Base62 (alphanumeric)</option>
-            <option value="b58">Base58 (Bitcoin)</option>
-            <option value="b36">Base36</option>
-            <option value="deflate">Deflate+Base64 (compressed)</option>
-            <option value="gzip">GZIP+Base64 (compressed)</option>
-            <option value="hex">Hexadecimal</option>
-            <option value="oct">Octal</option>
-            <option value="bin">Binary</option>
-            <option value="dec">Decimal</option>
-            <option value="qp">Quoted-Printable</option>
-            <option value="url">URL Encoding</option>
-            <option value="morse">Morse Code</option>
-            <option value="ez">EZ Encoding (Base64 + RLE)</option>
+      <!-- Mode tabs -->
+      <div class="tabs" style="margin-bottom:18px">
+        <button class="tab active" id="revModeTabSingle" onclick="switchRevMode('single')">Single Format</button>
+        <button class="tab" id="revModeTabChain" onclick="switchRevMode('chain')">⛓ Chain Decode</button>
+      </div>
+
+      <!-- ── SINGLE DECODE MODE ── -->
+      <div id="revModeSingle">
+        <div class="rev-grid">
+
+          <!-- Left col: format + actions -->
+          <div>
+            <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:6px">INPUT FORMAT</div>
+            <select class="sel" id="revFmt" style="width:100%;margin-bottom:14px">
+              <option value="b64">Base64</option>
+              <option value="b64url">Base64 URL-safe</option>
+              <option value="b32">Base32</option>
+              <option value="b85">Base85 / ASCII85</option>
+              <option value="b91">Base91</option>
+              <option value="b122">Base122</option>
+              <option value="b62">Base62 (alphanumeric)</option>
+              <option value="b58">Base58 (Bitcoin)</option>
+              <option value="b36">Base36</option>
+              <option value="deflate">Deflate+Base64 (compressed)</option>
+              <option value="gzip">GZIP+Base64 (compressed)</option>
+              <option value="lzw">LZW+Base64 (compressed)</option>
+              <option value="huffman">Huffman+Base64 (compressed)</option>
+              <option value="hex">Hexadecimal</option>
+              <option value="oct">Octal</option>
+              <option value="bin">Binary</option>
+              <option value="dec">Decimal</option>
+              <option value="qp">Quoted-Printable</option>
+              <option value="url">URL Encoding</option>
+              <option value="morse">Morse Code</option>
+              <option value="ez">EZ Encoding</option>
+            </select>
+
+            <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">ACTIONS</div>
+            <div class="btn-row" style="margin-top:0;flex-direction:column;align-items:stretch;gap:8px">
+              <button class="btn btn-amber" onclick="startReverse()" style="justify-content:center">🔄 DECODE &amp; RESTORE</button>
+              <button class="btn btn-ghost" onclick="useCurrentOut()" style="justify-content:center">↑ USE CURRENT OUTPUT</button>
+              <button class="btn btn-ghost" onclick="clearRevInput()" style="justify-content:center;color:var(--text3)">🗑 CLEAR INPUT</button>
+            </div>
+
+            <!-- Format hint box -->
+            <div id="revDetectHint" style="display:none;margin-top:12px;padding:8px 10px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:6px;font-family:var(--mono);font-size:0.63rem;color:var(--cyan2);line-height:1.6"></div>
+          </div>
+
+          <!-- Right col: tabbed paste / file upload -->
+          <div>
+            <div class="rev-input-tabs">
+              <button class="rev-input-tab active" id="revTabPaste" onclick="switchRevTab('paste')">✏ Paste Text</button>
+              <button class="rev-input-tab" id="revTabFile" onclick="switchRevTab('file')">📂 Upload File</button>
+            </div>
+
+            <!-- Paste pane -->
+            <div id="revPaneText" style="display:block">
+              <textarea class="code rev" id="revInput" placeholder="Paste encoded data here…&#10;&#10;Tip: if the data has a BCVT header the format will be auto-detected." style="height:150px"></textarea>
+              <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-top:4px"><span id="revInputStats"></span></div>
+            </div>
+
+            <!-- File upload pane -->
+            <div id="revPaneFile" style="display:none">
+              <div class="rev-drop-zone" id="revDz" onclick="document.getElementById('revFileInput').click()">
+                <span class="dz-icon">📄</span>
+                <div class="dz-text">Drop encoded file here, or <strong>click to browse</strong></div>
+                <div class="dz-sub">.txt .b64 .hex .bin .ez .b85 .b91 .b32 .b58 .b62 — any text file</div>
+                <input type="file" id="revFileInput" accept="*/*">
+              </div>
+              <div class="rev-file-badge" id="revFileBadge">
+                <span id="revFileBadgeText">—</span>
+                <button class="rev-file-badge-clear" onclick="clearRevFile()" title="Remove file">✕</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /rev-grid -->
+      </div><!-- /revModeSingle -->
+
+      <!-- ── CHAIN DECODE MODE ── -->
+      <div id="revModeChain" style="display:none">
+
+        <!-- Auto-load from current chain -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="loadChainForDecode()" style="border-color:var(--amber);color:var(--amber)">
+            ↺ LOAD FROM CURRENT CHAIN (reversed)
+          </button>
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)">or build manually below</span>
+        </div>
+
+        <!-- Chain decode order builder -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <select id="chainDecAddSelect" class="sel" style="min-width:170px">
+            <option value="">— Add a decode step —</option>
           </select>
-
-          <div style="font-family:var(--mono);font-size:0.63rem;color:var(--text3);letter-spacing:1.5px;margin-bottom:8px">ACTIONS</div>
-          <div class="btn-row" style="margin-top:0;flex-direction:column;align-items:stretch;gap:8px">
-            <button class="btn btn-amber" onclick="startReverse()" style="justify-content:center">🔄 DECODE &amp; RESTORE</button>
-            <button class="btn btn-ghost" onclick="useCurrentOut()" style="justify-content:center">↑ USE CURRENT OUTPUT</button>
-            <button class="btn btn-ghost" onclick="clearRevInput()" style="justify-content:center;color:var(--text3)">🗑 CLEAR INPUT</button>
-          </div>
-
-          <!-- Format hint box — shown after auto-detection -->
-          <div id="revDetectHint" style="display:none;margin-top:12px;padding:8px 10px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:6px;font-family:var(--mono);font-size:0.63rem;color:var(--cyan2);line-height:1.6"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addToChainDec()">＋ ADD</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearChainDec()">🗑 CLEAR</button>
         </div>
 
-        <!-- Right col: tabbed paste / file upload -->
-        <div>
-          <div class="rev-input-tabs">
-            <button class="rev-input-tab active" id="revTabPaste" onclick="switchRevTab('paste')">✏ Paste Text</button>
-            <button class="rev-input-tab" id="revTabFile" onclick="switchRevTab('file')">📂 Upload File</button>
-          </div>
-
-          <!-- Paste pane -->
-          <div id="revPaneText" style="display:block">
-            <textarea class="code rev" id="revInput" placeholder="Paste encoded data here…&#10;&#10;Tip: if the data has a BCVT header the format will be auto-detected." style="height:150px"></textarea>
-            <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin-top:4px">
-              <span id="revInputStats"></span>
-            </div>
-          </div>
-
-          <!-- File upload pane -->
-          <div id="revPaneFile" style="display:none">
-            <div class="rev-drop-zone" id="revDz" onclick="document.getElementById('revFileInput').click()">
-              <span class="dz-icon">📄</span>
-              <div class="dz-text">Drop encoded file here, or <strong>click to browse</strong></div>
-              <div class="dz-sub">.txt .b64 .hex .bin .ez .b85 .b91 .b32 .b58 .b62 — any text file</div>
-              <input type="file" id="revFileInput" accept="*/*">
-            </div>
-            <div class="rev-file-badge" id="revFileBadge">
-              <span id="revFileBadgeText">—</span>
-              <button class="rev-file-badge-clear" onclick="clearRevFile()" title="Remove file">✕</button>
-            </div>
-          </div>
+        <!-- Decode chain list -->
+        <div id="chainDecListEl" class="chain-empty" style="margin-bottom:14px">
+          No steps — click "Load from current chain" or add steps manually
         </div>
 
-      </div><!-- /rev-grid -->
+        <div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:10px">
+          💡 Decode order runs top→bottom.  To undo a GZIP→EZ→B64 encode chain, add: B64 → EZ → GZIP
+        </div>
+
+        <!-- File input for chain decode -->
+        <div class="rev-drop-zone" id="chainDecDz" onclick="document.getElementById('chainDecFileInput').click()" style="margin-bottom:10px">
+          <span class="dz-icon">📂</span>
+          <div class="dz-text">Drop the chain-encoded <strong>.bin file</strong> here, or <strong>click to browse</strong></div>
+          <div class="dz-sub">The raw binary output from a Chain Encode run</div>
+          <input type="file" id="chainDecFileInput" accept="*/*">
+        </div>
+        <div class="rev-file-badge" id="chainDecFileBadge">
+          <span id="chainDecFileBadgeText">—</span>
+          <button class="rev-file-badge-clear" onclick="clearChainDecFile()">✕</button>
+        </div>
+
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-amber" id="chainDecodeBtn" onclick="startChainDecode()">⛓ CHAIN DECODE</button>
+          <span id="chainDecStatus" style="font-family:var(--mono);font-size:0.65rem;color:var(--text3)"></span>
+        </div>
+
+        <div id="chainDecResult" style="display:none;margin-top:14px;padding:14px 16px;background:var(--bg0);border:1px solid var(--border2);border-radius:8px"></div>
+      </div><!-- /revModeChain -->
 
       <div class="err-box" id="revErr"></div>
       <div class="rev-result" id="revResult">
@@ -1067,17 +1455,19 @@ function workerMain() {
       const sz = end - i;
       const arr = new Array(sz);
       for (let j = 0; j < sz; j++) arr[j] = OCT_LUT[bytes[i + j]];
-      parts.push(arr.join(' '));
+      parts.push(arr.join(''));
     }
-    return parts.join(' ');
+    return parts.join('');
   }
 
   function decodeOctal(str) {
-    const tokens = str.trim().split(/\s+/);
-    const out = new Uint8Array(tokens.length);
-    for (let i = 0; i < tokens.length; i++) {
-      const v = parseInt(tokens[i], 8);
-      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid octal byte: ' + tokens[i]);
+    const s = str.replace(/\s+/g, '');
+    if (s.length % 3 !== 0) throw new Error('Octal data length must be a multiple of 3 (each byte = 3 octal digits)');
+    const out = new Uint8Array(s.length / 3);
+    for (let i = 0; i < out.length; i++) {
+      const tok = s.slice(i * 3, i * 3 + 3);
+      const v = parseInt(tok, 8);
+      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid octal byte: ' + tok);
       out[i] = v;
     }
     return out;
@@ -1529,94 +1919,558 @@ function workerMain() {
     return out;
   }
 
-  // ── EZ Encoding: Base64 + Run‑Length Encoding ─────────────────
-  // Format: \countCHAR\   e.g. AAAAAAAAA → \9A\
-  // Unambiguous because:
-  //   • Opening \ triggers an RLE token
-  //   • Closing \ terminates it
-  //   • The char BEFORE the closing \ is the repeated character
-  //   • Everything between opening \ and that char is the decimal count
-  //   Example: \39\ = three '9's, \3A\ = three 'A's — no ambiguity!
-  //   (\ never appears in standard Base64: A-Za-z0-9+/=)
+  // ── EZ Step 5: successive identical letter pairs → compact symbols ──
+  // AA→& BB→~ CC→" DD→< EE→' FF→{ GG→( HH→: II→- JJ→|
+  // KK→` LL→_ MM→\ NN→^ OO→; PP→@ QQ→+ RR→} SS→= TT→/
+  // UU→! VV→? WW→* XX→% YY→. ZZ→>
+  const EZ_DOUBLE_ENC = {
+    'AA':'&','BB':'~','CC':'\x22','DD':'<','EE':"'",'FF':'{',
+    'GG':'(','HH':':','II':'-','JJ':'|','KK':'`','LL':'_',
+    'MM':'\\','NN':'^','OO':';','PP':'@','QQ':'+','RR':'}',
+    'SS':'=','TT':'/','UU':'!','VV':'?','WW':'*','XX':'%',
+    'YY':'.','ZZ':'>'
+  };
+  const EZ_DOUBLE_DEC = {};
+  for (const k in EZ_DOUBLE_ENC) EZ_DOUBLE_DEC[EZ_DOUBLE_ENC[k]] = k;
 
-  function rleEncode(s) {
-    let out = '';
-    let i = 0;
-    while (i < s.length) {
-      let j = i;
-      while (j < s.length && s[j] === s[i]) j++;
-      const count = j - i;
-      if (count >= 3) {
-        out += '\\' + count + s[i] + '\\';  // e.g. \9A\
-      } else {
-        out += s.slice(i, j);
+  function ezEncodeDoubles(str) {
+    let result = '', i = 0;
+    while (i < str.length) {
+      if (i + 1 < str.length) {
+        const pair = str[i] + str[i + 1];
+        const sym  = EZ_DOUBLE_ENC[pair];
+        if (sym !== undefined) { result += sym; i += 2; continue; }
       }
-      i = j;
+      result += str[i++];
     }
-    return out;
+    return result;
   }
 
-  // Decoder: scan for \, find the NEXT \, everything inside is the token.
-  // Last char of token = the repeated character; preceding digits = count.
-  // All other characters are literals (including Base64 digits 0-9).
-  function rleDecode(s) {
-    let out = '';
-    let i = 0;
-    while (i < s.length) {
-      if (s[i] === '\\') {
-        const close = s.indexOf('\\', i + 1);
-        if (close === -1) throw new Error('RLE: unclosed token starting at pos ' + i);
-        const token = s.slice(i + 1, close); // e.g. "9A" or "39" or "4+"
-        if (token.length < 2) throw new Error('RLE: token too short "' + token + '" at pos ' + i);
-        const ch = token[token.length - 1];           // last char = repeated character
-        const countStr = token.slice(0, -1);          // prefix digits = count
-        const count = parseInt(countStr, 10);
-        if (isNaN(count) || count < 1) throw new Error('RLE: bad count "' + countStr + '"');
-        out += ch.repeat(count);
-        i = close + 1;
-      } else {
-        out += s[i++];
-      }
+  function ezDecodeDoubles(str) {
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+      const pair = EZ_DOUBLE_DEC[str[i]];
+      result += pair !== undefined ? pair : str[i];
     }
-    return out;
+    return result;
   }
 
-  // encodeEZ: receives header so it can be stored for "Use Current" reconstruction
-  function encodeEZ(bytes, header, maxDisplayChars) {
-    const base64Full = toBase64(bytes);
-    const rleFull = rleEncode(base64Full);
-    const MAX = maxDisplayChars || 2000;
-    return JSON.stringify({
-      _ez: true,
-      byteCount: bytes.length,
-      base64Len: base64Full.length,
-      rleLen: rleFull.length,
-      base64Preview: base64Full.slice(0, MAX),
-      rlePreview: rleFull.slice(0, MAX),
-      rleFull: rleFull,
-      header: header   // stored so "Use Current" can reconstruct full encodable string
+  // ── EZ Step 6: Run-Length Encoding for repeated successive identical chars ──
+  // e.g.  "1111111111111111111111" (22 ones)       → "#1*22#"
+  //       "efefefefefefefefefef"  (10 reps of "ef") → "#ef*10#"
+  // Only applied when the RLE token is strictly shorter than the run itself.
+  // '#' is safe — it never appears in Step-5 output (E-T letters, 1-9 digits, symbol set).
+  // At each position the algorithm tries both a 1-char run and a 2-char bigram run,
+  // picks whichever saves more characters, and falls back to emitting one char if neither helps.
+  function ezEncodeRLE(str) {
+    if (!str) return str;
+    let result = '';
+    let i = 0;
+    while (i < str.length) {
+      let bestToken = null, bestAdvance = 1, bestSaving = 0;
+
+      // ── 2-char bigram run (e.g. "efefef…") ──────────────────────
+      if (i + 3 < str.length) {          // need at least 2 repetitions = 4 chars
+        const pat = str[i] + str[i + 1];
+        let cnt = 1;
+        while (i + (cnt + 1) * 2 <= str.length &&
+               str.slice(i + cnt * 2, i + cnt * 2 + 2) === pat) cnt++;
+        if (cnt >= 2) {
+          const tok = '#' + pat + '*' + cnt + '#'; // e.g. "#ef*10#"
+          const saving = cnt * 2 - tok.length;
+          if (saving > 0 && saving > bestSaving) {
+            bestSaving = saving; bestToken = tok; bestAdvance = cnt * 2;
+          }
+        }
+      }
+
+      // ── 1-char run (e.g. "111111…") ─────────────────────────────
+      {
+        const ch = str[i];
+        let cnt = 1;
+        while (i + cnt < str.length && str[i + cnt] === ch) cnt++;
+        if (cnt >= 2) {
+          const tok = '#' + ch + '*' + cnt + '#'; // e.g. "#1*22#"
+          const saving = cnt - tok.length;
+          if (saving > 0 && saving > bestSaving) {
+            bestSaving = saving; bestToken = tok; bestAdvance = cnt;
+          }
+        }
+      }
+
+      if (bestToken) {
+        result += bestToken;
+        i += bestAdvance;
+      } else {
+        result += str[i++];
+      }
+    }
+    return result;
+  }
+
+  // Reverse of ezEncodeRLE: "#xy*n#" or "#x*n#" → pattern repeated n times
+  function ezDecodeRLE(str) {
+    if (!str) return str;
+    // Matches 1- or 2-char patterns between the # delimiters
+    return str.replace(/#([^*]{1,2})\*(\d+)#/g, function(_, pat, n) {
+      return pat.repeat(parseInt(n, 10));
     });
   }
 
+  // ── EZ Step 4 (v2): Top-26 most-frequent patterns (len 2–5) → lowercase a–z ──
+  // Patterns are taken from the E-T letter string before any substitution.
+  // Scoring: count × (len – 1) = total chars saved.  Top 26 by score → a…z.
+  // At each position greedy longest-match is tried (len 5 → 4 → 3 → 2).
+  // Map header: [aGEH,bKN,cMT,...] prepended to the encoded body.
+  // a-z are safe tokens — they never appear in unsubstituted E-T letter output.
+  const EZ_STEP4_ALPHA = 'abcdefghijklmnopqrstuvwxyz';
+  const EZ_STEP4_MAX_LEN = 5;
+
+  function ezEncodePatterns(letterStr) {
+    if (!letterStr || letterStr.length < 4) return { mapStr: '', encoded: letterStr, pairMap: [] };
+
+    // Adaptive max-length: cap at 4 for very large inputs to keep counting fast
+    const maxLen = Math.min(EZ_STEP4_MAX_LEN, letterStr.length > 200000 ? 4 : EZ_STEP4_MAX_LEN);
+
+    // Count all patterns of length 2..maxLen (overlapping sliding window)
+    const counts = new Map();
+    for (let len = 2; len <= maxLen; len++) {
+      for (let i = 0; i + len <= letterStr.length; i++) {
+        const p = letterStr.slice(i, i + len);
+        counts.set(p, (counts.get(p) || 0) + 1);
+      }
+    }
+
+    // Score each: count × (len – 1)  ≈ total chars saved
+    const candidates = [...counts.entries()]
+      .map(([pat, cnt]) => [pat, cnt, cnt * (pat.length - 1)])
+      .filter(([,, score]) => score >= 3) // must save at least 3 chars total
+      .sort((a, b) => b[2] - a[2] || b[0].length - a[0].length);
+
+    const top26 = candidates.slice(0, 26);
+    if (top26.length === 0) return { mapStr: '', encoded: letterStr, pairMap: [] };
+
+    // Build lookup: pattern → replacement char 'a'–'z'
+    const patToChar = new Map();
+    top26.forEach(([pat], i) => patToChar.set(pat, EZ_STEP4_ALPHA[i]));
+
+    // Greedy substitution: at each position try longest pattern first (5→4→3→2)
+    let result = '';
+    let i = 0;
+    while (i < letterStr.length) {
+      let matched = false;
+      const remaining = letterStr.length - i;
+      for (let len = Math.min(maxLen, remaining); len >= 2; len--) {
+        const sub = letterStr.slice(i, i + len);
+        const c = patToChar.get(sub);
+        if (c !== undefined) { result += c; i += len; matched = true; break; }
+      }
+      if (!matched) result += letterStr[i++];
+    }
+
+    // Build header: [aGEH,bKN,...]
+    const headerContent = top26.map(([pat], idx) => EZ_STEP4_ALPHA[idx] + pat).join(',');
+    const mapStr = '[' + headerContent + ']';
+
+    return {
+      mapStr,
+      encoded: result,
+      pairMap: top26.map(([pat, cnt, score], idx) => ({ char: EZ_STEP4_ALPHA[idx], pat, cnt, score }))
+    };
+  }
+
+  // Decode step 4 patterns: expand a-z → their E-T patterns
+  function ezDecodePatterns(body, charToPattern) {
+    let result = '';
+    for (let i = 0; i < body.length; i++) {
+      const pat = charToPattern[body[i]];
+      result += pat !== undefined ? pat : body[i];
+    }
+    return result;
+  }
+
+  // ── EZ Encoding v3: Binary → ABCD pairs → Letter pairs → Top-9 pair substitution ──
+  //
+  // Step 1: bytes → 8-bit binary string (e.g. 'e' → 01100101)
+  // Step 2: each 2 bits → A/B/C/D  (00=A 01=B 10=C 11=D)
+  // Step 3: each 2 ABCD chars → E-T letter
+  //         AA=E AB=F AC=G AD=H  BA=I BB=J BC=K BD=L
+  //         CA=M CB=N CC=O CD=P  DA=Q DB=R DC=S DD=T
+  // Step 4: Count frequency of every sequential 2-letter pair in the letter string.
+  //         Pick the 9 most frequent pairs, assign them digits 1-9.
+  //         Replace each occurrence of those pairs (in sequential scan) with its digit.
+  //         Prepend map header: [1XX,2XX,...,9XX]
+  //         Digits 1-9 are safe because the letter string only contains A-T (no digits).
+
+  // ── EZ lookup tables (built once at worker startup) ─────────────
+  // Byte → 2 letters: each nibble indexes into 'EFGHIJKLMNOPQRST'
+  const EZ_LETTER_MAP  = 'EFGHIJKLMNOPQRST'; // 16 entries, index 0-15
+  const EZ_BYTE_TO_LTR = new Array(256);      // byte → 2-char letter string
+  for (let b = 0; b < 256; b++) {
+    EZ_BYTE_TO_LTR[b] = EZ_LETTER_MAP[(b >> 4) & 0xF] + EZ_LETTER_MAP[b & 0xF];
+  }
+
+  // Letter → byte (for decode): 2 letters → original byte
+  const EZ_LTR_TO_BYTE = new Uint8Array(256 * 256); // keyed by charCode*256+charCode
+  for (let b = 0; b < 256; b++) {
+    const s = EZ_BYTE_TO_LTR[b];
+    EZ_LTR_TO_BYTE[s.charCodeAt(0) * 256 + s.charCodeAt(1)] = b;
+  }
+
+  // ── EZ Compact Alphabet (73 chars used in finalFull) ─────────────────
+  // Characters: E-T (16), a-z (26), double-symbols (16), RLE (#*0-9, 12), header ([],, 3)
+  const EZ_COMPACT_ALPHA = "EFGHIJKLMNOPQRSTabcdefghijklmnopqrstuvwxyz'({:|-`_\\^;@+}=/#*0123456789[],";
+  const EZ_COMPACT_MAP = {};
+  for (let i = 0; i < EZ_COMPACT_ALPHA.length; i++) EZ_COMPACT_MAP[EZ_COMPACT_ALPHA[i]] = i;
+  const EZ_COMPACT_BITS = 7; // ceil(log2(73)) = 7
+  const EZ_BINARY_MAGIC = [0x45, 0x5A, 0x42, 0x01]; // 'EZB\x01'
+
+  // Pack EZ final string into 7-bit compact binary
+  function ezPackBits(str) {
+    const n = str.length;
+    const bitCount = n * EZ_COMPACT_BITS;
+    const byteCount = Math.ceil(bitCount / 8);
+    const out = new Uint8Array(8 + byteCount);
+    out[0]=EZ_BINARY_MAGIC[0]; out[1]=EZ_BINARY_MAGIC[1];
+    out[2]=EZ_BINARY_MAGIC[2]; out[3]=EZ_BINARY_MAGIC[3];
+    out[4]=n&0xff; out[5]=(n>>8)&0xff; out[6]=(n>>16)&0xff; out[7]=(n>>24)&0xff;
+    let bitPos = 0;
+    for (let i = 0; i < n; i++) {
+      const idx = EZ_COMPACT_MAP[str[i]];
+      if (idx === undefined) { /* skip unknown chars (e.g. map header uses same chars) */ }
+      const val = idx !== undefined ? idx : 0;
+      for (let b = EZ_COMPACT_BITS - 1; b >= 0; b--) {
+        if ((val >> b) & 1) out[8 + (bitPos >> 3)] |= (1 << (7 - (bitPos & 7)));
+        bitPos++;
+      }
+    }
+    return out;
+  }
+
+  // Unpack 7-bit compact binary back to EZ string
+  function ezUnpackBits(bytes) {
+    if (bytes[0]!==EZ_BINARY_MAGIC[0]||bytes[1]!==EZ_BINARY_MAGIC[1]||
+        bytes[2]!==EZ_BINARY_MAGIC[2]||bytes[3]!==EZ_BINARY_MAGIC[3]) return null;
+    const n = bytes[4]|(bytes[5]<<8)|(bytes[6]<<16)|(bytes[7]<<24);
+    let result = '';
+    let bitPos = 0;
+    for (let i = 0; i < n; i++) {
+      let idx = 0;
+      for (let b = EZ_COMPACT_BITS - 1; b >= 0; b--) {
+        if ((bytes[8 + (bitPos >> 3)] >> (7 - (bitPos & 7))) & 1) idx |= (1 << b);
+        bitPos++;
+      }
+      result += EZ_COMPACT_ALPHA[idx] || '';
+    }
+    return result;
+  }
+
+  // ── LZW Compression ───────────────────────────────────────────────────
+  function encodeLZW(bytes) {
+    const n = bytes.length;
+    const dict = new Map();
+    for (let i = 0; i < 256; i++) dict.set(String.fromCodePoint(i), i);
+    let nextCode = 257; // 256 = clear sentinel (unused), 257 onwards = dictionary entries
+    let w = '';
+    const codes = [];
+    for (let i = 0; i < n; i++) {
+      const c = String.fromCodePoint(bytes[i]);
+      const wc = w + c;
+      if (dict.has(wc)) { w = wc; }
+      else {
+        codes.push(dict.get(w));
+        if (nextCode <= 65534) dict.set(wc, nextCode++);
+        w = c;
+      }
+    }
+    if (w.length > 0) codes.push(dict.get(w));
+    // Pack as: [4-byte orig size][2-byte per code (BE)]
+    const out = new Uint8Array(4 + codes.length * 2);
+    out[0]=(n>>24)&0xff; out[1]=(n>>16)&0xff; out[2]=(n>>8)&0xff; out[3]=n&0xff;
+    for (let i = 0; i < codes.length; i++) {
+      out[4+i*2]=(codes[i]>>8)&0xff; out[4+i*2+1]=codes[i]&0xff;
+    }
+    return out;
+  }
+
+  function decodeLZW(bytes) {
+    if (bytes.length < 4) throw new Error('Invalid LZW data');
+    const origLen = (bytes[0]<<24)|(bytes[1]<<16)|(bytes[2]<<8)|bytes[3];
+    const numCodes = (bytes.length - 4) >> 1;
+    if ((bytes.length - 4) % 2 !== 0) throw new Error('LZW: odd byte count');
+    if (numCodes === 0) return new Uint8Array(0);
+
+    const dict = new Array(256);
+    for (let i = 0; i < 256; i++) dict[i] = new Uint8Array([i]);
+
+    const parts = [];
+    let code0 = (bytes[4]<<8)|bytes[5];
+    let w = dict[code0];
+    parts.push(w);
+    for (let i = 1; i < numCodes; i++) {
+      const code = (bytes[4+i*2]<<8)|bytes[4+i*2+1];
+      let entry;
+      if (code < dict.length) entry = dict[code];
+      else if (code === dict.length) { const tmp = new Uint8Array(w.length+1); tmp.set(w); tmp[w.length]=w[0]; entry=tmp; }
+      else throw new Error('LZW decode error: bad code ' + code);
+      parts.push(entry);
+      const ne = new Uint8Array(w.length+1); ne.set(w); ne[w.length]=entry[0]; dict.push(ne);
+      w = entry;
+      if (dict.length >= 65535) dict.length = 65535; // cap
+    }
+    let total = 0; for (const p of parts) total += p.length;
+    const out = new Uint8Array(Math.min(total, origLen));
+    let off = 0;
+    for (const p of parts) { if (off >= origLen) break; const take = Math.min(p.length, origLen-off); out.set(p.subarray(0,take),off); off+=take; }
+    return out;
+  }
+
+  // ── Huffman Coding ────────────────────────────────────────────────────
+  function huffBuildTree(freq) {
+    const nodes = [];
+    for (let i = 0; i < 256; i++) if (freq[i] > 0) nodes.push({ sym: i, f: freq[i], l: null, r: null });
+    if (nodes.length === 0) return null;
+    if (nodes.length === 1) return { sym: -1, f: nodes[0].f, l: nodes[0], r: null };
+
+    // Min-heap
+    const heap = [...nodes];
+    const heapify = (i) => {
+      while (true) {
+        let s=i; const l=2*i+1, r=2*i+2;
+        if (l<heap.length && heap[l].f<heap[s].f) s=l;
+        if (r<heap.length && heap[r].f<heap[s].f) s=r;
+        if (s!==i) { [heap[i],heap[s]]=[heap[s],heap[i]]; i=s; } else break;
+      }
+    };
+    for (let i=Math.floor(heap.length/2)-1; i>=0; i--) heapify(i);
+    const pop=()=>{
+      const min=heap[0]; const last=heap.pop();
+      if (heap.length>0){heap[0]=last; heapify(0);}
+      return min;
+    };
+    const push=(n)=>{
+      heap.push(n); let i=heap.length-1;
+      while(i>0){const p=(i-1)>>1; if(heap[p].f>heap[i].f){[heap[p],heap[i]]=[heap[i],heap[p]];i=p;}else break;}
+    };
+    while (heap.length > 1) {
+      const a=pop(), b=pop();
+      push({sym:-1, f:a.f+b.f, l:a, r:b});
+    }
+    return heap[0];
+  }
+
+  function huffGetCodes(tree) {
+    const codes = new Array(256).fill(null);
+    const walk = (node, bits) => {
+      if (!node) return;
+      if (node.sym >= 0) { codes[node.sym] = bits; return; }
+      walk(node.l, bits + '0');
+      walk(node.r, bits + '1');
+    };
+    if (tree) {
+      if (tree.sym >= 0) codes[tree.sym] = '0'; // single-symbol edge case
+      else walk(tree, '');
+    }
+    return codes;
+  }
+
+  function encodeHuffman(bytes) {
+    if (bytes.length === 0) return new Uint8Array([0,0,0,0,0]);
+    const freq = new Uint32Array(256);
+    for (let i = 0; i < bytes.length; i++) freq[bytes[i]]++;
+    const tree = huffBuildTree(freq);
+    const codes = huffGetCodes(tree);
+
+    // Serialize: [4B orig len][1B padding][256×4B freq table][bitstream]
+    let bits = '';
+    for (let i = 0; i < bytes.length; i++) bits += codes[bytes[i]];
+    const padding = (8 - (bits.length % 8)) % 8;
+    const padded = bits + '0'.repeat(padding);
+    const bitBytes = new Uint8Array(padded.length >> 3);
+    for (let i = 0; i < bitBytes.length; i++) {
+      let b = 0;
+      for (let j = 0; j < 8; j++) if (padded[i*8+j]==='1') b |= (1<<(7-j));
+      bitBytes[i] = b;
+    }
+    const n = bytes.length;
+    const out = new Uint8Array(5 + 1024 + bitBytes.length);
+    out[0]=(n>>24)&0xff; out[1]=(n>>16)&0xff; out[2]=(n>>8)&0xff; out[3]=n&0xff;
+    out[4]=padding;
+    for (let i=0;i<256;i++){
+      out[5+i*4]=(freq[i]>>24)&0xff; out[6+i*4]=(freq[i]>>16)&0xff;
+      out[7+i*4]=(freq[i]>>8)&0xff; out[8+i*4]=freq[i]&0xff;
+    }
+    out.set(bitBytes, 5+1024);
+    return out;
+  }
+
+  function decodeHuffman(bytes) {
+    if (bytes.length < 5+1024) throw new Error('Invalid Huffman data');
+    const n = (bytes[0]<<24)|(bytes[1]<<16)|(bytes[2]<<8)|bytes[3];
+    const padding = bytes[4];
+    const freq = new Uint32Array(256);
+    for (let i=0;i<256;i++)
+      freq[i]=(bytes[5+i*4]<<24)|(bytes[6+i*4]<<16)|(bytes[7+i*4]<<8)|bytes[8+i*4];
+    const tree = huffBuildTree(freq);
+    if (!tree) return new Uint8Array(0);
+    const bitData = bytes.subarray(5+1024);
+    const totalBits = bitData.length*8 - padding;
+    const out = new Uint8Array(n);
+    let outIdx=0, node=tree;
+    // Handle single-symbol tree
+    if (tree.sym >= 0) {
+      out.fill(tree.sym); return out;
+    }
+    for (let i=0; i<totalBits && outIdx<n; i++) {
+      const bit = (bitData[i>>3]>>(7-(i&7)))&1;
+      node = bit ? node.r : node.l;
+      if (!node) throw new Error('Huffman tree decode error');
+      if (node.sym >= 0) { out[outIdx++]=node.sym; node=tree; }
+    }
+    return out;
+  }
+
+  // ── encodeEZ: chunked, with live progress (0→100 inside function) ──
+  function encodeEZ(bytes, header, maxDisplayChars, progressFn) {
+    const MAX   = maxDisplayChars || 2000;
+    const n     = bytes.length;
+    const CHUNK = 65536; // 64 KB per chunk
+    const prog  = progressFn || function(){};
+
+    prog(2);
+
+    // ── Steps 1-3 combined (single pass, chunked): byte → 2 E-T letters ──
+    // 1 byte = 8 bits → 4 ABCD chars → 2 letters  (nibble-indexed lookup)
+    const letterParts = new Array(Math.ceil(n / CHUNK));
+    for (let ci = 0, i = 0; i < n; i += CHUNK, ci++) {
+      const end = Math.min(i + CHUNK, n);
+      const sz  = end - i;
+      const part = new Array(sz);
+      for (let j = 0; j < sz; j++) part[j] = EZ_BYTE_TO_LTR[bytes[i + j]];
+      letterParts[ci] = part.join('');
+      prog(5 + Math.round((end / n) * 40)); // 5 → 45%
+    }
+    const letterStr = letterParts.join('');
+    prog(47);
+
+    // Build previews for display
+    const previewBytes = Math.min(Math.ceil(MAX / 8), n);
+    let binPreview = '', abcdPreview = '';
+    for (let i = 0; i < previewBytes; i++) {
+      const b = bytes[i];
+      binPreview  += b.toString(2).padStart(8, '0') + ' ';
+      abcdPreview += 'ABCD'[(b >> 6) & 3] + 'ABCD'[(b >> 4) & 3]
+                   + 'ABCD'[(b >> 2) & 3] + 'ABCD'[b & 3];
+    }
+
+    // ── Step 4: Top-26 variable-length pattern substitution (a–z) ─────────
+    const step4Result = ezEncodePatterns(letterStr);
+    const mapStr      = step4Result.mapStr;
+    const subStr      = step4Result.encoded;
+    prog(80);
+
+    // Build map header: [aGEH,bKN,...] already in step4Result.mapStr
+
+    // ── Step 5: replace successive identical letter pairs with compact symbols ──
+    // e.g. EE→' FF→{ GG→( TT→/ etc.  Safe: symbols not in E-T or a-z.
+    const step5Str = ezEncodeDoubles(subStr);
+    prog(90);
+
+    // ── Step 6: Run-Length Encoding for repeated successive identical chars ──
+    // e.g. "1111111111111111111111" → "#1*22#"
+    const step6Str = ezEncodeRLE(step5Str);
+    prog(95);
+
+    // Final = map header + encoded body (no Step 7 — step 4 already uses a-z)
+    const finalFull = mapStr + step6Str;
+    prog(97);
+
+    // ── Step 7: 7-bit compact binary packing ─────────────────────────────
+    // The EZ output uses only 73 distinct chars, so 7 bits/char instead of 8 → ~12.5% smaller
+    const finalPackedBytes = ezPackBits(finalFull);
+    const finalPackedB64 = toBase64(finalPackedBytes);
+
+    const result = JSON.stringify({
+      _ez:        true,
+      byteCount:  n,
+      binLen:     n * 8,
+      abcdLen:    n * 4,
+      letterLen:  letterStr.length,
+      subLen:     subStr.length,
+      step5Len:   step5Str.length,
+      step6Len:   step6Str.length,
+      finalLen:   finalFull.length,
+      finalPackedSize: finalPackedBytes.length,
+      mapStr:     mapStr,
+      pairMap:    step4Result.pairMap,
+      binPreview:    binPreview.trimEnd().slice(0, MAX),
+      abcdPreview:   abcdPreview.slice(0, MAX),
+      letterPreview: letterStr.slice(0, MAX),
+      subPreview:    subStr.slice(0, MAX),
+      step5Preview:  step5Str.slice(0, MAX),
+      step6Preview:  step6Str.slice(0, MAX),
+      finalFull:  finalFull,
+      finalPackedB64: finalPackedB64,
+      header:     header
+    });
+    prog(98);
+    return result;
+  }
+
+  // ── decodeEZ: reverses all 5 steps (also accepts 7-bit packed binary) ──
   function decodeEZ(str) {
-    // str is the RLE-encoded Base64 string (BCVT header already stripped by caller)
-    const base64Str = rleDecode(str);
-    return fromBase64(base64Str);
+    // Detect binary-packed format via sentinel prefix
+    // EZB1:  = raw 7-bit binary packed bytes, stored as latin-1 (new format, no overhead)
+    // EZB64: = legacy format: base64-encoded packed bytes (adds ~33% size vs EZB1)
+    let s = str;
+    if (s.startsWith('EZB1:')) {
+      // Raw 7-bit packed binary, loaded as latin-1 bytes — charCodeAt gives original byte values
+      const binStr = s.slice(5);
+      const packed = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) packed[i] = binStr.charCodeAt(i) & 0xFF;
+      const unpacked = ezUnpackBits(packed);
+      if (unpacked !== null) s = unpacked;
+    } else if (s.startsWith('EZB64:')) {
+      // Legacy: base64-encoded 7-bit packed binary
+      const b64 = s.slice(6);
+      const packed = fromBase64(b64);
+      const unpacked = ezUnpackBits(packed);
+      if (unpacked !== null) s = unpacked;
+    }
+    const charToPattern = {};
+
+    // Strip [aXXX,bYY,...] map header (Step 4 reverse)
+    if (s.startsWith('[')) {
+      const closeIdx = s.indexOf(']');
+      if (closeIdx !== -1) {
+        s.slice(1, closeIdx).split(',').forEach(entry => {
+          if (entry.length >= 3) charToPattern[entry[0]] = entry.slice(1);
+        });
+        s = s.slice(closeIdx + 1);
+      }
+    }
+
+    // Step 6 reverse: RLE decode "#x*n#" → x repeated n times
+    s = ezDecodeRLE(s);
+
+    // Step 5 reverse: expand compact symbols → uppercase letter pairs
+    s = ezDecodeDoubles(s);
+
+    // Step 4 reverse: expand a–z chars → their E-T patterns
+    const letterStr = ezDecodePatterns(s, charToPattern);
+
+    // Steps 3–1 reverse: each pair of E-T letters → original byte (lookup)
+    const out = new Uint8Array(letterStr.length >> 1);
+    for (let i = 0, j = 0; i + 1 < letterStr.length; i += 2, j++) {
+      out[j] = EZ_LTR_TO_BYTE[letterStr.charCodeAt(i) * 256 + letterStr.charCodeAt(i + 1)];
+    }
+    return out;
   }
 
-  // For reverse step display: take RLE string, return base64 preview and byte count
-  function reverseEZSteps(rleStr) {
-    const base64Str = rleDecode(rleStr);
-    const bytes = fromBase64(base64Str);
-    const MAX = 2000;
-    return JSON.stringify({
-      _ezrev: true,
-      byteCount: bytes.length,
-      rlePreview: rleStr.slice(0, MAX),
-      base64Preview: base64Str.slice(0, MAX),
-      rleFullLen: rleStr.length,
-      base64FullLen: base64Str.length
-    });
+  // reverseEZSteps — kept for compat (UI uses stored JSON steps)
+  function reverseEZSteps(finalStr) {
+    const bytes = decodeEZ(finalStr);
+    return JSON.stringify({ _ezrev: true, byteCount: bytes.length });
   }
 
   function fromBase64(str) {
@@ -1644,21 +2498,24 @@ function workerMain() {
   }
 
   function binToBytes(str) {
-    const tokens = str.trim().split(/\s+/);
-    const out = new Uint8Array(tokens.length);
-    for (let i = 0; i < tokens.length; i++) {
-      if (!/^[01]{1,8}$/.test(tokens[i])) throw new Error('Invalid binary token: ' + tokens[i]);
-      out[i] = parseInt(tokens[i], 2);
+    const s = str.replace(/\s+/g, '');
+    if (s.length % 8 !== 0) throw new Error('Binary data length must be a multiple of 8 (each byte = 8 bits)');
+    const out = new Uint8Array(s.length / 8);
+    for (let i = 0; i < out.length; i++) {
+      const tok = s.slice(i * 8, i * 8 + 8);
+      if (!/^[01]{8}$/.test(tok)) throw new Error('Invalid binary byte: ' + tok);
+      out[i] = parseInt(tok, 2);
     }
     return out;
   }
 
   function decToBytes(str) {
-    const tokens = str.trim().split(/\s+/);
-    const out = new Uint8Array(tokens.length);
-    for (let i = 0; i < tokens.length; i++) {
-      const v = parseInt(tokens[i], 10);
-      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid decimal byte: ' + tokens[i]);
+    const s = str.replace(/\s+/g, '');
+    if (s.length % 3 !== 0) throw new Error('Decimal data length must be a multiple of 3 (each byte = 3 decimal digits, zero-padded)');
+    const out = new Uint8Array(s.length / 3);
+    for (let i = 0; i < out.length; i++) {
+      const v = parseInt(s.slice(i * 3, i * 3 + 3), 10);
+      if (isNaN(v) || v < 0 || v > 255) throw new Error('Invalid decimal byte: ' + s.slice(i * 3, i * 3 + 3));
       out[i] = v;
     }
     return out;
@@ -1692,10 +2549,10 @@ function workerMain() {
             const sz = end - i;
             const arr = new Array(sz);
             for (let j = 0; j < sz; j++) arr[j] = lut[bytes[i + j]];
-            parts.push(arr.join(' '));
+            parts.push(arr.join(''));
             progress((end / n) * 100);
           }
-          result = header + parts.join(' ');
+          result = header + parts.join('');
         } else if (fmt === 'hexdump') {
           const parts = [];
           for (let i = 0; i < n; i += CHUNK) {
@@ -1738,10 +2595,10 @@ function workerMain() {
             const sz = end - i;
             const arr = new Array(sz);
             for (let j = 0; j < sz; j++) arr[j] = OCT_LUT[bytes[i + j]];
-            parts.push(arr.join(' '));
+            parts.push(arr.join(''));
             progress((end / n) * 100);
           }
-          result = header + parts.join(' ');
+          result = header + parts.join('');
         } else if (fmt === 'deflate') {
           progress(10);
           result = header + await deflateBase64(bytes);
@@ -1750,9 +2607,18 @@ function workerMain() {
           progress(10);
           result = header + await gzipBase64(bytes);
           progress(100);
+        } else if (fmt === 'lzw') {
+          progress(10);
+          result = header + toBase64(encodeLZW(bytes));
+          progress(100);
+        } else if (fmt === 'huffman') {
+          progress(10);
+          result = header + toBase64(encodeHuffman(bytes));
+          progress(100);
         } else if (fmt === 'ez') {
           // EZ returns JSON with pipeline steps + header for reconstruction
-          const ezData = encodeEZ(bytes, header, 2000);
+          // Progress is reported internally by encodeEZ (5 → 95%), we cap at 100 here
+          const ezData = encodeEZ(bytes, header, 2000, progress);
           result = ezData;
           progress(100);
         } else if (fmt === 'qp') {
@@ -1800,6 +2666,12 @@ function workerMain() {
         else if (fmt === 'gzip') {
           const compressed = fromBase64(raw);
           bytes = await gunzipBytes(compressed);
+        }
+        else if (fmt === 'lzw') {
+          bytes = decodeLZW(fromBase64(raw));
+        }
+        else if (fmt === 'huffman') {
+          bytes = decodeHuffman(fromBase64(raw));
         }
         else if (fmt === 'ez') {
           bytes = decodeEZ(raw);
@@ -1904,7 +2776,14 @@ const FORMATS = [
   { id:'b36',     label:'Base36',            badge:'B36',   icon:'⚪', rev:true,  note:'Base36 (0-9 A-Z), chunked 4-byte groups' },
   { id:'deflate', label:'Deflate+Base64',    badge:'ZLIB',  icon:'📦', rev:true,  note:'Raw deflate compress then base64 — often 40–80% smaller' },
   { id:'gzip',    label:'GZIP+Base64',       badge:'GZIP',  icon:'🗜', rev:true,  note:'GZIP compress then base64 — standard HTTP compression' },
-  { id:'ez',      label:'EZ Encoding',       badge:'EZ',    icon:'⚡', rev:true,  note:'Base64 → RLE: runs of 3+ same chars → \\countCHAR\\ (e.g. AAAAAAAAA5YYYY → \\9A\\5\\4Y\\)' },
+  { id:'lzw',     label:'LZW+Base64',        badge:'LZW',   icon:'🌿', rev:true,  note:'Lempel-Ziv-Welch dictionary compression then base64 — classic Unix compress algorithm' },
+  { id:'huffman', label:'Huffman+Base64',    badge:'HUFF',  icon:'🌲', rev:true,  note:'Huffman entropy coding then base64 — optimal prefix-free code for byte frequencies' },
+  { id:'ez',      label:'EZ Encoding',       badge:'EZ',    icon:'⚡', rev:true,  note:'6-step: Binary→ABCD pairs→E-T letters→Top-26 pattern subst. (a-z)→Symbol doubles→RLE runs' },
+  { id:'ez_bits', label:'EZ: Bits→ABCD',    badge:'BIT2', icon:'🔵', rev:false, note:'EZ Stage 2: each pair of bits mapped to A/B/C/D (00=A 01=B 10=C 11=D)', ezStage:'abcdPreview', ezLen:'abcdLen' },
+  { id:'ez_abcd', label:'EZ: ABCD→Letters', badge:'ABCD', icon:'🟢', rev:false, note:'EZ Stage 3: each pair of ABCD chars merged to a single letter E–T', ezStage:'letterPreview', ezLen:'letterLen' },
+  { id:'ez_top9', label:'EZ: Top-26 Patterns', badge:'PAT26', icon:'🟡', rev:false, note:'EZ Stage 4: top-26 most-frequent patterns (len 2-5) replaced by lowercase letters a-z', ezStage:'subPreview', ezLen:'subLen' },
+  { id:'ez_doubles',label:'EZ: Double-Pairs',badge:'DBL',  icon:'🟣', rev:false, note:'EZ Stage 5: successive identical letter pairs (EE, FF…) replaced by compact symbols', ezStage:'step5Preview', ezLen:'step5Len' },
+  { id:'ez_rle',  label:'EZ: RLE Output',   badge:'RLE',  icon:'🌸', rev:false, note:'EZ Stage 6: run-length encoding — repeated chars/bigrams → #x*n# tokens', ezStage:'step6Preview', ezLen:'step6Len' },
   { id:'hex',     label:'Hexadecimal',       badge:'HEX',   icon:'🟡', rev:true,  note:'Two hex digits per byte' },
   { id:'hexdump', label:'Hex Dump',          badge:'DUMP',  icon:'📊', rev:false, note:'xxd-style: offset | hex | ASCII' },
   { id:'oct',     label:'Octal',             badge:'OCT',   icon:'🟤', rev:true,  note:'3 octal digits per byte (base 8), space-separated' },
@@ -1926,13 +2805,29 @@ let outputFullSizes = {}; // fmt -> exact byte size of full output
 const DISPLAY_LIMIT = 800_000;
 const STORE_LIMIT = 50_000_000; // 50M chars: use blob above this
 
+// ── Chain encoding state (must be before initUI IIFE) ─────────
+const CHAIN_EXCLUDED = new Set(['sha256','hexdump','ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle']);
+let chainList = [];
+let currentFileName = 'output'; // tracks the input filename for raw-byte saves
+let chainOutputBytes = null;
+const CHAIN_LIST_STORAGE_KEY = 'bcvt_chain_list_v1';
+// Restore last chain from localStorage on load
+(function() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CHAIN_LIST_STORAGE_KEY) || '[]');
+    if (Array.isArray(saved) && saved.length) chainList = saved;
+  } catch(_) {}
+})();
+
 // ═══════════════════════════════════════════════════════════════════════
 //  HEADER FORMAT: BCVT1|name=...|mime=...|size=...|fmt=...\n
 // ═══════════════════════════════════════════════════════════════════════
 const HEADER_MAGIC = 'BCVT1';
 
 function buildHeader(name, mime, size, fmt) {
-  return `${HEADER_MAGIC}|name=${name}|mime=${mime}|size=${size}|fmt=${fmt}\n`;
+  // URI-encode filename so Arabic/Unicode chars survive as pure ASCII in the header
+  const safeName = encodeURIComponent(name || '');
+  return `${HEADER_MAGIC}|name=${safeName}|mime=${mime}|size=${size}|fmt=${fmt}\n`;
 }
 
 function parseHeader(str) {
@@ -1943,22 +2838,97 @@ function parseHeader(str) {
   const meta = {};
   line.split('|').slice(1).forEach(part => {
     const eq = part.indexOf('=');
-    if (eq > 0) meta[part.slice(0, eq)] = part.slice(eq + 1);
+    if (eq > 0) {
+      const key = part.slice(0, eq);
+      let val = part.slice(eq + 1);
+      // Restore Unicode filename from URI encoding
+      if (key === 'name') { try { val = decodeURIComponent(val); } catch(_) {} }
+      meta[key] = val;
+    }
   });
   return { meta, body: str.slice(nl + 1) };
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SEPARATOR SYSTEM — visual spacing toggle per output block
+//  Never affects copy / save / length stats (those use raw outputs[fmt])
+//  Declared with var so hoisted above the initUI() IIFE below
+// ═══════════════════════════════════════════════════════════════════════
+var SEP_GROUP = {
+  bin: 8, hex: 2,
+  dec: 3, oct: 3,
+  b64: 4, b64url: 4, b32: 8,
+  b85: 5, b91: 4, b122: 3,
+  b58: 6, b62: 6, b36: 6,
+  deflate: 4, gzip: 4, lzw: 4, huffman: 4,
+  hexdump: 0, qp: 0, url: 0, morse: 0, sha256: 0, ez: 0,
+  ez_bits: 4, ez_abcd: 2, ez_top9: 0, ez_doubles: 0, ez_rle: 0
+};
+var separatorActive = {};
+
+function applySeparator(fmt, str) {
+  var g = SEP_GROUP[fmt] || 0;
+  if (!g || !str) return str || '';
+  var result = '', count = 0;
+  for (var i = 0; i < str.length; i++) {
+    var ch = str[i];
+    if (ch === '\n' || ch === '\r') { result += ch; count = 0; continue; }
+    result += ch;
+    if (++count === g && i < str.length - 1) { result += ' '; count = 0; }
+  }
+  return result;
+}
+
+function toggleSeparator(fmt) {
+  separatorActive[fmt] = !separatorActive[fmt];
+  var btn = document.getElementById('sep-btn-' + fmt);
+  if (btn) {
+    btn.classList.toggle('sep-active', !!separatorActive[fmt]);
+    btn.title = separatorActive[fmt] ? 'Separator ON — click to remove' : 'Separator OFF — click to add visual spacing';
+  }
+  redisplayBody(fmt);
+}
+
+function redisplayBody(fmt) {
+  var str = outputs[fmt];
+  if (!str || typeof str !== 'string') return;
+  var body = document.getElementById('body-' + fmt);
+  if (!body) return;
+  var sliced = str.length > DISPLAY_LIMIT ? str.slice(0, DISPLAY_LIMIT) : str;
+  var parsed = parseHeader(sliced);
+  var bodyStr = parsed ? parsed.body : sliced;
+  var note = body.querySelector('.trunc-note');
+  body.textContent = separatorActive[fmt] ? applySeparator(fmt, bodyStr) : bodyStr;
+  if (note) body.appendChild(note);
+}
+
+// Toast timer — var so hoisted and accessible everywhere
+var toastTimer;
 
 // ═══════════════════════════════════════════════════════════════════════
 //  UI INIT
 // ═══════════════════════════════════════════════════════════════════════
 (function initUI() {
   const grid = document.getElementById('fmtGrid');
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  let addedEzSep = false;
   FORMATS.forEach(f => {
+    // Insert a separator before the EZ sub-stages group
+    if (EZ_STAGES.includes(f.id) && !addedEzSep) {
+      const sep = document.createElement('div');
+      sep.className = 'fmt-group-sep';
+      sep.textContent = '⚡ EZ Pipeline Stages';
+      grid.appendChild(sep);
+      addedEzSep = true;
+    }
     const label = document.createElement('label');
-    label.className = 'fmt-check checked';
+    label.className = 'fmt-check';
     label.dataset.fmt = f.id;
     label.title = f.note;
-    label.innerHTML = `<input type="checkbox" checked>
+    // EZ sub-stages unchecked by default
+    const checked = !EZ_STAGES.includes(f.id);
+    if (checked) label.classList.add('checked');
+    label.innerHTML = `<input type="checkbox" ${checked ? 'checked' : ''}>
       <span class="ficon">${f.icon}</span>
       <span class="flabel">${f.label}</span>
       <span class="fbadge">${f.badge}</span>`;
@@ -1985,6 +2955,7 @@ function parseHeader(str) {
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <div class="out-meta" id="meta-${f.id}"></div>
           <div class="out-actions">
+            ${(SEP_GROUP[f.id] || 0) > 0 ? `<button class="btn btn-ghost btn-sm" id="sep-btn-${f.id}" onclick="toggleSeparator('${f.id}')" title="Separator OFF — click to add visual spacing">⠿ SEP</button>` : ''}
             <button class="btn btn-ghost btn-sm" onclick="copyOut('${f.id}')">📋 COPY</button>
             <button class="btn btn-ghost btn-sm" onclick="saveOut('${f.id}')">💾 SAVE</button>
           </div>
@@ -2002,6 +2973,9 @@ function parseHeader(str) {
   document.getElementById('fileInput').addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
 
   document.getElementById('workerCount').textContent = '0';
+  initChainSelect();
+  // Chain decode init runs after DOM + JS fully ready
+  setTimeout(() => { initChainDecSelect(); initChainDecDropZone(); }, 0);
 })();
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -2103,10 +3077,27 @@ async function startConversion() {
   outputBlobs = {};
   outputFullSizes = {};
   Object.keys(fmtProgress).forEach(k => delete fmtProgress[k]);
+  Object.keys(separatorActive).forEach(k => { separatorActive[k] = false; });
+  FORMATS.forEach(f => { var b = document.getElementById('sep-btn-' + f.id); if (b) b.classList.remove('sep-active'); });
 
   const fileName = currentFile ? currentFile.name : 'input.txt';
+  currentFileName = fileName; // remember for raw-byte saves
   const mimeType = currentFile ? (currentFile.type || 'application/octet-stream') : 'text/plain';
   const fileSize = bytes.length;
+
+  // If any EZ sub-stage is selected, ensure 'ez' is also run (but not added to selected if not there)
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  const hasEzStage = selected.some(f => EZ_STAGES.includes(f));
+  const hasEz = selected.includes('ez');
+  // effectiveSelected = worker tasks: no EZ sub-stages (handled from EZ output)
+  let effectiveSelected = selected.filter(f => !EZ_STAGES.includes(f));
+  let hiddenEz = false;
+  if (hasEzStage && !hasEz) {
+    effectiveSelected = ['ez', ...effectiveSelected];
+    hiddenEz = true; // we added ez silently; its block stays hidden
+  }
+  // Mark outputs[sid] = null as placeholder so storeOutput('ez') knows to populate them
+  EZ_STAGES.forEach(sid => { if (selected.includes(sid)) outputs[sid] = null; });
 
   // Show blocks
   FORMATS.forEach(f => {
@@ -2120,6 +3111,11 @@ async function startConversion() {
       block.style.display = 'none';
     }
   });
+  // Hide the silently-added ez block
+  if (hiddenEz) {
+    const b = document.getElementById('block-ez');
+    if (b) b.style.display = 'none';
+  }
 
   document.getElementById('convertBtn').disabled = true;
   document.getElementById('stopBtn').style.display = 'flex';
@@ -2127,19 +3123,19 @@ async function startConversion() {
 
   // Determine parallelism: parallel if file <= 15MB
   const useParallel = fileSize <= 15 * 1024 * 1024;
-  document.getElementById('workerStatus').textContent = useParallel ? `⚡ Parallel (${Math.min(selected.length, MAX_WORKERS)} workers)` : '⏩ Sequential';
+  document.getElementById('workerStatus').textContent = useParallel ? `⚡ Parallel (${Math.min(effectiveSelected.length, MAX_WORKERS)} workers)` : '⏩ Sequential';
 
-  pendingFmts = selected.length;
+  pendingFmts = effectiveSelected.length;
 
   if (useParallel) {
     // Launch all formats concurrently
-    selected.forEach(fmt => {
+    effectiveSelected.forEach(fmt => {
       launchFormat(fmt, bytes.slice(), fileName, mimeType, fileSize);
     });
   } else {
     // Sequential to avoid OOM on huge files
     (async () => {
-      for (const fmt of selected) {
+      for (const fmt of effectiveSelected) {
         if (stopFlag) break;
         await launchFormat(fmt, bytes.slice(), fileName, mimeType, fileSize);
       }
@@ -2148,13 +3144,15 @@ async function startConversion() {
 }
 
 function launchFormat(fmt, bytes, fileName, mimeType, fileSize) {
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
   return new Promise(resolve => {
     setDot(fmt, 'spin');
-    document.getElementById('body-' + fmt).innerHTML = '<div class="out-placeholder">Processing…</div>';
+    const bodyEl = document.getElementById('body-' + fmt);
+    if (bodyEl) bodyEl.innerHTML = '<div class="out-placeholder">Processing…</div>';
     setFmtProgress(fmt, 0);
     document.getElementById('progText').textContent = `Encoding ${fmt.toUpperCase()}…`;
 
-    const header = fmt === 'sha256' ? '' : buildHeader(fileName, mimeType, fileSize, fmt);
+    const header = fmt === 'sha256' ? '' : buildHeader(fileName, mimeType, fileSize, fmt === 'ez' ? 'ez' : fmt);
 
     postTask(
       'encode', fmt,
@@ -2168,6 +3166,18 @@ function launchFormat(fmt, bytes, fileName, mimeType, fileSize) {
         setDot(f, 'ok');
         setFmtProgress(f, 100);
         pendingFmts--;
+        // After ez is stored, also render any selected ez sub-stages (they don't have separate worker tasks)
+        if (f === 'ez') {
+          EZ_STAGES.forEach(sid => {
+            const stageBlock = document.getElementById('block-' + sid);
+            if (stageBlock && stageBlock.style.display !== 'none') {
+              renderOutput(sid, fileSize);
+              setDot(sid, 'ok');
+              setFmtProgress(sid, 100);
+            }
+          });
+        }
+        updateComparePanel();
         if (pendingFmts <= 0) {
           document.getElementById('progText').textContent = '✓ All conversions complete';
           resetButtons();
@@ -2176,7 +3186,8 @@ function launchFormat(fmt, bytes, fileName, mimeType, fileSize) {
       },
       (err) => {
         setDot(fmt, 'err');
-        document.getElementById('body-' + fmt).innerHTML = `<div class="out-placeholder" style="color:var(--red)">Error: ${err}</div>`;
+        const bEl = document.getElementById('body-' + fmt);
+        if (bEl) bEl.innerHTML = `<div class="out-placeholder" style="color:var(--red)">Error: ${err}</div>`;
         pendingFmts--;
         if (pendingFmts <= 0) resetButtons();
         resolve();
@@ -2188,11 +3199,24 @@ function launchFormat(fmt, bytes, fileName, mimeType, fileSize) {
 function storeOutput(fmt, str) {
   if (fmt === 'ez') {
     try { outputs[fmt] = JSON.parse(str); } catch(e) { outputs[fmt] = str; }
-    // EZ size is the RLE string length (stored in the JSON)
     const ez = outputs[fmt];
-    outputFullSizes[fmt] = ez && ez.rleLen ? ez.rleLen : 0;
+    outputFullSizes[fmt] = ez && ez.finalLen ? ez.finalLen : 0;
+    // Also auto-populate EZ sub-stage outputs from the same computation
+    const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+    EZ_STAGES.forEach(sid => {
+      if (outputs[sid] !== undefined) { // only if selected
+        const stageFmt = FORMATS.find(f => f.id === sid);
+        if (stageFmt && ez[stageFmt.ezStage] !== undefined) {
+          outputs[sid] = ez[stageFmt.ezStage] || '';
+          outputFullSizes[sid] = ez[stageFmt.ezLen] || (outputs[sid] ? outputs[sid].length : 0);
+        }
+      }
+    });
     return;
   }
+  // EZ sub-stages: populated by the 'ez' run, just return if already set
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  if (EZ_STAGES.includes(fmt)) return; // handled by storeOutput('ez',...)
   // Calculate byte size BEFORE any truncation
   outputFullSizes[fmt] = new Blob([str]).size;
   if (str.length > STORE_LIMIT) {
@@ -2203,51 +3227,155 @@ function storeOutput(fmt, str) {
   }
 }
 
+// addDisplaySpacing replaced by toggleSeparator / applySeparator system (see above)
+
 function renderOutput(fmt, origBytes) {
+  // ── EZ sub-stage render ───────────────────────────────────────
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  if (EZ_STAGES.includes(fmt)) {
+    const fmtDef = FORMATS.find(f => f.id === fmt);
+    const ez = outputs['ez'];
+    const body = document.getElementById('body-' + fmt);
+    const metaEl = document.getElementById('meta-' + fmt);
+    if (!ez || !fmtDef) { if (body) body.innerHTML = '<div class="out-placeholder" style="color:var(--red)">Requires EZ Encoding</div>'; return; }
+    const content = ez[fmtDef.ezStage] || '';
+    const len = ez[fmtDef.ezLen] || content.length;
+    const byteCount = ez.byteCount || 0;
+    const ratio = byteCount > 0 ? (len / byteCount).toFixed(2) : '—';
+    body.textContent = separatorActive[fmt] ? applySeparator(fmt, content) : content;
+    if (metaEl) metaEl.innerHTML = `<span>Chars: <em>${fmtNum(len)}</em></span>
+      <span>Original: <em>${fmtSize(origBytes)}</em></span>
+      <span style="color:var(--green)">Ratio: <em>${ratio}×</em></span>`;
+    return;
+  }
+
   // ── EZ special render ──────────────────────────────────────────
   if (fmt === 'ez') {
     const ez = outputs['ez'];
     const body = document.getElementById('body-ez');
     const byteCount = ez.byteCount || 0;
+    const hasPairMap = ez.pairMap && ez.pairMap.length > 0;
+    const outputLen  = ez.finalLen || 0;
+    const packedSize = ez.finalPackedSize || 0;
+    const subSaved   = ez.letterLen - ez.subLen;
+    const step5Saved = ez.subLen - ez.step5Len;
+    const step6Saved = (ez.step5Len || 0) - (ez.step6Len || 0);
+    const ratio      = byteCount > 0 ? (outputLen / byteCount).toFixed(2) : '—';
+    const packPct    = outputLen > 0 ? ((1 - packedSize/outputLen)*100).toFixed(1) : '0';
+
+    // Build pattern-map legend HTML (step 4 — a-z substitutions)
+    const pairMapHTML = hasPairMap
+      ? ez.pairMap.map(({ char, pat, cnt, score }) =>
+          `<span style="color:var(--amber)">${char}</span><span style="color:var(--text3)">→</span><span style="color:var(--cyan)">${pat}</span><span style="color:var(--text3)">(×${cnt},−${score})</span>`
+        ).join('&ensp;')
+      : '<span style="color:var(--text3)">No patterns met threshold</span>';
 
     body.innerHTML = `<div class="ez-pipeline">
       <div class="ez-step">
         <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')">
-          <div class="ez-step-label">
-            <span class="badge ez-badge-b64">STEP 1</span>
-            🔤 Base64 (intermediate)
-          </div>
-          <div class="ez-step-meta">
-            <span>Length: <em>${fmtNum(ez.base64Len)} chars</em></span>
-            <span style="color:var(--red)">Ratio: <em>${(ez.base64Len / byteCount).toFixed(1)}×</em></span>
-          </div>
+          <div class="ez-step-label"><span class="badge ez-badge-bin">STEP 1</span> ⚙ Raw Binary (8-bit per byte)</div>
+          <div class="ez-step-meta"><span>Length: <em>${fmtNum(ez.binLen)} bits</em></span></div>
         </div>
-        <div class="ez-step-body">${ez.base64Preview || ''}</div>
+        <div class="ez-step-body">${ez.binPreview || ''}</div>
       </div>
       <div class="ez-arrow">↓</div>
       <div class="ez-step">
         <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')">
+          <div class="ez-step-label"><span class="badge ez-badge-bin">STEP 2</span> 🔤 Bit-pairs → ABCD  <code style="color:var(--text3);font-size:0.6rem">00=A 01=B 10=C 11=D</code></div>
+          <div class="ez-step-meta"><span>Length: <em>${fmtNum(ez.abcdLen)} chars</em></span></div>
+        </div>
+        <div class="ez-step-body">${ez.abcdPreview || ''}</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')">
+          <div class="ez-step-label"><span class="badge ez-badge-b64">STEP 3</span> 🔡 ABCD-pairs → Letters E–T  <code style="color:var(--text3);font-size:0.6rem">AA=E … DD=T</code></div>
+          <div class="ez-step-meta"><span>Length: <em>${fmtNum(ez.letterLen)} chars</em></span></div>
+        </div>
+        <div class="ez-step-body">${ez.letterPreview || ''}</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step" style="border-color:${hasPairMap ? 'var(--amber)' : 'var(--border2)'}">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')" style="${hasPairMap ? 'background:rgba(245,158,11,.05)' : ''}">
           <div class="ez-step-label">
-            <span class="badge ez-badge-rle">STEP 2</span>
-            🔢 Run‑Length Encoded — format: <code style="color:var(--amber)">\countCHAR\</code>
+            <span class="badge ez-badge-rle" style="background:#422006;color:#facc15">STEP 4</span>
+            🔤 Top-26 pattern substitution
+            <code style="color:var(--text3);font-size:0.6rem">most-frequent patterns (len 2–5) → a–z</code>
           </div>
           <div class="ez-step-meta">
-            <span>Length: <em>${fmtNum(ez.rleLen)} chars</em></span>
-            <span style="color:var(--red)">Compression: <em>${ez.base64Len ? Math.round((1 - ez.rleLen/ez.base64Len)*100) : 0}%</em></span>
+            <span>Length: <em>${fmtNum(ez.subLen)} chars</em></span>
+            ${hasPairMap ? `<span style="color:var(--cyan)">Saved: <em>${fmtNum(subSaved)} chars</em></span>` : ''}
+            ${hasPairMap ? `<span style="color:var(--amber)">Patterns: <em>${ez.pairMap.length}</em></span>` : ''}
           </div>
         </div>
-        <div class="ez-step-body open">${ez.rlePreview || ''}</div>
+        <div class="ez-step-body open">${
+          hasPairMap
+            ? '<span style="color:var(--amber);font-size:0.65rem">MAP: ' + (ez.mapStr || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,400) + '</span>\n\n'
+              + pairMapHTML + '\n\n'
+              + (ez.subPreview || '')
+            : (ez.subPreview || '')
+        }</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step" style="border-color:var(--purple)">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')" style="background:rgba(167,139,250,.05)">
+          <div class="ez-step-label">
+            <span class="badge" style="background:#2e1065;color:#c084fc">STEP 5</span>
+            🔣 Double-letter pairs → compact symbols
+            <code style="color:var(--text3);font-size:0.6rem">EE→' FF→{ GG→( TT→/ …</code>
+          </div>
+          <div class="ez-step-meta">
+            <span>Length: <em>${fmtNum(ez.step5Len)} chars</em></span>
+            ${step5Saved > 0 ? `<span style="color:var(--purple)">Saved: <em>${fmtNum(step5Saved)} chars</em></span>` : '<span style="color:var(--text3)">No doubles found</span>'}
+          </div>
+        </div>
+        <div class="ez-step-body open">${ez.step5Preview || ''}</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step" style="border-color:var(--pink)">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')" style="background:rgba(244,114,182,.05)">
+          <div class="ez-step-label">
+            <span class="badge ez-badge-rle6">STEP 6</span>
+            📦 RLE — repeated runs → compact tokens
+            <code style="color:var(--text3);font-size:0.6rem">e.g. aaaaaa → #a*6#  |  efefefef → #ef*4#</code>
+          </div>
+          <div class="ez-step-meta">
+            <span>Length: <em>${fmtNum(ez.step6Len)} chars</em></span>
+            ${step6Saved > 0 ? `<span style="color:var(--pink)">Saved: <em>${fmtNum(step6Saved)} chars</em></span>` : '<span style="color:var(--text3)">No runs to compress</span>'}
+            <span>Final (with map): <em>${fmtSize(outputLen)}</em></span>
+            <span style="color:var(--green)">vs original: <em>${ratio}×</em></span>
+          </div>
+        </div>
+        <div class="ez-step-body open">${ez.step6Preview || ''}</div>
+      </div>
+      <div class="ez-arrow">↓</div>
+      <div class="ez-step" style="border-color:var(--green)">
+        <div class="ez-step-head" onclick="this.nextElementSibling.classList.toggle('open')" style="background:rgba(52,211,153,.06)">
+          <div class="ez-step-label"><span class="badge" style="background:#064e3b;color:#34d399">STEP 7</span> 💽 7-bit Binary Pack — compact alphabet → raw bytes</div>
+          <div class="ez-step-meta">
+            <span>ASCII: <em>${fmtSize(outputLen)}</em></span>
+            <span style="color:var(--green)">Packed: <em>${fmtSize(packedSize)}</em></span>
+            <span style="color:var(--green)">Saved: <em>−${packPct}%</em></span>
+          </div>
+        </div>
+        <div class="ez-step-body">
+          <span style="color:var(--text3);font-size:0.68rem">73-char alphabet packed at 7 bits/symbol → raw binary bytes. Saved as compact <code>.ez</code> file using raw binary (EZB1 format) — no base64 overhead.</span>
+        </div>
       </div>
     </div>
-    <div style="margin-top:10px;display:flex;gap:8px">
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-ghost btn-sm" onclick="showEZReverse()">🔄 SHOW REVERSE STEPS</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ez-help-modal').style.display='flex'" style="border-color:var(--cyan);color:var(--cyan)">❓ HOW EZ WORKS</button>
     </div>
     <div id="ez-rev-panel" style="display:none;margin-top:12px"></div>`;
 
     document.getElementById('meta-ez').innerHTML =
-      `<span>Bytes: <em>${fmtNum(byteCount)}</em></span>
-       <span>RLE chars: <em>${fmtNum(ez.rleLen)}</em></span>
-       <span>Original: <em>${fmtSize(origBytes)}</em></span>`;
+      `<span>Bytes in: <em>${fmtNum(byteCount)}</em></span>
+       <span>Output: <em>${fmtSize(outputLen)}</em></span>
+       <span style="color:var(--green)">Packed: <em>${fmtSize(packedSize)}</em></span>
+       <span>Original: <em>${fmtSize(origBytes)}</em></span>
+       <span style="color:var(--green)">Ratio: <em>${ratio}×</em></span>
+       ${hasPairMap ? `<span style="color:var(--amber)">Pairs mapped: <em>${ez.pairMap.length}</em></span>` : ''}`;
     return;
   }
 
@@ -2264,7 +3392,8 @@ function renderOutput(fmt, origBytes) {
   const bodyStr = parsed ? parsed.body : (displayStr || '');
 
   const body = document.getElementById('body-' + fmt);
-  body.textContent = bodyStr.slice(0, DISPLAY_LIMIT);
+  // Display raw or separator-spaced — never affects copy/save/lengths
+  body.textContent = separatorActive[fmt] ? applySeparator(fmt, bodyStr) : bodyStr;
 
   if (isBlob || (str && str.length > DISPLAY_LIMIT)) {
     const note = document.createElement('div');
@@ -2276,7 +3405,7 @@ function renderOutput(fmt, origBytes) {
   // Meta — use outputFullSizes for accurate output byte count
   const parsed2 = parseHeader(str || '');
   const origSize = parseInt(parsed2?.meta?.size || origBytes || 0);
-  const isCompressed = fmt === 'deflate' || fmt === 'gzip';
+  const isCompressed = fmt === 'deflate' || fmt === 'gzip' || fmt === 'lzw' || fmt === 'huffman';
   let compressionInfo = '';
   if (isCompressed && origSize > 0) {
     // base64 of compressed bytes; strip header length
@@ -2308,32 +3437,143 @@ function resetButtons() {
 // ═══════════════════════════════════════════════════════════════════════
 //  COPY / SAVE
 // ═══════════════════════════════════════════════════════════════════════
+// ── Clipboard with mobile fallback ────────────────────────────
+function copyText(text, label) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('📋 Copied' + (label ? ' ' + label : '') + '!')).catch(() => fallbackCopy(text, label));
+  } else {
+    fallbackCopy(text, label);
+  }
+}
+function fallbackCopy(text, label) {
+  const el = document.createElement('textarea');
+  el.value = text;
+  el.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none';
+  document.body.appendChild(el);
+  el.focus(); el.select();
+  try {
+    document.execCommand('copy');
+    showToast('📋 Copied' + (label ? ' ' + label : '') + '!');
+  } catch(e) {
+    showToast('⚠ Copy failed — please select and copy manually');
+  }
+  document.body.removeChild(el);
+}
+
 function copyOut(fmt) {
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  if (EZ_STAGES.includes(fmt)) {
+    const fmtDef = FORMATS.find(f => f.id === fmt);
+    const ez = outputs['ez'];
+    if (!ez || !fmtDef || !ez[fmtDef.ezStage]) { showToast('Nothing to copy'); return; }
+    copyText(ez[fmtDef.ezStage], fmtDef.label);
+    return;
+  }
   if (fmt === 'ez') {
     const ez = outputs['ez'];
     if (!ez) { showToast('Nothing to copy'); return; }
-    navigator.clipboard.writeText((ez.header || '') + ez.rleFull || '').then(() => showToast('📋 Copied EZ RLE!'));
+    copyText((ez.header || '') + (ez.finalFull || ''), 'EZ Encoded');
     return;
   }
   const str = outputs[fmt];
   if (!str) { showToast('Nothing to copy'); return; }
   if (outputBlobs[fmt]) { showToast('⚠ Output too large to copy — use SAVE instead'); return; }
-  navigator.clipboard.writeText(str).then(() => showToast('📋 Copied!'));
+  copyText(str, fmt.toUpperCase());
 }
 
 function saveOut(fmt) {
+  const rawMode = isRawBytesMode();
+  const baseName = currentFileName || 'output';
+  const ext = FMT_EXT[fmt] || fmt;
+  const saveFileName = rawMode ? baseName + '.' + ext : null; // null = use legacy generic name
+
   if (fmt === 'ez') {
     const ez = outputs['ez'];
     if (!ez) { showToast('Nothing to save'); return; }
-    const blob = new Blob([(ez.header || '') + ez.rleFull || ''], { type: 'text/plain' });
-    triggerDownload(blob, 'ez_rle.txt');
+    if (ez.finalPackedB64) {
+      const packedBytes = Uint8Array.from(atob(ez.finalPackedB64), c => c.charCodeAt(0));
+      let combined;
+      if (rawMode) {
+        // Raw mode: NO BCVT header, just EZB1: sentinel + packed binary
+        const sentinelBytes = new TextEncoder().encode('EZB1:');
+        combined = new Uint8Array(sentinelBytes.length + packedBytes.length);
+        combined.set(sentinelBytes, 0);
+        combined.set(packedBytes, sentinelBytes.length);
+      } else {
+        // Normal mode: BCVT header + EZB1: sentinel + packed binary
+        const headerBytes = new TextEncoder().encode(ez.header || '');
+        const sentinelBytes = new TextEncoder().encode('EZB1:');
+        combined = new Uint8Array(headerBytes.length + sentinelBytes.length + packedBytes.length);
+        combined.set(headerBytes, 0);
+        combined.set(sentinelBytes, headerBytes.length);
+        combined.set(packedBytes, headerBytes.length + sentinelBytes.length);
+      }
+      const blob = new Blob([combined], { type: 'application/octet-stream' });
+      triggerDownload(blob, saveFileName || 'ez_encoded.ez');
+      const asciiSize = new TextEncoder().encode((ez.header||'') + (ez.finalFull||'')).length;
+      const pct = ((1 - combined.length/asciiSize)*100).toFixed(1);
+      showToast(`💾 Saved ${fmtSize(combined.length)} · −${pct}% vs ASCII`);
+    } else {
+      const encodedStr = rawMode ? (ez.finalFull || '') : ((ez.header || '') + (ez.finalFull || ''));
+      const rawBytes = new TextEncoder().encode(encodedStr);
+      triggerDownload(new Blob([rawBytes], { type: 'application/octet-stream' }), saveFileName || 'ez_encoded.ez');
+      showToast('💾 Saved EZ (' + fmtSize(rawBytes.length) + ')');
+    }
     return;
   }
+
   const blob = outputBlobs[fmt] || (outputs[fmt] ? new Blob([outputs[fmt]], { type: 'text/plain' }) : null);
   if (!blob) { showToast('Nothing to save'); return; }
-  const ext = { bin:'bin.txt', dec:'dec.txt', hex:'hex.txt', hexdump:'hexdump.txt', b64:'base64.txt', b64url:'base64url.txt', b32:'base32.txt', b85:'base85.txt', b91:'base91.txt', b122:'base122.txt', b58:'base58.txt', b62:'base62.txt', b36:'base36.txt', oct:'octal.txt', morse:'morse.txt', deflate:'deflate_b64.txt', gzip:'gzip_b64.txt', sha256:'sha256.txt', qp:'quoted-printable.txt', url:'url-encoded.txt' }[fmt] || 'output.txt';
-  triggerDownload(blob, ext);
+
+  if (rawMode) {
+    // Raw mode: save with original filename + format extension, no header
+    // Strip the BCVT header from the blob content before saving
+    blob.arrayBuffer().then(buf => {
+      const bytes = new Uint8Array(buf);
+      const text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+      const parsed = parseHeader(text);
+      let saveBlob;
+      if (parsed) {
+        // Remove header, save only the encoded body
+        const bodyBytes = new TextEncoder().encode(parsed.body);
+        saveBlob = new Blob([bodyBytes], { type: 'application/octet-stream' });
+      } else {
+        saveBlob = new Blob([bytes], { type: 'application/octet-stream' });
+      }
+      triggerDownload(saveBlob, saveFileName);
+      showToast('💾 Saved ' + saveFileName + ' (' + fmtSize(saveBlob.size) + ')');
+    });
+    return;
+  }
+
+  const legacyExt = { bin:'bin.txt', dec:'dec.txt', hex:'hex.txt', hexdump:'hexdump.txt', b64:'base64.txt', b64url:'base64url.txt', b32:'base32.txt', b85:'base85.txt', b91:'base91.txt', b122:'base122.txt', b58:'base58.txt', b62:'base62.txt', b36:'base36.txt', oct:'octal.txt', morse:'morse.txt', deflate:'deflate_b64.txt', gzip:'gzip_b64.txt', sha256:'sha256.txt', qp:'quoted-printable.txt', url:'url-encoded.txt' }[fmt] || 'output.txt';
+  triggerDownload(blob, legacyExt);
 }
+
+function isRawBytesMode() {
+  const chk = document.getElementById('rawBytesChk');
+  return chk && chk.checked;
+}
+
+function onRawBytesToggle() {
+  const label = document.getElementById('rawBytesLabel');
+  const on = isRawBytesMode();
+  if (label) {
+    label.style.borderColor = on ? 'var(--amber)' : 'var(--border2)';
+    label.style.color       = on ? 'var(--amber)' : 'var(--text2)';
+    label.style.background  = on ? 'rgba(245,158,11,.08)' : 'var(--bg0)';
+  }
+  if (on) showToast('💾 Raw-bytes mode ON — saves file.txt → file.txt.ez (no BCVT header)');
+}
+
+// Build the extension map for every fmt
+const FMT_EXT = {
+  bin:'bin', dec:'dec', hex:'hex', hexdump:'hexdump',
+  b64:'b64', b64url:'b64url', b32:'b32', b85:'b85', b91:'b91',
+  b122:'b122', b58:'b58', b62:'b62', b36:'b36', oct:'oct',
+  morse:'morse', deflate:'deflate', gzip:'gzip', sha256:'sha256',
+  qp:'qp', url:'url', ez:'ez', lzw:'lzw', huffman:'huffman'
+};
 
 function triggerDownload(blob, name) {
   const a = document.createElement('a');
@@ -2348,68 +3588,594 @@ function triggerDownload(blob, name) {
 // ═══════════════════════════════════════════════════════════════════════
 function showEZReverse() {
   const ez = outputs['ez'];
-  if (!ez || !ez.rleFull) { showToast('⚠ No EZ output yet'); return; }
+  if (!ez || !ez.finalFull) { showToast('⚠ No EZ output yet'); return; }
   const panel = document.getElementById('ez-rev-panel');
   if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
   panel.style.display = 'block';
 
-  let base64Preview = '', byteCount = 0;
-  try {
-    const base64Full = rleDecode(ez.rleFull);
-    base64Preview = base64Full.slice(0, 2000);
-    byteCount = fromBase64(base64Full).length;
-  } catch (e) {
-    base64Preview = 'Error decoding RLE: ' + e.message;
-  }
+  const hasPairMap = ez.pairMap && ez.pairMap.length > 0;
+  const step6Saved = (ez.step5Len || 0) - (ez.step6Len || 0);
 
-  panel.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-transform:uppercase">🔄 Reverse Path — RLE → Base64 → Bytes</div>
+  panel.innerHTML = `<div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-transform:uppercase">🔄 Reverse Path — 5 steps back to original bytes</div>
   <div class="ez-pipeline ez-rev-pipeline">
+    <div class="ez-step" style="border-color:var(--pink)">
+      <div class="ez-step-head" style="background:rgba(244,114,182,.05)">
+        <div class="ez-step-label">
+          <span class="badge ez-badge-rle6">STEP 0</span>
+          📦 RLE-encoded output — decode #x*n# tokens back to runs
+        </div>
+        <div class="ez-step-meta">
+          <span>Size: <em>${fmtSize(ez.finalLen)}</em></span>
+          ${step6Saved > 0 ? `<span style="color:var(--pink)">RLE saved: <em>${fmtNum(step6Saved)} chars</em></span>` : '<span style="color:var(--text3)">No RLE tokens</span>'}
+        </div>
+      </div>
+      <div class="ez-step-body open">${(ez.step6Preview || ez.step5Preview || '').slice(0, 1200)}</div>
+    </div>
+    <div class="ez-arrow">↓ #x*n# → x repeated n times  (e.g. #a*6# → aaaaaa)</div>
+    <div class="ez-step" style="border-color:var(--purple)">
+      <div class="ez-step-head" style="background:rgba(167,139,250,.05)">
+        <div class="ez-step-label">
+          <span class="badge" style="background:#2e1065;color:#c084fc">STEP A</span>
+          🔣 Expand compact symbols → double-letter pairs
+        </div>
+        <div class="ez-step-meta">
+          <span>Chars: <em>${fmtNum(ez.step5Len)}</em></span>
+        </div>
+      </div>
+      <div class="ez-step-body open">${(ez.step5Preview || '').slice(0, 1200)}</div>
+    </div>
+    <div class="ez-arrow">↓ symbol → letter pair  (e.g. ' → EE, { → FF …)</div>
+    <div class="ez-step" style="border-color:${hasPairMap ? 'var(--amber)' : 'var(--border2)'}">
+      <div class="ez-step-head" style="${hasPairMap ? 'background:rgba(245,158,11,.05)' : ''}">
+        <div class="ez-step-label">
+          <span class="badge ez-badge-rle" style="background:#422006;color:#facc15">STEP B</span>
+          🔤 Parse [a–z] map header &amp; expand letters → E-T patterns
+        </div>
+        <div class="ez-step-meta">
+          <span>Chars: <em>${fmtNum(ez.subLen)}</em></span>
+          ${hasPairMap
+            ? `<span style="color:var(--amber)">Patterns: <em>${ez.pairMap.length}</em></span>`
+            : `<span style="color:var(--text3)">No map header</span>`}
+        </div>
+      </div>
+      <div class="ez-step-body open">${(ez.subPreview || '').slice(0, 1200)}</div>
+    </div>
+    <div class="ez-arrow">↓ a-z letter → E-T pattern  (e.g. a → GEH, b → KN …)</div>
     <div class="ez-step">
       <div class="ez-step-head">
-        <div class="ez-step-label"><span class="badge ez-badge-rle">STEP A</span> 🔢 RLE string — format: <code>\\countCHAR\\</code> (e.g. <code>\\9A\\</code> = 9×A)</div>
-        <div class="ez-step-meta"><span>Chars: <em>${fmtNum(ez.rleLen)}</em></span></div>
+        <div class="ez-step-label"><span class="badge ez-badge-b64">STEP C</span> 🔡 Restored letter string E–T</div>
+        <div class="ez-step-meta"><span>Chars: <em>${fmtNum(ez.letterLen)}</em></span></div>
       </div>
-      <div class="ez-step-body open">${(ez.rlePreview || '').slice(0, 1200)}</div>
+      <div class="ez-step-body open">${(ez.letterPreview || '').slice(0, 1200)}</div>
     </div>
-    <div class="ez-arrow">↓ expand \\count CHAR\\ runs → Base64</div>
+    <div class="ez-arrow">↓ each letter → 2-char ABCD pair</div>
     <div class="ez-step">
       <div class="ez-step-head">
-        <div class="ez-step-label"><span class="badge ez-badge-b64">STEP B</span> 🔤 Base64 intermediate</div>
-        <div class="ez-step-meta"><span>Chars: <em>${fmtNum(ez.base64Len)}</em></span></div>
+        <div class="ez-step-label"><span class="badge ez-badge-bin">STEP D</span> 🔤 ABCD → bit-pairs  <code style="color:var(--text3);font-size:0.6rem">A→00 B→01 C→10 D→11</code></div>
+        <div class="ez-step-meta"><span>Bits: <em>${fmtNum(ez.binLen)}</em></span></div>
       </div>
-      <div class="ez-step-body open">${base64Preview}</div>
+      <div class="ez-step-body open">${(ez.abcdPreview || '').slice(0, 1200)}</div>
     </div>
-    <div class="ez-arrow">↓ Base64 decode → original bytes</div>
+    <div class="ez-arrow">↓ group 8 bits → 1 byte</div>
     <div class="ez-step" style="border-color:var(--green)">
       <div class="ez-step-head" style="background:rgba(52,211,153,.08)">
-        <div class="ez-step-label" style="color:var(--green)">✓ Original bytes restored (${fmtSize(byteCount)})</div>
+        <div class="ez-step-label" style="color:var(--green)">✓ Original bytes restored (${fmtSize(ez.byteCount)})</div>
       </div>
     </div>
   </div>`;
 }
 
-// Main-thread rleDecode — mirrors worker version exactly
-// Format: \countCHAR\ — e.g. \9A\ = 9 A's, \39\ = 3 nines
-// The last char before the closing \ is the repeated character; digits before it are the count.
-function rleDecode(s) {
-  let out = '';
-  let i = 0;
-  while (i < s.length) {
-    if (s[i] === '\\') {
-      const close = s.indexOf('\\', i + 1);
-      if (close === -1) throw new Error('RLE: unclosed token at pos ' + i);
-      const token = s.slice(i + 1, close);
-      if (token.length < 2) throw new Error('RLE: token too short "' + token + '"');
-      const ch = token[token.length - 1];
-      const count = parseInt(token.slice(0, -1), 10);
-      if (isNaN(count) || count < 1) throw new Error('RLE: bad count in "' + token + '"');
-      out += ch.repeat(count);
-      i = close + 1;
-    } else {
-      out += s[i++];
+// (rleDecode removed — EZ v2 stores all pipeline steps directly in JSON)
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CHAIN ENCODING
+// ═══════════════════════════════════════════════════════════════════════
+
+function initChainSelect() {
+  const sel = document.getElementById('chainAddSelect');
+  FORMATS.forEach(f => {
+    if (CHAIN_EXCLUDED.has(f.id)) return;
+    const opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.icon + ' ' + f.label + ' [' + f.badge + ']';
+    sel.appendChild(opt);
+  });
+  // Render the chain restored from localStorage (if any)
+  if (chainList.length > 0) renderChainList();
+}
+
+function saveChainList() {
+  try { localStorage.setItem(CHAIN_LIST_STORAGE_KEY, JSON.stringify(chainList)); } catch(_) {}
+}
+
+function renderChainList() {
+  saveChainList();
+  const el = document.getElementById('chainListEl');
+  if (chainList.length === 0) {
+    el.className = 'chain-empty';
+    el.innerHTML = 'No steps added — pick a preset or build your own chain above';
+    return;
+  }
+  el.className = 'chain-list';
+  el.innerHTML = chainList.map((fmt, idx) => {
+    const f = FORMATS.find(x => x.id === fmt);
+    if (!f) return '';
+    return `<div class="chain-item">
+      <span class="chain-num">${idx + 1}</span>
+      ${idx > 0 ? '<span class="chain-arrow" style="font-size:0.75rem">↓</span>' : '<span style="min-width:14px"></span>'}
+      <span class="chain-icon">${f.icon}</span>
+      <span class="chain-label">${f.label}</span>
+      <span class="badge" style="background:var(--bg3);color:var(--text3);font-size:0.58rem">${f.badge}</span>
+      <div class="chain-item-btns">
+        ${idx > 0 ? `<button class="btn btn-ghost btn-sm" style="padding:3px 7px" onclick="moveChain(${idx},-1)" title="Move up">↑</button>` : ''}
+        ${idx < chainList.length - 1 ? `<button class="btn btn-ghost btn-sm" style="padding:3px 7px" onclick="moveChain(${idx},1)" title="Move down">↓</button>` : ''}
+        <button class="btn btn-danger btn-sm" style="padding:3px 7px" onclick="removeChain(${idx})" title="Remove">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addToChain() {
+  const sel = document.getElementById('chainAddSelect');
+  if (!sel.value) { showToast('Select a format first'); return; }
+  chainList.push(sel.value);
+  sel.value = '';
+  renderChainList();
+}
+
+function removeChain(idx) {
+  chainList.splice(idx, 1);
+  renderChainList();
+}
+
+function moveChain(idx, dir) {
+  const ni = idx + dir;
+  if (ni < 0 || ni >= chainList.length) return;
+  [chainList[idx], chainList[ni]] = [chainList[ni], chainList[idx]];
+  renderChainList();
+}
+
+function clearChain() {
+  chainList = [];
+  renderChainList();
+  document.getElementById('chainResult').style.display = 'none';
+  document.getElementById('chainStatus').textContent = '';
+}
+
+function loadChainPreset(fmts) {
+  chainList = [...fmts];
+  renderChainList();
+  document.getElementById('chainResult').style.display = 'none';
+  document.getElementById('chainStatus').textContent = '';
+  showToast('⛓ Preset loaded: ' + fmts.map(f => f.toUpperCase()).join(' → '));
+}
+
+async function startChainEncode() {
+  if (chainList.length === 0) { showToast('⚠ Add at least one format to the chain'); return; }
+
+  // Get input bytes
+  let inputBytes;
+  const activePane = document.querySelector('.tab-pane.active').id;
+  if (activePane === 'pane-file') {
+    if (!currentFile) { showToast('⚠ Please select a file first'); return; }
+    inputBytes = new Uint8Array(await currentFile.arrayBuffer());
+  } else {
+    const txt = document.getElementById('textInput').value;
+    if (!txt) { showToast('⚠ Enter some text first'); return; }
+    inputBytes = new TextEncoder().encode(txt);
+  }
+
+  const btn = document.getElementById('chainEncodeBtn');
+  const statusEl = document.getElementById('chainStatus');
+  const resultEl = document.getElementById('chainResult');
+  btn.disabled = true;
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:0.7rem">⏳ Starting chain…</div>';
+
+  const origSize = inputBytes.length;
+  const stepResults = [];
+  let currentBytes = inputBytes;
+  let errMsg = null;
+
+  for (let i = 0; i < chainList.length; i++) {
+    const fmt = chainList[i];
+    const f = FORMATS.find(x => x.id === fmt);
+    statusEl.textContent = `Step ${i+1}/${chainList.length}: ${f?.label || fmt}…`;
+    resultEl.innerHTML = `<div style="color:var(--amber);font-family:var(--mono);font-size:0.7rem">
+      ⏳ Step ${i+1}/${chainList.length} — encoding as <strong>${(f?.label||fmt).toUpperCase()}</strong>…
+    </div>`;
+
+    try {
+      const inputSize = currentBytes.length;
+      const result = await new Promise((resolve, reject) => {
+        // Pass a copy so buffer isn't neutered by transfer
+        postTask('encode', fmt, currentBytes.buffer.slice(0), '', null,
+          () => {},
+          (r) => resolve(r),
+          (e) => reject(new Error(e))
+        );
+      });
+
+      // Extract text output (EZ returns JSON; extract finalFull)
+      let outputStr;
+      if (fmt === 'ez') {
+        try {
+          const ezData = JSON.parse(result);
+          outputStr = (ezData.header || '') + (ezData.finalFull || '');
+        } catch { outputStr = result; }
+      } else {
+        outputStr = result;
+      }
+
+      // Convert output string → bytes for the next step
+      const outputBytes = new TextEncoder().encode(outputStr);
+      stepResults.push({ fmt, inputSize, outputSize: outputBytes.length });
+      currentBytes = outputBytes;
+
+    } catch(e) {
+      errMsg = `Step ${i+1} (${fmt.toUpperCase()}): ${e.message}`;
+      break;
     }
   }
-  return out;
+
+  btn.disabled = false;
+  statusEl.textContent = '';
+
+  if (errMsg) {
+    resultEl.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:0.7rem">❌ ${errMsg}</div>`;
+    return;
+  }
+
+  // Store output for download
+  chainOutputBytes = currentBytes;
+
+  // Build result HTML
+  let html = `<div style="font-family:var(--mono);font-size:0.62rem;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px;text-transform:uppercase">
+    ⛓ Chain Result — ${chainList.length} step${chainList.length > 1 ? 's' : ''}
+  </div>`;
+
+  html += `<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text3);margin-bottom:10px">
+    Input: <span style="color:var(--cyan)">${fmtSize(origSize)}</span>
+  </div>`;
+
+  stepResults.forEach(({ fmt, inputSize, outputSize }, i) => {
+    const f = FORMATS.find(x => x.id === fmt);
+    const grew = outputSize > inputSize;
+    const pct = grew
+      ? '+' + ((outputSize / inputSize - 1) * 100).toFixed(1) + '%'
+      : '−' + ((1 - outputSize / inputSize) * 100).toFixed(1) + '%';
+    html += `<div class="chain-result-step">
+      <span style="color:var(--text3);min-width:20px;text-align:right">${i+1}.</span>
+      <span>${f?.icon || ''}</span>
+      <span style="color:var(--text);min-width:100px;font-weight:600">${f?.label || fmt}</span>
+      <span style="color:var(--text3)">${fmtSize(inputSize)}</span>
+      <span style="color:var(--text3)">→</span>
+      <span style="color:var(--cyan);font-weight:600">${fmtSize(outputSize)}</span>
+      <span style="color:${grew ? 'var(--red)' : 'var(--green)'};margin-left:4px">${pct}</span>
+    </div>`;
+  });
+
+  const finalPct = currentBytes.length < origSize
+    ? '−' + ((1 - currentBytes.length / origSize) * 100).toFixed(1) + '%'
+    : '+' + ((currentBytes.length / origSize - 1) * 100).toFixed(1) + '%';
+  const finalBetter = currentBytes.length < origSize;
+
+  html += `<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);
+    font-family:var(--mono);font-size:0.72rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span>Final: <strong style="color:var(--amber)">${fmtSize(currentBytes.length)}</strong></span>
+    <span style="color:var(--text3)">vs ${fmtSize(origSize)} original</span>
+    <span style="color:${finalBetter ? 'var(--green)' : 'var(--red)'}">
+      ${finalBetter ? '↓' : '↑'} ${finalPct}
+    </span>
+    <span style="color:var(--text3);font-size:0.65rem">${chainList.map(f=>f.toUpperCase()).join(' → ')}</span>
+  </div>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-amber btn-sm" onclick="saveChainOutput()">💾 SAVE RAW BYTES (.bin)</button>
+    <span style="font-family:var(--mono);font-size:0.62rem;color:var(--text3)">${fmtSize(currentBytes.length)} · application/octet-stream</span>
+  </div>`;
+
+  resultEl.innerHTML = html;
+}
+
+function saveChainOutput() {
+  if (!chainOutputBytes) { showToast('Nothing to save'); return; }
+  const name = chainList.map(f => f.toUpperCase()).join('-') + '.bin';
+  const blob = new Blob([chainOutputBytes], { type: 'application/octet-stream' });
+  triggerDownload(blob, name);
+  showToast(`💾 Saved ${fmtSize(chainOutputBytes.length)} — ${name}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CHAIN PRESETS — localStorage persistence
+// ═══════════════════════════════════════════════════════════════════════
+const PRESET_STORAGE_KEY = 'bcvt_chain_presets_v1';
+
+function getSavedPresets() {
+  try { return JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY) || '[]'); } catch { return []; }
+}
+
+function saveSavedPresets(list) {
+  try { localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(list)); } catch (e) { showToast('⚠ Could not save: ' + e.message); }
+}
+
+function saveChainAsPreset() {
+  if (chainList.length === 0) { showToast('⚠ Add at least one step to save as preset'); return; }
+  const nameInput = document.getElementById('presetNameInput');
+  const name = (nameInput.value || '').trim() || chainList.map(f => f.toUpperCase()).join(' → ');
+  const presets = getSavedPresets();
+  presets.push({ name, chain: [...chainList] });
+  saveSavedPresets(presets);
+  nameInput.value = '';
+  renderSavedPresets();
+  showToast(`💾 Saved preset: "${name}"`);
+}
+
+function deletePreset(idx) {
+  const presets = getSavedPresets();
+  const name = presets[idx]?.name || '';
+  presets.splice(idx, 1);
+  saveSavedPresets(presets);
+  renderSavedPresets();
+  showToast(`🗑 Deleted preset "${name}"`);
+}
+
+function renderSavedPresets() {
+  const container = document.getElementById('chainSavedPresets');
+  if (!container) return;
+  const presets = getSavedPresets();
+  if (presets.length === 0) {
+    container.innerHTML = '<span style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);font-style:italic">No saved presets yet</span>';
+    return;
+  }
+  container.innerHTML = presets.map((p, i) =>
+    `<span class="chain-saved-btn">
+      <span onclick="loadChainPreset(${JSON.stringify(p.chain)})" title="${p.chain.map(f=>f.toUpperCase()).join(' → ')}">${p.name}</span>
+      <button class="preset-del" onclick="deletePreset(${i})" title="Delete preset">✕</button>
+    </span>`
+  ).join('');
+}
+
+// Initialize saved presets on page load
+(function() { setTimeout(renderSavedPresets, 50); })();
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CHAIN DECODE
+// ═══════════════════════════════════════════════════════════════════════
+let chainDecList = [];        // decode chain (usually reverse of chainList)
+let chainDecFileBytes = null; // raw bytes of the loaded .bin file
+
+function initChainDecSelect() {
+  const sel = document.getElementById('chainDecAddSelect');
+  FORMATS.forEach(f => {
+    if (CHAIN_EXCLUDED.has(f.id)) return;
+    const opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.icon + ' ' + f.label + ' [' + f.badge + ']';
+    sel.appendChild(opt);
+  });
+}
+
+function renderChainDecList() {
+  const el = document.getElementById('chainDecListEl');
+  if (chainDecList.length === 0) {
+    el.className = 'chain-empty';
+    el.innerHTML = 'No steps — click "Load from current chain" or add steps manually';
+    return;
+  }
+  el.className = 'chain-list';
+  el.innerHTML = chainDecList.map((fmt, idx) => {
+    const f = FORMATS.find(x => x.id === fmt);
+    if (!f) return '';
+    return `<div class="chain-item">
+      <span class="chain-num">${idx + 1}</span>
+      ${idx > 0 ? '<span class="chain-arrow" style="font-size:0.75rem">↓</span>' : '<span style="min-width:14px"></span>'}
+      <span class="chain-icon">${f.icon}</span>
+      <span class="chain-label">${f.label}</span>
+      <span class="badge" style="background:var(--bg3);color:var(--text3);font-size:0.58rem">${f.badge}</span>
+      <div class="chain-item-btns">
+        ${idx > 0 ? `<button class="btn btn-ghost btn-sm" style="padding:3px 7px" onclick="moveChainDec(${idx},-1)">↑</button>` : ''}
+        ${idx < chainDecList.length - 1 ? `<button class="btn btn-ghost btn-sm" style="padding:3px 7px" onclick="moveChainDec(${idx},1)">↓</button>` : ''}
+        <button class="btn btn-danger btn-sm" style="padding:3px 7px" onclick="removeChainDec(${idx})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addToChainDec() {
+  const sel = document.getElementById('chainDecAddSelect');
+  if (!sel.value) { showToast('Select a format first'); return; }
+  chainDecList.push(sel.value);
+  sel.value = '';
+  renderChainDecList();
+}
+
+function removeChainDec(idx) { chainDecList.splice(idx, 1); renderChainDecList(); }
+function moveChainDec(idx, dir) {
+  const ni = idx + dir;
+  if (ni < 0 || ni >= chainDecList.length) return;
+  [chainDecList[idx], chainDecList[ni]] = [chainDecList[ni], chainDecList[idx]];
+  renderChainDecList();
+}
+
+function clearChainDec() {
+  chainDecList = [];
+  renderChainDecList();
+  document.getElementById('chainDecResult').style.display = 'none';
+}
+
+function loadChainForDecode() {
+  if (chainList.length === 0) { showToast('⚠ No encode chain defined yet'); return; }
+  chainDecList = [...chainList].reverse();
+  renderChainDecList();
+  showToast('↺ Loaded encode chain in reverse: ' + chainDecList.map(f=>f.toUpperCase()).join(' → '));
+}
+
+function clearChainDecFile() {
+  chainDecFileBytes = null;
+  document.getElementById('chainDecFileInput').value = '';
+  document.getElementById('chainDecFileBadge').classList.remove('show');
+}
+
+// Init chain-dec file drop zone (called once after DOM ready)
+function initChainDecDropZone() {
+  const dz = document.getElementById('chainDecDz');
+  const fi = document.getElementById('chainDecFileInput');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer.files[0]) loadChainDecFile(e.dataTransfer.files[0]);
+  });
+  fi.addEventListener('change', e => { if (e.target.files[0]) loadChainDecFile(e.target.files[0]); });
+}
+
+function loadChainDecFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    chainDecFileBytes = new Uint8Array(e.target.result);
+    document.getElementById('chainDecFileBadgeText').textContent =
+      `✓ ${file.name}  —  ${fmtSize(file.size)}`;
+    document.getElementById('chainDecFileBadge').classList.add('show');
+    showToast(`📂 Loaded "${file.name}" — ${fmtSize(file.size)}`);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function switchRevMode(mode) {
+  const isSingle = mode === 'single';
+  document.getElementById('revModeTabSingle').classList.toggle('active', isSingle);
+  document.getElementById('revModeTabChain').classList.toggle('active', !isSingle);
+  document.getElementById('revModeSingle').style.display = isSingle ? '' : 'none';
+  document.getElementById('revModeChain').style.display = isSingle ? 'none' : '';
+  // hide shared result/error when switching
+  document.getElementById('revResult').classList.remove('show');
+  document.getElementById('revErr').classList.remove('show');
+  document.getElementById('chainDecResult').style.display = 'none';
+}
+
+async function startChainDecode() {
+  if (chainDecList.length === 0) { showToast('⚠ Add at least one decode step'); return; }
+  if (!chainDecFileBytes) { showToast('⚠ Load the chain-encoded .bin file first'); return; }
+
+  const btn = document.getElementById('chainDecodeBtn');
+  const statusEl = document.getElementById('chainDecStatus');
+  const resultEl = document.getElementById('chainDecResult');
+  btn.disabled = true;
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:0.7rem">⏳ Starting chain decode…</div>';
+
+  const origSize = chainDecFileBytes.length;
+  const stepResults = [];
+  let currentBytes = chainDecFileBytes;
+  let errMsg = null;
+
+  for (let i = 0; i < chainDecList.length; i++) {
+    const fmt = chainDecList[i];
+    const f = FORMATS.find(x => x.id === fmt);
+    statusEl.textContent = `Step ${i+1}/${chainDecList.length}: decode ${f?.label || fmt}…`;
+    resultEl.innerHTML = `<div style="color:var(--amber);font-family:var(--mono);font-size:0.7rem">
+      ⏳ Step ${i+1}/${chainDecList.length} — decoding <strong>${(f?.label||fmt).toUpperCase()}</strong>…
+    </div>`;
+
+    try {
+      const inputSize = currentBytes.length;
+
+      // Convert current bytes → string for the decoder
+      let rawStr;
+      try {
+        rawStr = new TextDecoder('utf-8', { fatal: true }).decode(currentBytes);
+      } catch(_) {
+        rawStr = new TextDecoder('iso-8859-1').decode(currentBytes);
+      }
+
+      // Decode the string
+      const decodedBytes = await new Promise((resolve, reject) => {
+        postTask('decode', fmt, null, null, rawStr, null,
+          (bytes) => resolve(bytes),
+          (e) => reject(new Error(e))
+        );
+      });
+
+      stepResults.push({ fmt, inputSize, outputSize: decodedBytes.length });
+      currentBytes = decodedBytes;
+
+    } catch(e) {
+      errMsg = `Step ${i+1} (${fmt.toUpperCase()}): ${e.message}`;
+      break;
+    }
+  }
+
+  btn.disabled = false;
+  statusEl.textContent = '';
+
+  if (errMsg) {
+    resultEl.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:0.7rem">❌ ${errMsg}</div>`;
+    return;
+  }
+
+  // Build result HTML
+  let html = `<div style="font-family:var(--mono);font-size:0.62rem;letter-spacing:1.5px;color:var(--text3);margin-bottom:10px;text-transform:uppercase">
+    ⛓ Chain Decode Result — ${chainDecList.length} step${chainDecList.length > 1 ? 's' : ''}
+  </div>`;
+  html += `<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text3);margin-bottom:10px">
+    Input: <span style="color:var(--cyan)">${fmtSize(origSize)}</span>
+  </div>`;
+
+  stepResults.forEach(({ fmt, inputSize, outputSize }, i) => {
+    const f = FORMATS.find(x => x.id === fmt);
+    const reduced = outputSize < inputSize;
+    const pct = reduced
+      ? '−' + ((1 - outputSize / inputSize) * 100).toFixed(1) + '%'
+      : '+' + ((outputSize / inputSize - 1) * 100).toFixed(1) + '%';
+    html += `<div class="chain-result-step">
+      <span style="color:var(--text3);min-width:20px;text-align:right">${i+1}.</span>
+      <span>${f?.icon || ''}</span>
+      <span style="color:var(--text);min-width:100px;font-weight:600">${f?.label || fmt}</span>
+      <span style="color:var(--text3)">${fmtSize(inputSize)}</span>
+      <span style="color:var(--text3)">→</span>
+      <span style="color:var(--cyan);font-weight:600">${fmtSize(outputSize)}</span>
+      <span style="color:${reduced ? 'var(--green)' : 'var(--red)'};margin-left:4px">${pct}</span>
+    </div>`;
+  });
+
+  // Try to detect text content
+  let restoredText = null;
+  try { restoredText = new TextDecoder('utf-8', { fatal: true }).decode(currentBytes); } catch(_) {}
+
+  html += `<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);
+    font-family:var(--mono);font-size:0.72rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span>Restored: <strong style="color:var(--green)">${fmtSize(currentBytes.length)}</strong></span>
+    <span style="color:var(--text3)">${restoredText !== null ? '✓ UTF-8 text' : '⬛ Binary'}</span>
+  </div>`;
+
+  if (restoredText !== null) {
+    const preview = restoredText.length > 2000 ? restoredText.slice(0, 2000) + '…' : restoredText;
+    html += `<div style="margin-top:10px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;
+      font-family:var(--mono);font-size:0.68rem;color:var(--text2);max-height:120px;overflow-y:auto;word-break:break-all;white-space:pre-wrap">${preview.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+  }
+
+  const finalBytes = currentBytes; // capture for closure
+  html += `<div class="btn-row" style="margin-top:12px" id="chainDecActions"></div>`;
+  resultEl.innerHTML = html;
+
+  // Add download button via JS (avoids closure issues with innerHTML)
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'btn btn-amber btn-sm';
+  dlBtn.innerHTML = `💾 DOWNLOAD RESTORED FILE`;
+  dlBtn.onclick = () => {
+    const name = 'restored_' + chainDecList.map(f=>f.toUpperCase()).join('-') + (restoredText !== null ? '.txt' : '.bin');
+    triggerDownload(new Blob([finalBytes], { type: restoredText !== null ? 'text/plain' : 'application/octet-stream' }), name);
+    showToast(`💾 Saved ${fmtSize(finalBytes.length)} — ${name}`);
+  };
+  document.getElementById('chainDecActions').appendChild(dlBtn);
+
+  if (restoredText !== null) {
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-ghost btn-sm';
+    copyBtn.innerHTML = '📋 COPY TEXT';
+    copyBtn.onclick = () => navigator.clipboard.writeText(restoredText).then(() => showToast('📋 Copied!'));
+    document.getElementById('chainDecActions').appendChild(copyBtn);
+  }
 }
 
 function fromBase64(str) {
@@ -2437,6 +4203,8 @@ function clearAll() {
   document.getElementById('progWrap').classList.remove('show');
   document.getElementById('progBar').style.width = '0';
   document.getElementById('workerStatus').textContent = '';
+  document.getElementById('comparePanel').classList.remove('show');
+  document.getElementById('compareBody').innerHTML = '';
   FORMATS.forEach(f => { document.getElementById('block-' + f.id).style.display = 'none'; });
 }
 
@@ -2506,16 +4274,49 @@ function loadRevFile(file) {
   reader.onload = function(e) {
     revFileRaw = new Uint8Array(e.target.result);
 
-    // Convert bytes to string (encoded files are always text)
+    // ── Binary EZ (EZB1) detection ──────────────────────────────────────
+    // The file may be a binary-packed .ez file: [BCVT header text\n] + 'EZB1:' + raw bytes.
+    // Scanning for 'EZB1:' at the byte level avoids corrupt latin-1 string issues,
+    // since the packed body can contain 0x00 null bytes and other non-printable values.
+    // When found, we re-encode the binary body as base64 in memory so the existing
+    // EZB64 decode path handles it seamlessly — no changes to the decode pipeline needed.
+    const EZB1 = [69, 90, 66, 49, 58]; // 'EZB1:' in ASCII bytes
+    let ezb1Pos = -1;
+    const searchLimit = Math.min(revFileRaw.length - 4, 4096); // header is always near the start
+    for (let i = 0; i <= searchLimit; i++) {
+      if (revFileRaw[i]===EZB1[0] && revFileRaw[i+1]===EZB1[1] && revFileRaw[i+2]===EZB1[2]
+          && revFileRaw[i+3]===EZB1[3] && revFileRaw[i+4]===EZB1[4]) {
+        ezb1Pos = i;
+        break;
+      }
+    }
+
     let text;
-    try {
-      text = new TextDecoder('utf-8', { fatal: true }).decode(revFileRaw);
-    } catch(_) {
+    if (ezb1Pos !== -1) {
+      // Binary EZ file: header is pure ASCII text, body is raw 7-bit packed bytes
+      const headerText = new TextDecoder('ascii').decode(revFileRaw.slice(0, ezb1Pos));
+      const bodyBytes  = revFileRaw.slice(ezb1Pos + 5); // skip 'EZB1:'
+      // Re-encode binary body as base64 so the EZB64 decode path handles it
+      let bodyBin = '';
+      const CHUNK = 8192;
+      for (let i = 0; i < bodyBytes.length; i += CHUNK) {
+        bodyBin += String.fromCharCode.apply(null, bodyBytes.subarray(i, i + CHUNK));
+      }
+      const bodyB64 = btoa(bodyBin);
+      text = headerText + 'EZB64:' + bodyB64;
+      // Update revFileRaw to the text-encoded form so getRevRawText() works correctly
+      revFileRaw = new TextEncoder().encode(text);
+    } else {
+      // Regular text-based encoded file (hex, base64, old EZB64, etc.)
       try {
-        text = new TextDecoder('latin-1').decode(revFileRaw);
-      } catch(e2) {
-        showToast('⚠ Could not read file as text');
-        return;
+        text = new TextDecoder('utf-8', { fatal: true }).decode(revFileRaw);
+      } catch(_) {
+        try {
+          text = new TextDecoder('iso-8859-1').decode(revFileRaw);
+        } catch(e2) {
+          showToast('⚠ Could not read file as text');
+          return;
+        }
       }
     }
 
@@ -2616,8 +4417,8 @@ function revAutoDetect(text, filename) {
       detectedFmt = 'dec'; hints.push('🔍 Looks like Decimal byte values');
     } else if (/[.\-]{2,}\s/.test(sample)) {
       detectedFmt = 'morse'; hints.push('🔍 Looks like Morse Code (dots & dashes)');
-    } else if (sample.includes('\\') && /\\[0-9]+[A-Za-z0-9+/=]\\/.test(sample)) {
-      detectedFmt = 'ez'; hints.push('🔍 Looks like EZ Encoding (\\count CHAR\\)');
+    } else if (/^[3-9]?[E-T&~"#'{\(\[-|`_\\^@+}=\/!?*%.,:]+$/.test(sample.replace(/\s|\d/g,''))) {
+      detectedFmt = 'ez'; hints.push('🔍 Looks like EZ Encoding (letters E–T + symbol pairs)');
     } else if (sample.includes('=') && sample.includes('_')) {
       detectedFmt = 'qp'; hints.push('🔍 Looks like Quoted-Printable');
     } else if (sample.includes('%') && /%[0-9A-Fa-f]{2}/.test(sample)) {
@@ -2643,7 +4444,7 @@ function getRevRawText() {
     try {
       return new TextDecoder('utf-8', { fatal: true }).decode(revFileRaw);
     } catch(_) {
-      return new TextDecoder('latin-1').decode(revFileRaw);
+      return new TextDecoder('iso-8859-1').decode(revFileRaw);
     }
   } else {
     return document.getElementById('revInput').value || null;
@@ -2652,7 +4453,7 @@ function getRevRawText() {
 
 function useCurrentOut() {
   const available = FORMATS.filter(f => {
-    if (f.id === 'ez') return !!(outputs['ez'] && outputs['ez'].rleFull);
+    if (f.id === 'ez') return !!(outputs['ez'] && outputs['ez'].finalFull);
     return !!outputs[f.id];
   });
   if (!available.length) { showToast('⚠ No encoded output yet — convert something first'); return; }
@@ -2663,7 +4464,7 @@ function useCurrentOut() {
   let fullStr;
   if (fmt === 'ez') {
     const ez = outputs['ez'];
-    fullStr = (ez.header || '') + ez.rleFull;
+    fullStr = (ez.header || '') + ez.finalFull;
   } else {
     fullStr = outputs[fmt] || '';
   }
@@ -2723,9 +4524,23 @@ function showReverseResult(bytes, len, meta) {
   let text = null;
   try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch(e) {}
 
-  const origName = meta?.name || revFileName?.replace(/\.(b64|b32|b85|b91|b122|b58|b62|b36|hex|oct|bin|dec|qp|url|morse|ez|txt)$/i, '') || null;
-  const origMime = meta?.mime || 'application/octet-stream';
-  const origSize = meta?.size ? parseInt(meta.size) : len;
+  // Determine the output filename:
+  // 1. If raw-bytes mode: strip the format extension from the loaded filename
+  //    e.g.  algorithm.txt.ez  →  algorithm.txt
+  //          photo.jpg.b64     →  photo.jpg
+  // 2. Otherwise: use the BCVT header name (if present) or strip legacy extensions
+  let origName, origMime, origSize;
+  const allExts = Object.values(FMT_EXT).join('|');
+  const extRe = new RegExp('\\.(' + allExts + ')$', 'i');
+  if (isRawBytesMode() && revFileName) {
+    origName = revFileName.replace(extRe, '') || revFileName;
+    origMime = 'application/octet-stream';
+    origSize = len;
+  } else {
+    origName = meta?.name || (revFileName ? revFileName.replace(extRe, '') : null) || null;
+    origMime = meta?.mime || 'application/octet-stream';
+    origSize = meta?.size ? parseInt(meta.size) : len;
+  }
 
   infoEl.innerHTML = `
     ${origName ? `<strong>Filename:</strong> <span style="color:var(--cyan)">${origName}</span> &nbsp;|&nbsp;` : ''}
@@ -2759,7 +4574,6 @@ function showReverseResult(bytes, len, meta) {
 // ═══════════════════════════════════════════════════════════════════════
 //  TOAST
 // ═══════════════════════════════════════════════════════════════════════
-let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -2915,11 +4729,307 @@ function b2bConvert() {
 function b2bCopy(base) {
   const el = document.getElementById('b2b-out-' + base);
   if (!el || el.classList.contains('empty')) { showToast('Nothing to copy'); return; }
-  navigator.clipboard.writeText(el.textContent).then(() => showToast('📋 Copied Base ' + base + '!'));
+  copyText(el.textContent, 'Base ' + base);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COMPARATIVE TABLE
+// ═══════════════════════════════════════════════════════════════════════
+function updateComparePanel() {
+  const EZ_STAGES = ['ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle'];
+  const rows = [];
+  FORMATS.forEach(f => {
+    const block = document.getElementById('block-' + f.id);
+    if (!block || block.style.display === 'none') return;
+    if (f.id === 'sha256') return; // hash not comparable
+    let len = 0, chars = 0;
+    if (f.id === 'ez') {
+      const ez = outputs['ez'];
+      if (!ez || typeof ez !== 'object') return;
+      len = outputFullSizes['ez'] || 0;
+      chars = len;
+    } else if (EZ_STAGES.includes(f.id)) {
+      const ez = outputs['ez'];
+      if (!ez || typeof ez !== 'object') return;
+      const fmtDef = FORMATS.find(ff => ff.id === f.id);
+      chars = ez[fmtDef.ezLen] || 0;
+      len = chars;
+    } else {
+      len = outputFullSizes[f.id] || 0;
+      chars = outputs[f.id] ? outputs[f.id].length : len;
+    }
+    if (!len && !chars) return;
+    rows.push({ id: f.id, label: f.label, badge: f.badge, icon: f.icon, len, chars });
+  });
+
+  const panel = document.getElementById('comparePanel');
+  if (rows.length < 2) { panel.classList.remove('show'); return; }
+
+  rows.sort((a, b) => a.len - b.len);
+  const minLen = rows[0].len;
+  const origBytes = (() => {
+    // try to get original size from any output
+    for (const r of rows) {
+      if (!['ez','ez_bits','ez_abcd','ez_top9','ez_doubles','ez_rle','sha256'].includes(r.id)) {
+        const str = outputs[r.id] || '';
+        const parsed = parseHeader(str);
+        if (parsed && parsed.meta && parsed.meta.size) return parseInt(parsed.meta.size);
+      }
+    }
+    return 0;
+  })();
+
+  const tbody = document.getElementById('compareBody');
+  tbody.innerHTML = rows.map((r, i) => {
+    const ratio = origBytes > 0 ? (r.len / origBytes).toFixed(2) : '—';
+    const ratioColor = origBytes > 0 ? (r.len <= origBytes ? 'var(--green)' : 'var(--red)') : 'var(--text3)';
+    return `<tr${i === 0 ? ' class="best"' : ''}>
+      <td><div class="td-fmt">${r.icon} <strong>${r.label}</strong> <span class="badge" style="background:var(--bg3);color:var(--text3)">${r.badge}</span>${i===0?'<span class="badge" style="background:rgba(52,211,153,.15);color:var(--green);margin-left:4px">SMALLEST</span>':''}</div></td>
+      <td class="td-len">${fmtSize(r.len)}</td>
+      <td class="td-chars">${fmtNum(r.chars)}</td>
+      <td style="color:${ratioColor}">${ratio !== '—' ? ratio + '×' : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  panel.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  ASCII TABLE MODAL
+// ═══════════════════════════════════════════════════════════════════════
+const ASCII_CTRL_NAMES = ['NUL','SOH','STX','ETX','EOT','ENQ','ACK','BEL','BS','HT','LF','VT','FF','CR','SO','SI','DLE','DC1','DC2','DC3','DC4','NAK','SYN','ETB','CAN','EM','SUB','ESC','FS','GS','RS','US'];
+
+function buildAsciiTable() {
+  const tbody = document.getElementById('asciiTableBody');
+  if (tbody.children.length > 0) return; // already built
+  for (let i = 0; i < 128; i++) {
+    const isCtrl = i < 32;
+    const isDel = i === 127;
+    const charDisplay = isCtrl ? `<span style="color:var(--text3);font-size:0.6rem">[${ASCII_CTRL_NAMES[i]}]</span>`
+      : isDel ? `<span style="color:var(--text3);font-size:0.6rem">[DEL]</span>`
+      : `<span>${String.fromCharCode(i)}</span>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="td-dec">${i}</td>
+      <td class="td-hex">${i.toString(16).toUpperCase().padStart(2,'0')}</td>
+      <td class="td-bin">${i.toString(2).padStart(8,'0')}</td>
+      <td class="td-char">${charDisplay}</td>
+      <td class="td-name">${isCtrl ? ASCII_CTRL_NAMES[i] + ' — ' + getCtrlDesc(i) : isDel ? 'Delete' : escHtml(String.fromCharCode(i))}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+function getCtrlDesc(i) {
+  const d = ['Null','Start of Heading','Start of Text','End of Text','End of Transmission','Enquiry','Acknowledge','Bell',
+    'Backspace','Horizontal Tab','Line Feed','Vertical Tab','Form Feed','Carriage Return','Shift Out','Shift In',
+    'Data Link Escape','Device Control 1','Device Control 2','Device Control 3','Device Control 4',
+    'Negative Acknowledge','Synchronous Idle','End of Block','Cancel','End of Medium','Substitute','Escape',
+    'File Separator','Group Separator','Record Separator','Unit Separator'];
+  return d[i] || '';
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showAsciiModal() {
+  buildAsciiTable();
+  filterAsciiTable();
+  document.getElementById('ascii-modal').style.display = 'flex';
+}
+
+function filterAsciiTable() {
+  const q = document.getElementById('asciiSearch').value.toLowerCase();
+  const cat = document.getElementById('asciiCat').value;
+  const rows = document.getElementById('asciiTableBody').querySelectorAll('tr');
+  rows.forEach((tr, i) => {
+    const dec = i;
+    let show = true;
+    if (cat === 'ctrl' && dec >= 32) show = false;
+    if (cat === 'print' && (dec < 32 || dec === 127)) show = false;
+    if (cat === 'alpha' && !((dec >= 65 && dec <= 90) || (dec >= 97 && dec <= 122))) show = false;
+    if (cat === 'digit' && !(dec >= 48 && dec <= 57)) show = false;
+    if (q) {
+      const text = tr.textContent.toLowerCase();
+      if (!text.includes(q)) show = false;
+    }
+    tr.style.display = show ? '' : 'none';
+  });
 }
 
 // Live convert on input
 document.getElementById('b2bInput').addEventListener('input', b2bConvert);
+
+// Close modals with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var m = document.getElementById('ez-help-modal');
+    if (m) m.style.display = 'none';
+    var a = document.getElementById('ascii-modal');
+    if (a) a.style.display = 'none';
+  }
+});
 </script>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     EZ ENCODING HELP MODAL
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="ez-help-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="ez-help-box">
+    <button class="ez-help-close" onclick="document.getElementById('ez-help-modal').style.display='none'">✕ CLOSE</button>
+    <h2>⚡ EZ Encoding — 7-Stage Pipeline</h2>
+    <p style="font-family:var(--mono);font-size:0.7rem;color:var(--text3);margin-bottom:18px;line-height:1.7">
+      EZ Encoding transforms raw bytes through 7 successive stages, each reducing the output size.<br>
+      Every stage is fully reversible — decoding runs all 7 stages in reverse order.
+    </p>
+
+    <!-- Step 1 -->
+    <div class="ez-help-step">
+      <div class="ez-help-step-head">
+        <span class="badge ez-badge-bin" style="font-size:0.65rem;padding:3px 8px">STEP 1</span>
+        ⚙ Raw Binary — each byte → 8-bit string
+      </div>
+      <div class="ez-help-step-body">
+        Every input byte is written as its 8-bit binary representation.
+        <div class="ez-help-example">
+          <b>Input:</b> <code>"Hi"</code> = bytes <code>72</code>, <code>105</code><br>
+          <b>Binary:</b> <code>01001000</code> <code>01101001</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="ez-help-step">
+      <div class="ez-help-step-head">
+        <span class="badge ez-badge-bin" style="font-size:0.65rem;padding:3px 8px">STEP 2</span>
+        🔤 Bit-pairs → ABCD alphabet  <code>00=A  01=B  10=C  11=D</code>
+      </div>
+      <div class="ez-help-step-body">
+        Each pair of bits is mapped to one of four letters A–D.
+        This converts the binary stream into a 4-symbol alphabet stream (4× the original byte count).
+        <div class="ez-help-example">
+          <b>Binary:</b> <code>01 00 10 00</code> → <b>ABCD:</b> <code>B A C A</code> = <code>BACA</code><br>
+          Mapping: <code>00</code>→A &nbsp; <code>01</code>→B &nbsp; <code>10</code>→C &nbsp; <code>11</code>→D
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="ez-help-step">
+      <div class="ez-help-step-head">
+        <span class="badge ez-badge-b64" style="font-size:0.65rem;padding:3px 8px">STEP 3</span>
+        🔡 ABCD-pairs → Single Letter  <code>AA=E  AB=F  …  DD=T</code>
+      </div>
+      <div class="ez-help-step-body">
+        Consecutive pairs of ABCD letters are merged into a single letter from E to T (16 letters total).
+        This halves the length — 2 chars become 1 char. The resulting string contains only letters E–T.
+        <div class="ez-help-example">
+          <b>ABCD:</b> <code>BA CA</code> → <b>Letters:</b> <code>I</code> <code>M</code><br>
+          Full table: AA=E AB=F AC=G AD=H | BA=I BB=J BC=K BD=L | CA=M CB=N CC=O CD=P | DA=Q DB=R DC=S DD=T
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="ez-help-step">
+      <div class="ez-help-step-head">
+        <span class="badge ez-badge-rle" style="background:#422006;color:#facc15;font-size:0.65rem;padding:3px 8px">STEP 4</span>
+        🔤 Top-26 Pattern Substitution — frequent patterns (len 2–5) → a–z
+      </div>
+      <div class="ez-help-step-body">
+        Scans the E-T letter string and counts every overlapping sub-pattern of length 2 to 5.
+        Each pattern is scored by <code>occurrences × (length – 1)</code>, measuring total chars saved.
+        The 26 highest-scoring patterns are assigned lowercase letters <code>a–z</code>.
+        A map header like <code>[aGEH,bKN,cMNT…]</code> is prepended.
+        At each position the longest matching pattern wins (greedy left-to-right).
+        <div class="ez-help-example">
+          <b>Letter string:</b> <code>GEHGEHKN GEHKN</code> (GEH appears 3×, KN 2×)<br>
+          <b>Map:</b> <code>[aGEH,bKN]</code> &nbsp; <b>After subst.:</b> <code>aab ab</code>
+          <br><small style="color:var(--text3)">GEH (len 3, 3×) scores 3×2=6 &gt; KN (len 2, 2×) scores 2×1=2 → a assigned to GEH</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="ez-help-step">
+      <div class="ez-help-step-head">
+        <span class="badge" style="background:#2e1065;color:#c084fc;font-size:0.65rem;padding:3px 8px">STEP 5</span>
+        🔣 Double-letter pairs → Compact Symbols
+      </div>
+      <div class="ez-help-step-body">
+        When two identical letters appear together (like <code>EE</code>, <code>FF</code>, <code>TT</code>…),
+        they are replaced by a single printable symbol. 26 symbol mappings cover all letter doubles.
+        This can only improve or maintain output length.
+        <div class="ez-help-example">
+          <code>EE</code>→<code>'</code> &nbsp; <code>FF</code>→<code>{</code> &nbsp; <code>GG</code>→<code>(</code> &nbsp;
+          <code>HH</code>→<code>:</code> &nbsp; <code>KK</code>→<code>\`</code> &nbsp; <code>TT</code>→<code>/</code><br>
+          <b>Input:</b> <code>EEKK</code> → <b>Output:</b> <code>'\`</code>  (4 chars → 2 chars)
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="ez-help-step" style="border-color:var(--pink)">
+      <div class="ez-help-step-head" style="background:rgba(244,114,182,.07)">
+        <span class="badge ez-badge-rle6" style="font-size:0.65rem;padding:3px 8px">STEP 6</span>
+        📦 Run-Length Encoding — repeated identical chars → compact token
+      </div>
+      <div class="ez-help-step-body">
+        The final stage scans the output for <strong style="color:var(--pink)">runs of repeated identical characters OR 2-character patterns</strong>.
+        Any run that can be represented more compactly is replaced by the token <code>#pat*n#</code>,
+        where <code>pat</code> is the 1- or 2-char repeating unit and <code>n</code> is its count.
+        The algorithm tries both pattern sizes at each position and picks whichever saves the most characters.
+        The <code>#</code> delimiter is safe — it never appears in earlier stages.
+        Compression is only applied when the token is strictly shorter than the run.
+        <div class="ez-help-example">
+          <b>1-char run:</b> <code>1111111111111111111111</code> (22×) → <code>#1*22#</code>  (saves 16 chars)<br>
+          <b>2-char bigram:</b> <code>efefefefefefefefefef</code> (10× "ef") → <code>#ef*10#</code>  (saves 13 chars)<br><br>
+          <b>Thresholds:</b><br>
+          &nbsp;1-char: benefit when run ≥ 8 identical chars (e.g. <code>aaaaaaaa</code> → <code>#a*8#</code>)<br>
+          &nbsp;2-char: benefit when ≥ 4 repetitions (e.g. <code>abababab</code> → <code>#ab*4#</code>)
+        </div>
+      </div>
+    </div>
+
+    <!-- Decoding -->
+    <div style="margin-top:20px;padding:14px 18px;background:var(--bg0);border:1px solid var(--border2);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:0.7rem;font-weight:700;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-transform:uppercase">🔄 Decoding — All 5 Steps in Reverse</div>
+      <div style="font-family:var(--mono);font-size:0.7rem;color:var(--text2);line-height:2">
+        <span style="color:var(--pink)">6. RLE decode</span>: <code>#x*n#</code> → x repeated n times<br>
+        <span style="color:var(--purple)">5. Symbol decode</span>: compact symbol → 2-letter pair (<code>'</code>→<code>EE</code>, etc.)<br>
+        <span style="color:var(--amber)">4. Pattern decode</span>: parse map header, expand a–z → E-T patterns<br>
+        <span style="color:var(--cyan)">3. Letter decode</span>: each E–T letter → 2 ABCD chars<br>
+        <span style="color:#60a5fa">2. ABCD decode</span>: each ABCD char → 2 bits (A=00 B=01 C=10 D=11)<br>
+        <span style="color:var(--green)">1. Bytes</span>: group 8 bits → original byte ✓
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     ASCII TABLE MODAL
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="ascii-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="ascii-box">
+    <div class="ascii-box-head">
+      <h2>📋 ASCII TABLE — DEC · HEX · BIN · CHAR</h2>
+      <button class="ascii-close" onclick="document.getElementById('ascii-modal').style.display='none'">✕ CLOSE</button>
+    </div>
+    <div class="ascii-filter-row">
+      <input type="text" id="asciiSearch" placeholder="Search char, dec, hex, name…" oninput="filterAsciiTable()">
+      <select id="asciiCat" onchange="filterAsciiTable()">
+        <option value="all">All 128 chars</option>
+        <option value="ctrl">Control (0–31)</option>
+        <option value="print">Printable (32–126)</option>
+        <option value="alpha">Letters A–Z a–z</option>
+        <option value="digit">Digits 0–9</option>
+      </select>
+    </div>
+    <div class="ascii-table-wrap">
+      <table class="ascii-table">
+        <thead><tr><th>DEC</th><th>HEX</th><th>BINARY</th><th>CHAR</th><th>NAME / DESCRIPTION</th></tr></thead>
+        <tbody id="asciiTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

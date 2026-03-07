@@ -1,0 +1,3449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle DDL Studio v4 · Professional SQL Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  --bg0:#0a0c10; --bg1:#0f1318; --bg2:#141a22; --bg3:#1c2535; --bg4:#222e40;
+  --border:#1e3352; --border2:#2a4570;
+  --amber:#f59e0b; --amber2:#fcd34d; --amber3:#451a03;
+  --cyan:#22d3ee; --cyan2:#67e8f9;
+  --green:#34d399; --green2:#065f46;
+  --red:#f87171; --red2:#450a0a;
+  --orange:#fb923c; --purple:#a78bfa;
+  --blue:#60a5fa; --pink:#f472b6;
+  --text:#e2e8f0; --text2:#94a3b8; --text3:#475569; --text4:#2a3a50;
+  --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif;
+  --err:#ef4444; --warn:#f59e0b; --info:#38bdf8; --ok:#34d399;
+  --panel-transition: all 0.22s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"] {
+  --bg0:#f8f9fc; --bg1:#f0f2f7; --bg2:#e8ebf3; --bg3:#dde2ec; --bg4:#d0d7e6;
+  --border:#c5cfe0; --border2:#a0b0cc;
+  --text:#1a2540; --text2:#3d5070; --text3:#7080a0; --text4:#a0b0cc;
+  --amber:#b8720a; --amber2:#f59e0b; --amber3:#fff3c4;
+  --cyan:#0891b2; --cyan2:#22d3ee;
+  --green:#059669; --green2:#d1fae5;
+  --red:#dc2626; --red2:#fee2e2;
+  --orange:#ea580c; --purple:#7c3aed;
+  --blue:#2563eb; --pink:#db2777;
+  --err:#dc2626; --warn:#b8720a; --info:#0891b2; --ok:#059669;
+}
+[data-theme="midnight"] {
+  --bg0:#050608; --bg1:#090c12; --bg2:#0d1220; --bg3:#111828; --bg4:#161f32;
+  --border:#192540; --border2:#223060;
+  --amber:#fbbf24; --cyan:#06b6d4;
+}
+[data-theme="contrast"] {
+  --bg0:#000; --bg1:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --bg4:#222;
+  --border:#333; --border2:#555;
+  --amber:#ffcc00; --cyan:#00ffff; --green:#00ff88;
+  --text:#ffffff; --text2:#dddddd; --text3:#888888; --text4:#444444;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);font-family:var(--mono)}
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* ===== HEADER ===== */
+#header{display:flex;align-items:center;gap:0;background:linear-gradient(90deg,var(--bg0),var(--bg1));border-bottom:1px solid var(--border2);padding:0 12px;height:46px;flex-shrink:0;position:relative;z-index:30;}
+#header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--amber),var(--cyan),transparent);opacity:.4;}
+.logo{display:flex;align-items:center;gap:8px;margin-right:14px;flex-shrink:0}
+.logo-icon{width:28px;height:28px;border-radius:5px;background:linear-gradient(135deg,#2d1a00,#5c3300);border:1px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:.9rem;box-shadow:0 0 10px rgba(245,158,11,.2);}
+.logo-text{font-family:var(--sans);font-size:.82rem;font-weight:800;color:var(--amber);letter-spacing:2px}
+.logo-sub{font-size:.48rem;color:var(--text3);letter-spacing:1.2px;font-family:var(--mono)}
+#toolbar{display:flex;align-items:center;gap:3px;flex:1;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+#toolbar::-webkit-scrollbar{display:none}
+.tb-sep{width:1px;height:20px;background:var(--border2);margin:0 3px;flex-shrink:0}
+.tb-btn{font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;padding:4px 9px;border-radius:4px;border:1px solid transparent;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .13s;background:transparent;color:var(--text3);flex-shrink:0;}
+.tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.tb-btn:active{transform:scale(.96)}
+.tb-btn.primary{background:var(--amber);border-color:var(--amber);color:#000;font-weight:700}
+.tb-btn.primary:hover{background:var(--amber2);box-shadow:0 0 10px rgba(245,158,11,.3)}
+.tb-btn.danger{color:var(--red);border-color:var(--red2)}
+.tb-btn.danger:hover{background:rgba(239,68,68,.1);border-color:var(--err)}
+.tb-btn.success{color:var(--green)}
+.tb-btn.success:hover{background:rgba(52,211,153,.1);border-color:var(--green)}
+.tb-btn.cyan{color:var(--cyan)}
+.tb-btn.cyan:hover{background:rgba(34,211,238,.08);border-color:var(--cyan)}
+.tb-btn.dim{color:var(--text3)}
+.tb-btn.active-btn{background:var(--bg3);color:var(--cyan);border-color:var(--cyan)}
+.theme-select{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:3px 6px;font-family:var(--mono);font-size:.6rem;outline:none;cursor:pointer}
+.theme-select:focus{border-color:var(--amber)}
+
+/* ===== LAYOUT ===== */
+#main{display:flex;flex:1;overflow:hidden;position:relative}
+#editor-pane{display:flex;flex-direction:column;flex:1;min-width:300px;overflow:hidden;background:var(--bg0)}
+#resizer{width:5px;background:var(--border);cursor:col-resize;transition:background .13s;flex-shrink:0;position:relative;z-index:10}
+#resizer:hover,#resizer.dragging{background:var(--amber)}
+
+/* ===== RIGHT PANEL (pin/auto-hide) ===== */
+#right-pane{width:360px;min-width:240px;max-width:640px;display:flex;flex-direction:column;flex-shrink:0;border-left:1px solid var(--border);transition:var(--panel-transition);position:relative}
+#right-pane.auto-hide{width:28px!important;min-width:28px!important;overflow:hidden}
+#right-pane.auto-hide:hover{width:380px!important}
+#right-pane.auto-hide .right-pane-inner{opacity:0;pointer-events:none;transition:opacity .2s}
+#right-pane.auto-hide:hover .right-pane-inner{opacity:1;pointer-events:all}
+.right-pane-inner{display:flex;flex-direction:column;flex:1;overflow:hidden;min-width:240px}
+
+/* Auto-hide indicator strip */
+#right-pane.auto-hide::before{content:'◁';position:absolute;left:6px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.7rem;z-index:2;pointer-events:none}
+
+/* ===== EDITOR HEADER ===== */
+#editor-header{display:flex;align-items:center;justify-content:space-between;padding:5px 12px;background:var(--bg1);border-bottom:1px solid var(--border);font-size:.6rem;color:var(--text3);flex-shrink:0;}
+.file-tab{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.65rem;color:var(--text2);}
+.file-dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.file-dot.dirty{background:var(--orange)}
+#editor-actions{display:flex;gap:8px;align-items:center}
+#cm-wrap{flex:1;overflow:hidden;position:relative}
+.CodeMirror{height:100%!important;font-family:var(--mono)!important;font-size:13.5px!important;line-height:1.7!important;background:var(--bg0)!important;color:#c9d1d9!important;}
+.CodeMirror-gutters{background:var(--bg1)!important;border-right:1px solid var(--border)!important}
+.CodeMirror-linenumber{color:var(--text4)!important;font-size:11px!important;padding-right:10px!important}
+.CodeMirror-cursor{border-left:2px solid var(--amber)!important}
+.CodeMirror-selected{background:rgba(34,211,238,.12)!important}
+.CodeMirror-activeline-background{background:rgba(255,255,255,.02)!important}
+.CodeMirror-foldgutter-open,.CodeMirror-foldgutter-folded{color:var(--text3)!important;font-size:10px}
+.CodeMirror-matchingbracket{color:var(--amber)!important;background:rgba(245,158,11,.15)!important;border-radius:2px}
+.cm-s-oracle .cm-keyword{color:#ff7b72!important;font-weight:500}
+.cm-s-oracle .cm-type{color:#79c0ff!important}
+.cm-s-oracle .cm-number{color:#79c0ff!important}
+.cm-s-oracle .cm-string{color:#a5d6ff!important}
+.cm-s-oracle .cm-comment{color:#6e7d8e!important;font-style:italic}
+.cm-s-oracle .cm-def{color:#e3b341!important}
+.cm-s-oracle .cm-operator{color:#ff7b72!important}
+.cm-s-oracle .cm-punctuation{color:#8b949e!important}
+.cm-s-oracle .cm-atom{color:#79c0ff!important}
+.cm-s-oracle .cm-builtin{color:#d2a8ff!important}
+.cm-err-line{background:rgba(239,68,68,.07)!important}
+.cm-warn-line{background:rgba(245,158,11,.07)!important}
+.CodeMirror-lint-marker-error,.CodeMirror-lint-marker-warning{display:none}
+
+/* Light theme CodeMirror overrides */
+[data-theme="light"] .CodeMirror,
+[data-theme="github-light"] .CodeMirror,
+[data-theme="warm-light"] .CodeMirror,
+[data-theme="sepia"] .CodeMirror,
+[data-theme="ice-light"] .CodeMirror {
+  background: var(--bg0) !important;
+  color: var(--text) !important;
+}
+[data-theme="light"] .CodeMirror-gutters,
+[data-theme="github-light"] .CodeMirror-gutters,
+[data-theme="warm-light"] .CodeMirror-gutters,
+[data-theme="sepia"] .CodeMirror-gutters,
+[data-theme="ice-light"] .CodeMirror-gutters {
+  background: var(--bg1) !important;
+  border-right: 1px solid var(--border) !important;
+}
+[data-theme="light"] .CodeMirror-linenumber,
+[data-theme="github-light"] .CodeMirror-linenumber,
+[data-theme="warm-light"] .CodeMirror-linenumber,
+[data-theme="sepia"] .CodeMirror-linenumber,
+[data-theme="ice-light"] .CodeMirror-linenumber { color: var(--text3) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-keyword,
+[data-theme="github-light"] .cm-s-oracle .cm-keyword,
+[data-theme="warm-light"] .cm-s-oracle .cm-keyword,
+[data-theme="sepia"] .cm-s-oracle .cm-keyword,
+[data-theme="ice-light"] .cm-s-oracle .cm-keyword { color: var(--red) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-string,
+[data-theme="github-light"] .cm-s-oracle .cm-string,
+[data-theme="warm-light"] .cm-s-oracle .cm-string,
+[data-theme="sepia"] .cm-s-oracle .cm-string,
+[data-theme="ice-light"] .cm-s-oracle .cm-string { color: var(--green) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-comment,
+[data-theme="github-light"] .cm-s-oracle .cm-comment,
+[data-theme="warm-light"] .cm-s-oracle .cm-comment,
+[data-theme="sepia"] .cm-s-oracle .cm-comment,
+[data-theme="ice-light"] .cm-s-oracle .cm-comment { color: var(--text3) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-number,
+[data-theme="github-light"] .cm-s-oracle .cm-number,
+[data-theme="warm-light"] .cm-s-oracle .cm-number,
+[data-theme="sepia"] .cm-s-oracle .cm-number,
+[data-theme="ice-light"] .cm-s-oracle .cm-number { color: var(--blue) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-def,
+[data-theme="github-light"] .cm-s-oracle .cm-def,
+[data-theme="warm-light"] .cm-s-oracle .cm-def,
+[data-theme="sepia"] .cm-s-oracle .cm-def,
+[data-theme="ice-light"] .cm-s-oracle .cm-def { color: var(--amber) !important; }
+
+[data-theme="light"] .cm-s-oracle .cm-builtin,
+[data-theme="github-light"] .cm-s-oracle .cm-builtin,
+[data-theme="warm-light"] .cm-s-oracle .cm-builtin,
+[data-theme="sepia"] .cm-s-oracle .cm-builtin,
+[data-theme="ice-light"] .cm-s-oracle .cm-builtin { color: var(--purple) !important; }
+
+[data-theme="light"] .CodeMirror-selected,
+[data-theme="github-light"] .CodeMirror-selected,
+[data-theme="warm-light"] .CodeMirror-selected,
+[data-theme="sepia"] .CodeMirror-selected,
+[data-theme="ice-light"] .CodeMirror-selected { background: rgba(0,100,200,.15) !important; }
+
+[data-theme="light"] .CodeMirror-hints,
+[data-theme="github-light"] .CodeMirror-hints,
+[data-theme="warm-light"] .CodeMirror-hints,
+[data-theme="sepia"] .CodeMirror-hints,
+[data-theme="ice-light"] .CodeMirror-hints { background: var(--bg0) !important; border-color: var(--border2) !important; }
+
+[data-theme="light"] .CodeMirror-hint,
+[data-theme="github-light"] .CodeMirror-hint,
+[data-theme="warm-light"] .CodeMirror-hint,
+[data-theme="sepia"] .CodeMirror-hint,
+[data-theme="ice-light"] .CodeMirror-hint { color: var(--text2) !important; }
+
+[data-theme="light"] .CodeMirror-hint-active,
+[data-theme="github-light"] .CodeMirror-hint-active,
+[data-theme="warm-light"] .CodeMirror-hint-active,
+[data-theme="sepia"] .CodeMirror-hint-active,
+[data-theme="ice-light"] .CodeMirror-hint-active { background: var(--bg3) !important; color: var(--cyan) !important; }
+.CodeMirror-hints{background:var(--bg2)!important;border:1px solid var(--border2)!important;border-radius:6px!important;box-shadow:0 8px 24px rgba(0,0,0,.5)!important;font-family:var(--mono)!important;font-size:11.5px!important;z-index:999!important;}
+.CodeMirror-hint{color:var(--text2)!important;padding:4px 11px!important}
+.CodeMirror-hint-active{background:rgba(34,211,238,.12)!important;color:var(--cyan)!important}
+.hint-kw{color:var(--red)!important}
+.hint-type{color:var(--blue)!important}
+.hint-table{color:var(--amber)!important}
+.hint-col{color:var(--green)!important}
+.hint-obj{color:var(--purple)!important}
+.hint-ddl-suggestion{color:var(--cyan)!important;font-style:italic!important}
+.hint-fn-args{color:var(--purple)!important;font-style:italic!important;opacity:.85!important}
+
+/* ===== RIGHT PANEL TABS ===== */
+#right-tabs{display:flex;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;position:relative}
+#right-tabs::-webkit-scrollbar{display:none}
+.r-tab{font-family:var(--mono);font-size:.58rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:8px 11px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);background:transparent;border-top:none;border-left:none;border-right:none;transition:all .13s;white-space:nowrap;flex-shrink:0;}
+.r-tab:hover{color:var(--text2)}
+.r-tab.active{color:var(--amber);border-bottom:2px solid var(--amber)}
+.pane-pin-btn{margin-left:auto;margin-right:6px;background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text3);font-size:.6rem;padding:2px 6px;cursor:pointer;font-family:var(--mono);flex-shrink:0;align-self:center;white-space:nowrap}
+.pane-pin-btn:hover{border-color:var(--amber);color:var(--amber)}
+.pane-pin-btn.pinned{color:var(--amber);border-color:var(--amber)}
+#right-body{flex:1;overflow-y:auto;padding:0}
+#right-body::-webkit-scrollbar{width:4px}
+#right-body::-webkit-scrollbar-track{background:var(--bg1)}
+#right-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ===== VALIDATION ===== */
+.val-summary{display:flex;gap:6px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:.62rem;align-items:center;flex-wrap:wrap;}
+.val-badge{display:flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-weight:700;font-size:.6rem}
+.val-badge.err{background:var(--red2);color:var(--err)}
+.val-badge.warn{background:var(--amber3);color:var(--amber)}
+.val-badge.info{background:#082f49;color:var(--info)}
+.val-badge.ok{background:var(--green2);color:var(--green)}
+.val-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;gap:8px;color:var(--text3);font-size:.68rem;text-align:center;}
+.val-item{display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;align-items:flex-start;}
+.val-item:hover{background:var(--bg3)}
+.val-icon{font-size:.72rem;margin-top:2px;flex-shrink:0;width:14px}
+.val-msg{font-size:.65rem;color:var(--text2);line-height:1.5;flex:1}
+.val-msg strong{color:var(--text);font-weight:500}
+.val-loc{font-size:.58rem;color:var(--text3);margin-top:2px}
+.val-item.error .val-icon{color:var(--err)}
+.val-item.warning .val-icon{color:var(--amber)}
+.val-item.info .val-icon{color:var(--info)}
+.val-item.error{border-left:3px solid var(--err)}
+.val-item.warning{border-left:3px solid var(--amber)}
+.val-item.info{border-left:3px solid var(--info)}
+
+/* ===== EXTRA THEMES ===== */
+[data-theme="solarized"] {
+  --bg0:#002b36; --bg1:#073642; --bg2:#0d4050; --bg3:#154860; --bg4:#1d5470;
+  --border:#1a4050; --border2:#2a6070;
+  --amber:#b58900; --amber2:#cb9f00; --amber3:#3a2d00;
+  --cyan:#2aa198; --cyan2:#3dcbc1;
+  --green:#859900; --green2:#2a3200;
+  --red:#dc322f; --red2:#4a0f0e;
+  --orange:#cb4b16; --purple:#6c71c4;
+  --blue:#268bd2; --pink:#d33682;
+  --text:#e8e8d0; --text2:#93a1a1; --text3:#4a6a70; --text4:#1e3a3e;
+  --err:#dc322f; --warn:#b58900; --info:#268bd2; --ok:#859900;
+}
+[data-theme="monokai"] {
+  --bg0:#1e1f1c; --bg1:#272822; --bg2:#2d2e2a; --bg3:#353630; --bg4:#3e3f3a;
+  --border:#3a3b36; --border2:#4a4b46;
+  --amber:#e6db74; --amber2:#f8f056; --amber3:#2d2c1a;
+  --cyan:#66d9e8; --cyan2:#a1ecf7;
+  --green:#a6e22e; --green2:#1a2e0a;
+  --red:#f92672; --red2:#3d0018;
+  --orange:#fd971f; --purple:#ae81ff;
+  --blue:#66d9e8; --pink:#f92672;
+  --text:#f8f8f2; --text2:#cfcfc2; --text3:#75715e; --text4:#3a3a32;
+  --err:#f92672; --warn:#e6db74; --info:#66d9e8; --ok:#a6e22e;
+}
+[data-theme="dracula"] {
+  --bg0:#191a21; --bg1:#21222c; --bg2:#282a36; --bg3:#343746; --bg4:#3e4052;
+  --border:#3a3b4e; --border2:#44475a;
+  --amber:#ffb86c; --amber2:#ffd080; --amber3:#3a2a10;
+  --cyan:#8be9fd; --cyan2:#b0f0ff;
+  --green:#50fa7b; --green2:#0a2a14;
+  --red:#ff5555; --red2:#3d0a0a;
+  --orange:#ffb86c; --purple:#bd93f9;
+  --blue:#6272a4; --pink:#ff79c6;
+  --text:#f8f8f2; --text2:#bdc3d8; --text3:#6272a4; --text4:#3a3a50;
+  --err:#ff5555; --warn:#ffb86c; --info:#8be9fd; --ok:#50fa7b;
+}
+/* ===== NEW LIGHT THEMES ===== */
+[data-theme="github-light"] {
+  --bg0:#ffffff; --bg1:#f6f8fa; --bg2:#eef1f4; --bg3:#e1e4e8; --bg4:#d0d7de;
+  --border:#d0d7de; --border2:#b4bbc4;
+  --amber:#bf8700; --amber2:#d4a017; --amber3:#fff8c5;
+  --cyan:#0969da; --cyan2:#218bff;
+  --green:#1a7f37; --green2:#dafbe1;
+  --red:#cf222e; --red2:#ffebe9;
+  --orange:#bc4c00; --purple:#8250df;
+  --blue:#0550ae; --pink:#bf3989;
+  --text:#1f2328; --text2:#424a53; --text3:#6e7781; --text4:#b0bac4;
+  --err:#cf222e; --warn:#bf8700; --info:#0969da; --ok:#1a7f37;
+}
+[data-theme="warm-light"] {
+  --bg0:#fdf8f0; --bg1:#f5ede0; --bg2:#ede0ce; --bg3:#e2d0b8; --bg4:#d4bfa0;
+  --border:#c8b090; --border2:#b09070;
+  --amber:#a05c00; --amber2:#c07800; --amber3:#fff3d4;
+  --cyan:#006080; --cyan2:#0090c0;
+  --green:#2d6a2d; --green2:#e8f5e8;
+  --red:#c0281e; --red2:#fce8e8;
+  --orange:#b04000; --purple:#6040a0;
+  --blue:#1a4a8a; --pink:#a02060;
+  --text:#2c1a08; --text2:#5a3820; --text3:#9a7050; --text4:#c8a880;
+  --err:#c0281e; --warn:#a05c00; --info:#006080; --ok:#2d6a2d;
+}
+[data-theme="sepia"] {
+  --bg0:#f4ede4; --bg1:#ece0d0; --bg2:#e2d0bc; --bg3:#d6c0a8; --bg4:#c8ae90;
+  --border:#baa080; --border2:#9e8060;
+  --amber:#7a4a00; --amber2:#9a6200; --amber3:#fff0cc;
+  --cyan:#2a5870; --cyan2:#3a7890;
+  --green:#285a28; --green2:#e6f2e6;
+  --red:#9e2018; --red2:#f8e4e2;
+  --orange:#8a3200; --purple:#5c3880;
+  --blue:#1e3e70; --pink:#8a1e50;
+  --text:#241408; --text2:#4e3018; --text3:#8a6840; --text4:#b89870;
+  --err:#9e2018; --warn:#7a4a00; --info:#2a5870; --ok:#285a28;
+}
+[data-theme="ice-light"] {
+  --bg0:#f0f6ff; --bg1:#e4eeff; --bg2:#d8e6ff; --bg3:#c8d8f8; --bg4:#b8c8ee;
+  --border:#a8b8de; --border2:#8898c8;
+  --amber:#8a6000; --amber2:#b08000; --amber3:#fff8e0;
+  --cyan:#005890; --cyan2:#0078c0;
+  --green:#1a5c30; --green2:#e0f4e8;
+  --red:#b82020; --red2:#fce4e4;
+  --orange:#9a4000; --purple:#5030a0;
+  --blue:#0030a0; --pink:#900060;
+  --text:#0a1830; --text2:#203058; --text3:#506890; --text4:#9ab0d0;
+  --err:#b82020; --warn:#8a6000; --info:#005890; --ok:#1a5c30;
+}
+
+/* ===== SCHEMA ===== */
+.obj-section{border-bottom:1px solid var(--border)}
+.obj-section-head{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg2);cursor:pointer;user-select:none;font-size:.6rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;}
+.obj-section-head:hover{background:var(--bg3)}
+.obj-table-item{padding:6px 12px 6px 24px;border-bottom:1px solid var(--border);cursor:pointer}
+.obj-table-item:hover{background:rgba(245,158,11,.05)}
+.obj-table-name{font-size:.68rem;font-weight:700;color:var(--amber)}
+.obj-table-meta{font-size:.58rem;color:var(--text3);margin-top:1px}
+.obj-col-list{padding:0 12px 6px 24px}
+.obj-col{display:flex;gap:8px;align-items:center;padding:2px 0;font-size:.62rem}
+.obj-col-name{color:var(--text2);min-width:110px}
+.obj-col-type{color:var(--blue);opacity:.85}
+.obj-col-flags{color:var(--text3);font-size:.56rem}
+.obj-con{font-size:.6rem;color:var(--purple);padding:2px 0}
+
+/* ===== DICTIONARY ===== */
+.dict-toolbar{display:flex;gap:5px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.dict-search{flex:1;min-width:100px;background:var(--bg0);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:4px 8px;font-family:var(--mono);font-size:.65rem;outline:none;}
+.dict-search:focus{border-color:var(--amber)}
+.dict-list{padding:8px 12px}
+.dict-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:2px 7px;font-size:.6rem;margin:2px;cursor:default;}
+.dict-tag.kw{color:var(--red);border-color:#3a1a1a}
+.dict-tag.type{color:var(--blue);border-color:#1a2a3a}
+.dict-tag.table{color:var(--amber);border-color:#3a2a00}
+.dict-tag.col{color:var(--green);border-color:#0a2a1a}
+.dict-tag.obj{color:var(--purple);border-color:#2a1a3a}
+.dict-tag .del-x{cursor:pointer;color:var(--text3);font-size:.65rem;width:12px;height:12px;display:flex;align-items:center;justify-content:center;border-radius:2px;transition:all .1s;}
+.dict-tag .del-x:hover{background:var(--red2);color:var(--err)}
+.dict-empty{color:var(--text3);font-size:.65rem;padding:10px 0;font-style:italic}
+
+/* ===== HISTORY PANEL ===== */
+.hist-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);}
+.hist-item{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.hist-item:hover{background:var(--bg3)}
+.hist-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.hist-item-time{font-size:.55rem;color:var(--text3)}
+.hist-item-chars{font-size:.55rem;color:var(--text3)}
+.hist-preview{font-size:.62rem;color:var(--text2);line-height:1.5;white-space:pre-wrap;word-break:break-all;max-height:56px;overflow:hidden;border-left:2px solid var(--border2);padding-left:6px;font-family:var(--mono)}
+.hist-actions{display:flex;gap:4px;margin-top:5px;}
+.hist-small-btn{font-family:var(--mono);font-size:.56rem;padding:2px 7px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;}
+.hist-small-btn:hover{background:var(--bg3);color:var(--text)}
+.hist-small-btn.restore{color:var(--cyan);border-color:rgba(34,211,238,.3)}
+.hist-small-btn.restore:hover{background:rgba(34,211,238,.08)}
+
+/* ===== TEMPLATES PANEL ===== */
+.tmpl-section{border-bottom:1px solid var(--border)}
+.tmpl-head{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--bg2);cursor:pointer;user-select:none;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.tmpl-head:hover{background:var(--bg3)}
+.tmpl-item{padding:8px 12px 8px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.tmpl-item:hover{background:rgba(245,158,11,.06)}
+.tmpl-name{font-size:.68rem;font-weight:600;color:var(--cyan)}
+.tmpl-desc{font-size:.58rem;color:var(--text3);margin-top:2px}
+.tmpl-actions{display:flex;gap:4px;margin-top:5px}
+
+/* ===== STATUS BAR ===== */
+#statusbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:24px;background:var(--bg1);border-top:1px solid var(--border);font-size:.58rem;color:var(--text3);flex-shrink:0;}
+.sb-item{display:flex;align-items:center;gap:4px}
+.sb-item.ok{color:var(--green)}
+.sb-item.err{color:var(--err)}
+.sb-item.warn{color:var(--amber)}
+#sb-msg{margin-left:auto;font-style:italic;transition:color .2s}
+.err-gutter{color:var(--err)!important;font-size:9px}
+.warn-gutter{color:var(--amber)!important;font-size:9px}
+
+/* ===== MODALS ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);}
+.modal-box{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;max-width:520px;width:100%;padding:22px 26px;box-shadow:0 0 40px rgba(245,158,11,.1);position:relative;}
+.modal-title{font-family:var(--sans);font-size:.9rem;font-weight:800;color:var(--amber);margin-bottom:14px;letter-spacing:1.5px;text-transform:uppercase}
+.modal-close{position:absolute;top:12px;right:14px;background:transparent;border:1px solid var(--border2);border-radius:4px;color:var(--text3);font-family:var(--mono);font-size:.65rem;padding:3px 9px;cursor:pointer}
+.modal-close:hover{border-color:var(--err);color:var(--err)}
+textarea.modal-ta{width:100%;height:180px;background:var(--bg0);border:1px solid var(--border2);border-radius:5px;color:var(--text);padding:9px;font-family:var(--mono);font-size:.7rem;line-height:1.6;resize:vertical;outline:none}
+textarea.modal-ta:focus{border-color:var(--amber)}
+.modal-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.modal-hint{font-size:.62rem;color:var(--text3);margin-top:7px;line-height:1.6}
+select.modal-sel{background:var(--bg0);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:5px 8px;font-family:var(--mono);font-size:.65rem;outline:none}
+input.modal-input{background:var(--bg0);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:5px 9px;font-family:var(--mono);font-size:.68rem;outline:none;width:100%}
+input.modal-input:focus{border-color:var(--amber)}
+
+/* ===== SCROLLBARS ===== */
+*::-webkit-scrollbar{width:4px;height:4px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.val-item,.hist-item,.tmpl-item{animation:fadeIn .12s ease}
+
+/* ===== FIX POPUP ===== */
+#fix-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+#fix-popup-box{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;padding:20px 22px 16px;width:560px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.fix-popup-title{font-family:var(--sans);font-size:.8rem;font-weight:800;color:var(--amber);letter-spacing:1px;flex-shrink:0}
+.fix-popup-subtitle{font-size:.6rem;color:var(--text3);margin-top:-4px;flex-shrink:0}
+.fix-popup-list{overflow-y:auto;display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+.fix-item{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.6rem}
+.fix-item-icon{font-size:.8rem;flex-shrink:0}
+.fix-item-msg{flex:1;color:var(--text2);line-height:1.5}
+.fix-item-line{font-size:.55rem;color:var(--text3);white-space:nowrap;margin-left:auto;padding-left:8px}
+.fix-popup-summary{font-size:.58rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;flex-shrink:0}
+.fix-popup-actions{display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- ===== HEADER ===== -->
+<div id="header">
+  <div class="logo">
+    <div class="logo-icon">🔶</div>
+    <div>
+      <div class="logo-text">ORACLE DDL STUDIO</div>
+      <div class="logo-sub">PROFESSIONAL EDITOR · v4</div>
+    </div>
+  </div>
+  <div id="toolbar">
+    <button class="tb-btn dim" onclick="newFile()" title="New (Ctrl+N)">📄 NEW</button>
+    <button class="tb-btn dim" onclick="openFile()" title="Open">📂 OPEN</button>
+    <button class="tb-btn dim" onclick="saveFile()" title="Save (Ctrl+S)">💾 SAVE</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn dim" onclick="doUndo()" title="Undo (Ctrl+Z)">⟲ UNDO</button>
+    <button class="tb-btn dim" onclick="doRedo()" title="Redo (Ctrl+Y)">⟳ REDO</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn success" onclick="validateDDL()" title="Validate (F5)">✓ VALIDATE</button>
+    <button class="tb-btn primary" onclick="formatDDL()" title="Format (Ctrl+Shift+F)">⌸ FORMAT</button>
+    <button class="tb-btn cyan" onclick="fixDDL()" title="Auto-Fix (Ctrl+Shift+X)">🔧 FIX</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn dim" onclick="copyDDL()">📋 COPY</button>
+    <button class="tb-btn danger" onclick="clearEditor()">🗑 CLEAR</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn dim" onclick="showImportExport('import')">⬇ IMPORT</button>
+    <button class="tb-btn dim" onclick="showImportExport('export')">⬆ EXPORT</button>
+    <div class="tb-sep"></div>
+    <select class="theme-select" onchange="setTheme(this.value)" title="Theme">
+      <option value="dark">🌑 Dark</option>
+      <option value="midnight">🌒 Midnight</option>
+      <option value="dracula">🧛 Dracula</option>
+      <option value="monokai">🎨 Monokai</option>
+      <option value="solarized">☀ Solarized Dark</option>
+      <option value="contrast">⬛ Contrast</option>
+      <option value="light">🌤 Light</option>
+      <option value="github-light">🐙 GitHub Light</option>
+      <option value="warm-light">🌅 Warm Light</option>
+      <option value="sepia">📜 Sepia</option>
+      <option value="ice-light">🧊 Ice Light</option>
+    </select>
+    <div class="tb-sep"></div>
+    <button class="tb-btn dim" onclick="showHelp()">? HELP</button>
+  </div>
+  <input type="file" id="fileInput" style="display:none" accept=".sql,.ddl,.txt" onchange="handleFileOpen(event)">
+</div>
+
+<!-- ===== MAIN ===== -->
+<div id="main">
+  <!-- Editor pane -->
+  <div id="editor-pane">
+    <div id="editor-header">
+      <div class="file-tab">
+        <div class="file-dot" id="dirtyDot"></div>
+        <span id="fileName">untitled.sql</span>
+      </div>
+      <div id="editor-actions">
+        <span id="cursor-info">Ln 1, Col 1</span>
+        <span style="margin:0 5px;color:var(--border2)">│</span>
+        <span id="sel-info"></span>
+        <span style="margin:0 5px;color:var(--border2)">│</span>
+        <span style="color:var(--text3)">Oracle 19c</span>
+        <span style="margin:0 5px;color:var(--border2)">│</span>
+        <span id="stat-words">0 words</span>
+      </div>
+    </div>
+    <div id="cm-wrap">
+      <textarea id="editor"></textarea>
+    </div>
+  </div>
+
+  <div id="resizer"></div>
+
+  <!-- Right panel -->
+  <div id="right-pane">
+    <div class="right-pane-inner">
+      <div id="right-tabs">
+        <button class="r-tab active" onclick="switchRTab('validation')">⚡ ISSUES</button>
+        <button class="r-tab" onclick="switchRTab('schema')">🏛 SCHEMA</button>
+        <button class="r-tab" onclick="switchRTab('dictionary')">📚 DICT</button>
+        <button class="r-tab" onclick="switchRTab('history')">🕐 HISTORY</button>
+        <button class="r-tab" onclick="switchRTab('templates')">📋 TEMPLATES</button>
+        <button class="pane-pin-btn pinned" id="pinBtn" onclick="togglePanelPin()" title="Toggle auto-hide">📌 PIN</button>
+      </div>
+      <div id="right-body">
+        <!-- Validation Tab -->
+        <div id="tab-validation">
+          <div id="val-summary" class="val-summary"></div>
+          <div id="val-list">
+            <div class="val-empty">
+              <div style="font-size:2rem;opacity:.25">✓</div>
+              <div>Press <strong style="color:var(--text2)">F5</strong> to validate DDL</div>
+            </div>
+          </div>
+        </div>
+        <!-- Schema Tab -->
+        <div id="tab-schema" style="display:none">
+          <div id="schema-list"><div class="val-empty"><div style="font-size:2rem;opacity:.25">🏛</div><div>Validate to build schema tree</div></div></div>
+        </div>
+        <!-- Dictionary Tab -->
+        <div id="tab-dictionary" style="display:none">
+          <div class="dict-toolbar">
+            <input class="dict-search" id="dictSearch" placeholder="Filter…" oninput="renderDictionary()">
+            <button class="tb-btn" style="padding:4px 9px" onclick="addDictWord()">+ ADD</button>
+            <button class="tb-btn danger" style="padding:4px 8px" onclick="clearDictionary()">🗄</button>
+          </div>
+          <div id="dict-legend" style="display:flex;gap:4px;padding:5px 12px;flex-wrap:wrap;font-size:.56rem;border-bottom:1px solid var(--border)">
+            <span class="dict-tag kw">KEYWORD</span>
+            <span class="dict-tag type">DATATYPE</span>
+            <span class="dict-tag table">TABLE</span>
+            <span class="dict-tag col">COLUMN</span>
+            <span class="dict-tag obj">OBJECT</span>
+          </div>
+          <div id="dict-list" class="dict-list"></div>
+        </div>
+        <!-- History Tab -->
+        <div id="tab-history" style="display:none">
+          <div class="hist-toolbar">
+            <span style="font-size:.62rem;color:var(--text3);flex:1">Copy/Validation history</span>
+            <button class="tb-btn danger" style="padding:3px 8px" onclick="clearHistory()">CLEAR</button>
+          </div>
+          <div id="hist-list">
+            <div class="val-empty"><div style="font-size:1.8rem;opacity:.25">🕐</div><div>No history yet. Copy or validate DDL to record entries.</div></div>
+          </div>
+        </div>
+        <!-- Templates Tab -->
+        <div id="tab-templates" style="display:none">
+          <div id="templates-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status bar -->
+<div id="statusbar">
+  <div class="sb-item" id="sb-status">◉ Ready</div>
+  <div class="sb-item" id="sb-err" style="display:none"></div>
+  <div class="sb-item" id="sb-warn" style="display:none"></div>
+  <div class="sb-item" id="sb-tables" style="display:none"></div>
+  <div id="sb-msg" class="sb-item"></div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="ie-modal" style="display:none" onclick="if(event.target===this)closeModal('ie-modal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('ie-modal')">✕ CLOSE</button>
+    <div class="modal-title" id="ie-title">IMPORT DICTIONARY</div>
+    <div id="ie-import-section">
+      <div class="modal-hint">Paste JSON dictionary data below.</div>
+      <textarea class="modal-ta" id="ie-import-ta" placeholder='{"tables":["EMPLOYEES"],"columns":["ID"],"objects":["SEQ_EMP"]}'></textarea>
+    </div>
+    <div id="ie-export-section" style="display:none">
+      <div class="modal-hint">Copy this JSON to back up your dictionary.</div>
+      <textarea class="modal-ta" id="ie-export-ta" readonly></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="tb-btn primary" id="ie-action-btn">⬇ IMPORT</button>
+      <button class="tb-btn" onclick="closeModal('ie-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addword-modal" style="display:none" onclick="if(event.target===this)closeModal('addword-modal')">
+  <div class="modal-box" style="max-width:360px">
+    <button class="modal-close" onclick="closeModal('addword-modal')">✕ CLOSE</button>
+    <div class="modal-title">ADD WORD TO DICTIONARY</div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px">
+      <input id="aw-word" class="modal-input" placeholder="Word / identifier…" oninput="this.value=this.value.toUpperCase()">
+      <select id="aw-type" class="modal-sel" style="width:100%">
+        <option value="table">TABLE</option>
+        <option value="col">COLUMN</option>
+        <option value="obj">OBJECT</option>
+        <option value="kw">KEYWORD</option>
+        <option value="type">DATATYPE</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="tb-btn primary" onclick="confirmAddWord()">+ ADD</button>
+      <button class="tb-btn" onclick="closeModal('addword-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="help-modal" style="display:none" onclick="if(event.target===this)closeModal('help-modal')">
+  <div class="modal-box" style="max-width:580px">
+    <button class="modal-close" onclick="closeModal('help-modal')">✕ CLOSE</button>
+    <div class="modal-title">⌨ SHORTCUTS & FEATURES</div>
+    <table style="font-size:.65rem;border-collapse:collapse;width:100%">
+      <tr><td style="padding:4px 0;color:var(--amber);width:200px">F5</td><td style="color:var(--text2)">Validate DDL (smart syntax + semantic)</td></tr>
+      <tr><td>Ctrl+Shift+F</td><td>Format / Beautify DDL</td></tr>
+      <tr><td>Ctrl+Shift+X</td><td>Auto-Fix issues</td></tr>
+      <tr><td>Ctrl+Z / Ctrl+Y</td><td>Undo / Redo</td></tr>
+      <tr><td>Ctrl+Space</td><td>Autocomplete</td></tr>
+      <tr><td>Ctrl+/</td><td>Toggle comment</td></tr>
+      <tr><td>Ctrl+S</td><td>Save file</td></tr>
+    </table>
+    <div style="margin-top:12px;font-size:.65rem;color:var(--text3);line-height:1.9">
+      <strong style="color:var(--amber)">Smart Validator v3</strong> — new checks:<br>
+      • <strong style="color:var(--err)">Trailing comma</strong> before <code>)</code> in CREATE TABLE — detected and reported with line number<br>
+      • <strong style="color:var(--err)">Empty REFERENCES ()</strong> — FK with empty column list is an error; must be <code>REFERENCES tbl (col)</code><br>
+      • <strong style="color:var(--err)">Empty constraint column lists</strong> — PK/UNIQUE/FK with no columns flagged<br>
+      • <strong style="color:var(--err)">True reserved words</strong> unquoted → ERROR with suggestion to quote<br>
+      • <strong style="color:var(--warn)">Unreserved keywords</strong> (PASSWORD, NAME…) as identifiers → WARNING<br>
+      • <strong style="color:var(--info)">Quoted reserved words</strong> (e.g. "DATE", "create") → INFO noting queries must use quotes<br>
+      • <strong style="color:var(--err)">"ROWID" (exact uppercase)</strong> as quoted identifier → ERROR (Oracle forbids this)<br>
+      <br>
+      <strong style="color:var(--cyan)">Templates</strong> — each constraint type has a canonical syntax template showing the correct structure with rules.<br>
+      <strong style="color:var(--purple)">Themes</strong> — Dark, Midnight, Dracula, Monokai, Solarized, Contrast, Light, GitHub Light, Warm Light, Sepia, Ice Light.<br>
+      <strong style="color:var(--amber)">Smart DDL Completion</strong> — type <code>ALTER</code> or <code>CREATE</code> and the editor suggests full statements in <em>italic</em> — press <strong>Tab</strong> to accept.<br>
+      <strong style="color:var(--green)">Function Hints</strong> — type <code>TO_CHAR(</code>, <code>NVL(</code> etc. and see example arguments in italic in the autocomplete dropdown.<br>
+      <strong style="color:var(--cyan)">Smart Fix</strong> — the 🔧 FIX button now uses the validator to detect errors and applies targeted fixes (missing TABLE keyword, trailing commas, extra parens, typos, etc.).
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ===== FIX PREVIEW POPUP ===== -->
+<div id="fix-popup-overlay" style="display:none" onclick="if(event.target===this)closeFix()">
+  <div id="fix-popup-box">
+    <div class="fix-popup-title">🔧 AUTO-FIX PREVIEW</div>
+    <div class="fix-popup-subtitle" id="fix-popup-subtitle"></div>
+    <div class="fix-popup-list" id="fix-popup-list"></div>
+    <div class="fix-popup-summary" id="fix-popup-summary"></div>
+    <div class="fix-popup-actions">
+      <button class="tb-btn" onclick="closeFix()">CANCEL</button>
+      <button class="tb-btn cyan" onclick="applyFix()" id="fix-apply-btn">✓ APPLY ALL FIXES</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/comment-fold.min.js"></script>
+
+<script>
+'use strict';
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+const ORACLE_KEYWORDS = [
+  // DDL
+  'CREATE','TABLE','ALTER','DROP','MODIFY','ADD','COLUMN','CONSTRAINT',
+  'PRIMARY','KEY','FOREIGN','REFERENCES','UNIQUE','NOT','NULL','DEFAULT',
+  'CHECK','INDEX','ON','CASCADE','SET','DELETE','UPDATE','ENABLE','DISABLE',
+  'NOVALIDATE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','SEQUENCE',
+  'INCREMENT','START','WITH','MAXVALUE','MINVALUE','CYCLE','NOCYCLE','CACHE',
+  'NOCACHE','ORDER','NOORDER','TABLESPACE','PARTITION','BY','RANGE',
+  'LIST','HASH','VALUES','LESS','THAN','OR','REPLACE','FORCE','VIEW',
+  'LOGGING','NOLOGGING','COMPRESS','NOCOMPRESS','PARALLEL','NOPARALLEL',
+  'RESTRICT','ACTION','PCTFREE','PCTUSED','INITRANS','STORAGE','INITIAL','NEXT',
+  'MINEXTENTS','MAXEXTENTS','MATERIALIZED','REFRESH','COMPLETE','FAST','DEMAND',
+  'SYNONYM','PUBLIC','PRIVATE','RENAME','TRUNCATE','COMMENT','GRANT','REVOKE',
+  // DML
+  'SELECT','FROM','WHERE','GROUP','HAVING','UNION','INTERSECT','MINUS',
+  'INSERT','INTO','MERGE','USING','MATCHED','COMMIT','ROLLBACK','SAVEPOINT',
+  'DISTINCT','ALL','ANY','EXISTS','BETWEEN','LIKE','IN','IS','AND','NOT','OR',
+  'ASC','DESC','NULLS','FIRST','LAST','ROWNUM','ROWID','LEVEL','PRIOR','SIBLINGS',
+  'JOIN','INNER','LEFT','RIGHT','FULL','OUTER','CROSS','NATURAL',
+  'FETCH','NEXT','ROWS','ONLY','OFFSET','LIMIT',
+  // PL/SQL block
+  'DECLARE','BEGIN','END','EXCEPTION','RAISE','RAISE_APPLICATION_ERROR',
+  'PRAGMA','AUTONOMOUS_TRANSACTION','DETERMINISTIC','PIPELINED',
+  // PL/SQL objects
+  'PROCEDURE','FUNCTION','PACKAGE','BODY','TRIGGER','BEFORE','AFTER',
+  'INSTEAD','OF','FOR','EACH','ROW','STATEMENT',
+  'TYPE','RECORD','CURSOR','ROWTYPE','BULK','COLLECT','FORALL','INDICES',
+  // PL/SQL flow control
+  'IF','THEN','ELSE','ELSIF','END','LOOP','WHILE','EXIT','WHEN','RETURN',
+  'CONTINUE','GOTO','NULL',
+  // PL/SQL variable/typing
+  'IS','AS','AUTHID','CURRENT_USER','DEFINER','OUT','NOCOPY',
+  'CONSTANT','SUBTYPE','VARRAY','NESTED','TABLE','OBJECT',
+  // PL/SQL cursor
+  'OPEN','CLOSE','FETCH','FOUND','NOTFOUND','ROWCOUNT','ISOPEN',
+  // Misc Oracle
+  'SCHEMA','USER','SESSION','DATABASE','CONNECT','RESOURCE','DBA',
+  'EXPLAIN','PLAN','ANALYZE','COMPUTE','ESTIMATE','STATISTICS',
+  'LOCK','MODE','EXCLUSIVE','SHARE','NOWAIT','WAIT','SKIP','LOCKED'
+];
+const ORACLE_DATATYPES = [
+  'NUMBER','VARCHAR2','CHAR','NVARCHAR2','NCHAR','DATE','TIMESTAMP','CLOB',
+  'NCLOB','BLOB','RAW','LONG','INTEGER','INT','SMALLINT','FLOAT','REAL',
+  'DECIMAL','NUMERIC','BINARY_FLOAT','BINARY_DOUBLE','INTERVAL','YEAR','MONTH',
+  'DAY','SECOND','XMLTYPE','ROWID','UROWID','BOOLEAN','PLS_INTEGER',
+  'BINARY_INTEGER','SIMPLE_INTEGER','SIMPLE_FLOAT','SIMPLE_DOUBLE',
+  'VARCHAR','DOUBLE PRECISION','LONG RAW','SYS_REFCURSOR','REFCURSOR'
+];
+const ORACLE_FUNCTIONS = [
+  // Date/Time
+  'SYSDATE','SYSTIMESTAMP','CURRENT_DATE','CURRENT_TIMESTAMP','LOCALTIMESTAMP',
+  'TO_DATE','TO_CHAR','TO_TIMESTAMP','TO_TIMESTAMP_TZ','TO_INTERVAL',
+  'ADD_MONTHS','MONTHS_BETWEEN','NEXT_DAY','LAST_DAY','TRUNC','ROUND',
+  'EXTRACT','NUMTODSINTERVAL','NUMTOYMINTERVAL',
+  // Numeric
+  'TO_NUMBER','ABS','CEIL','FLOOR','MOD','POWER','SQRT','SIGN','LOG','EXP',
+  'BITAND','NANVL','REMAINDER','WIDTH_BUCKET',
+  // String
+  'LENGTH','LENGTHB','SUBSTR','SUBSTRB','INSTR','INSTRB',
+  'UPPER','LOWER','INITCAP','TRIM','LTRIM','RTRIM',
+  'LPAD','RPAD','REPLACE','TRANSLATE','CONCAT',
+  'CHR','ASCII','DUMP','VSIZE','SOUNDEX','METAPHONE',
+  'REGEXP_REPLACE','REGEXP_SUBSTR','REGEXP_INSTR','REGEXP_LIKE','REGEXP_COUNT',
+  // Null handling
+  'NVL','NVL2','COALESCE','NULLIF','DECODE','LNNVL',
+  // Aggregates
+  'SUM','COUNT','AVG','MIN','MAX','STDDEV','VARIANCE','MEDIAN',
+  'LISTAGG','XMLAGG','WM_CONCAT',
+  // Analytic/Window
+  'ROW_NUMBER','RANK','DENSE_RANK','PERCENT_RANK','CUME_DIST',
+  'LAG','LEAD','FIRST_VALUE','LAST_VALUE','NTH_VALUE','NTILE',
+  'PERCENTILE_CONT','PERCENTILE_DISC',
+  // Conversion / Type
+  'CAST','CONVERT','TO_CLOB','TO_BLOB','TO_BINARY_FLOAT','TO_BINARY_DOUBLE',
+  'HEXTORAW','RAWTOHEX','ROWIDTOCHAR','CHARTOROWID',
+  // Misc
+  'GREATEST','LEAST','GREATEST_IGNORE_NULLS','LEAST_IGNORE_NULLS',
+  'SYS_GUID','SYS_CONTEXT','USERENV','UID','USER',
+  'NEXTVAL','CURRVAL','ROWNUM',
+  // PL/SQL
+  'RAISE_APPLICATION_ERROR','DBMS_OUTPUT','DBMS_LOCK','DBMS_UTILITY',
+  'UTL_FILE','UTL_HTTP','UTL_SMTP',
+  // Conditional expression keywords
+  'CASE','WHEN','THEN','ELSE','END'
+];
+// TRUE Oracle 19c reserved words — CANNOT be used as unquoted identifiers (error)
+// Source: Oracle Database SQL Language Reference, 19c Appendix C
+const ORACLE_TRUE_RESERVED = new Set([
+  'ACCESS','ADD','ALL','ALTER','AND','ANY','AS','ASC','AUDIT','BETWEEN','BY',
+  'CHAR','CHECK','CLUSTER','COLUMN','COMMENT','COMPRESS','CONNECT','CREATE',
+  'CURRENT','DATE','DECIMAL','DEFAULT','DELETE','DESC','DISTINCT','DROP','ELSE',
+  'EXCLUSIVE','EXISTS','FILE','FLOAT','FOR','FROM','GRANT','GROUP','HAVING',
+  'IDENTIFIED','IMMEDIATE','IN','INCREMENT','INDEX','INITIAL','INSERT',
+  'INTEGER','INTERSECT','INTO','IS','LEVEL','LIKE','LOCK','LONG','MAXEXTENTS',
+  'MINUS','MLSLABEL','MODE','MODIFY','NOAUDIT','NOCOMPRESS','NOT','NOWAIT',
+  'NULL','NUMBER','OF','OFFLINE','ON','ONLINE','OPTION','OR','ORDER','PCTFREE',
+  'PRIOR','PRIVILEGES','PUBLIC','RAW','RENAME','RESOURCE','REVOKE','ROW',
+  'ROWID','ROWNUM','ROWS','SELECT','SESSION','SET','SHARE','SIZE','SMALLINT',
+  'START','SUCCESSFUL','SYNONYM','SYSDATE','TABLE','THEN','TO','TRIGGER','UID',
+  'UNION','UNIQUE','UPDATE','USER','VALIDATE','VALUES','VARCHAR','VARCHAR2',
+  'VIEW','WHENEVER','WHERE','WITH'
+]);
+
+// FORBIDDEN even as quoted identifier — Oracle explicitly bans this exact uppercase form
+
+// Unreserved Oracle keywords — allowed as identifiers but risky / bad practice (warning)
+const ORACLE_UNRESERVED_KW = new Set([
+  'ADMIN','AFTER','ARCHIVE','AUTHORIZATION','AUTOEXTEND','BACKUP','BEFORE',
+  'BEGIN','BITMAP','BODY','CACHE','CANCEL','CASCADE','CHARACTER','CHECKPOINT',
+  'CLOSE','COMMIT','COMPILE','CONSTRAINT','CONSTRAINTS','CONTENTS','CONTINUE',
+  'CONTROLFILE','CURSOR','CYCLE','DATABASE','DATAFILE','DBA','DECLARE',
+  'DEFERRABLE','DEFERRED','DEGREE','DISABLE','DISTRIBUTED','EACH','ENABLE',
+  'END','ESCAPE','EVENTS','EXCEPT','EXCEPTIONS','EXECUTE','EXPIRE','EXPLAIN',
+  'EXTENT','FETCH','FLUSH','FORCE','FOREIGN','FUNCTION','GLOBAL','HASH',
+  'HEAP','IF','INSTANCE','INSTEAD','KEY','LIMIT','LOCAL','LOGFILE','LOGGING',
+  'LOOP','MAX','MAXVALUE','MIN','MINVALUE','MOUNT','NAME','NEW','NEXT',
+  'NOCACHE','NOCYCLE','NOLOGGING','NOORDER','NOVALIDATE','OFF','OLD','ONLY',
+  'OPEN','OPTIMAL','PACKAGE','PARALLEL','PASSWORD','PCTINCREASE','PCTUSED',
+  'PLAN','PRECISION','PRIMARY','PRIVATE','PROCEDURE','PROFILE','QUOTA','READ',
+  'RECOVER','REFERENCES','REPLACE','RESTRICTED','RETURN','REUSE','ROLE',
+  'ROLES','ROLLBACK','SAVEPOINT','SEGMENT','SEQUENCE','SHARED','SNAPSHOT',
+  'SORT','STATISTICS','STOP','STORAGE','SYSTEM','TABLES','TABLESPACE',
+  'TEMPORARY','THREAD','TIME','TRANSACTION','TRUNCATE','UNLIMITED','USE',
+  'USING','WHEN','WORK','WRITE'
+]);
+const TYPE_FAMILY = {
+  NUMBER:'num', INTEGER:'num', INT:'num', SMALLINT:'num', DECIMAL:'num',
+  NUMERIC:'num', FLOAT:'num', REAL:'num', 'BINARY_FLOAT':'num',
+  'BINARY_DOUBLE':'num', 'DOUBLE PRECISION':'num', 'PLS_INTEGER':'num',
+  'BINARY_INTEGER':'num', 'SIMPLE_INTEGER':'num',
+  VARCHAR2:'char', CHAR:'char', NVARCHAR2:'char', NCHAR:'char', VARCHAR:'char',
+  DATE:'date', TIMESTAMP:'date',
+  CLOB:'lob', NCLOB:'lob', BLOB:'lob',
+  RAW:'raw', LONG:'raw',
+  ROWID:'rowid', UROWID:'rowid',
+  XMLTYPE:'xml',
+};
+const DTYPE_SET = new Set(ORACLE_DATATYPES.map(d => d.toUpperCase()));
+const KW_SET = new Set(ORACLE_KEYWORDS.map(k => k.toUpperCase()));
+
+function getTypeFamily(t) {
+  const up = (t||'').toUpperCase().replace(/\s*\(.*\)/, '').trim();
+  return TYPE_FAMILY[up] || 'other';
+}
+function areFKTypesCompatible(a, b) {
+  const fa = getTypeFamily(a), fb = getTypeFamily(b);
+  return fa === fb;
+}
+
+// ============================================================================
+// TOKENIZER
+// ============================================================================
+function tokenize(sql) {
+  const tokens = [];
+  let i=0, n=sql.length, line=1, col=1;
+  function addTok(type, val, l, c) {
+    tokens.push({ type, value:val, upper:(type==='IDENT'||type==='KEYWORD')?val.toUpperCase():val, line:l||line, col:c||col });
+  }
+  while(i<n){
+    const sl=line, sc=col, ch=sql[i];
+    if(ch==='\r'||ch==='\n'){ if(ch==='\r'&&sql[i+1]==='\n')i++; line++;col=1;i++;continue; }
+    if(/[ \t]/.test(ch)){col++;i++;continue;}
+    if(ch==='-'&&sql[i+1]==='-'){ let c=''; while(i<n&&sql[i]!=='\n'&&sql[i]!=='\r'){c+=sql[i++];col++;} addTok('COMMENT',c,sl,sc);continue; }
+    if(ch==='/'&&sql[i+1]==='*'){ let c='/*';i+=2;col+=2; while(i<n&&!(sql[i]==='*'&&sql[i+1]==='/'))c+=sql[i++]; c+='*/';i+=2; addTok('COMMENT',c,sl,sc);continue; }
+    if(ch==="'"){ let s="'";i++;col++; while(i<n){ const q=sql[i]; s+=q; if(q==='\n')line++; i++;col++; if(q==="'"&&sql[i]!=="'")break; } addTok('STRING',s,sl,sc);continue; }
+    if(ch==='"'){ let s='"';i++;col++; while(i<n&&sql[i]!=='"'){s+=sql[i];if(sql[i]==='\n')line++;i++;col++;} s+='"';i++;col++; addTok('QUOTED_ID',s.slice(1,-1),sl,sc);continue; }
+    if(/[0-9]/.test(ch)||( ch==='.'&&/[0-9]/.test(sql[i+1]))){ let s=''; while(i<n&&/[0-9._eE+\-x]/.test(sql[i]))s+=sql[i++]; addTok('NUMBER',s,sl,sc);continue; }
+    if(/[A-Za-z_$#]/.test(ch)){ let s=''; while(i<n&&/[\w$#]/.test(sql[i]))s+=sql[i++]; const up=s.toUpperCase(); addTok(KW_SET.has(up)||DTYPE_SET.has(up)?'KEYWORD':'IDENT',s,sl,sc);continue; }
+    const two=sql.slice(i,i+2);
+    if(['<>','!=','<=','>=',':=','..','||'].includes(two)){addTok('OP',two,sl,sc);i+=2;col+=2;}
+    // Known single-char punctuation
+    else if('();,.*/%+-=<>@^~&|!'.includes(ch)){addTok('PUNCT',ch,sl,sc);i++;col++;}
+    // Unknown/Unicode chars (em dash, smart quotes, etc.) — skip silently
+    else{i++;col++;}
+  }
+  return tokens.filter(t=>t.type!=='COMMENT');
+}
+
+// ============================================================================
+// DDL PARSER
+// ============================================================================
+function parseDDL(sql) {
+  const toks = tokenize(sql);
+  let pos = 0;
+  const schema = {
+    tables:{}, sequences:{}, indexes:[], synonyms:{}, views:{},
+    constraintNames: new Set(),
+    errors:[], warnings:[], infos:[]
+  };
+  const peek = (o=0) => toks[pos+o]||null;
+  const cur  = ()    => toks[pos]||null;
+  const consume = ()  => toks[pos++]||null;
+
+  function expectKeyword(kw, msg) {
+    const t=cur();
+    if(!t||t.type!=='KEYWORD'||t.upper!==kw){
+      schema.errors.push({msg:msg+(t?` (found "${t.value}")`:''), line:t?.line||1}); return false;
+    } pos++;return true;
+  }
+  function expectOneOf(kws, msg) {
+    const t=cur();
+    if(!t||!kws.includes(t.upper)){
+      schema.errors.push({msg:msg+(t?` (found "${t.value}")`:''), line:t?.line||1}); return null;
+    } const v=t.upper; pos++;return v;
+  }
+  function skipToSemicolon() {
+    while(pos<toks.length&&cur().value!==';')pos++;
+    if(cur()?.value===';')pos++;
+  }
+  function parseIdentifier() {
+    const t=cur(); if(!t)return null;
+    if(t.type==='QUOTED_ID'||t.type==='IDENT'||t.type==='KEYWORD'){pos++;return t.upper;}
+    return null;
+  }
+  // Returns {name, quoted, line} or null — used when we need to track quoting
+  function parseIdentifierFull() {
+    const t=cur(); if(!t)return null;
+    if(t.type==='QUOTED_ID'){pos++;return{name:t.value, nameU:t.value.toUpperCase(), quoted:true, origCase:t.value, line:t.line};}
+    if(t.type==='IDENT'||t.type==='KEYWORD'){pos++;return{name:t.value, nameU:t.upper, quoted:false, origCase:t.value, line:t.line};}
+    return null;
+  }
+  function parseSchemaObject() {
+    const n1=parseIdentifier(); if(!n1)return[null,null];
+    if(cur()?.value==='.'){pos++;const n2=parseIdentifier();return[n1,n2];}
+    return[null,n1];
+  }
+  function parseConstraintName() {
+    if(cur()?.upper==='CONSTRAINT'){pos++;return parseIdentifier();}
+    return null;
+  }
+  function parseDataType() {
+    const t=cur(); if(!t)return null;
+    const baseType=parseIdentifier(); if(!baseType)return null;
+    let fullType=baseType;
+    if(baseType==='DOUBLE'&&cur()?.upper==='PRECISION'){fullType='DOUBLE PRECISION';pos++;}
+    else if(baseType==='LONG'&&cur()?.upper==='RAW'){fullType='LONG RAW';pos++;}
+    let precision=null, scale=null;
+    if(cur()?.value==='('){
+      pos++;
+      if(cur()?.type==='NUMBER'){
+        precision=parseFloat(consume().value);
+        if(cur()?.value===','){pos++;if(cur()?.type==='NUMBER')scale=parseFloat(consume().value);}
+      } else if(cur()?.value===')'){/* empty parens - ok */}
+      // consume everything until matching )
+      while(pos<toks.length&&cur()?.value!==')')pos++;
+      if(cur()?.value===')')pos++;
+    }
+    return{base:fullType, precision, scale, full:fullType+(precision!=null?`(${precision}${scale!=null?','+scale:''})`:'')}
+  }
+  function parseColCons(colInfo, tableName, colLine) {
+    while(pos<toks.length){
+      const t=cur(); if(!t)break;
+      const u=t.upper, ln=t.line;
+      if(u===','||u===')'||u===';')break;
+      if(u==='NOT'){
+        pos++;
+        if(cur()?.upper==='NULL'){pos++;colInfo.notNull=true;}
+        else schema.errors.push({msg:`Expected NULL after NOT, found "${cur()?.value||'EOF'}"`,line:ln});
+        continue;
+      }
+      if(u==='NULL'){pos++;colInfo.nullable=true;continue;}
+      if(u==='DEFAULT'){pos++;let dp=[];while(pos<toks.length&&!['NOT','NULL','CHECK','CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','REFERENCES',','].includes(cur()?.upper))dp.push(consume().value);colInfo.default=dp.join(' ');continue;}
+      if(u==='CONSTRAINT'){const cn=parseConstraintName();if(cn){schema.constraintNames.add(cn);colInfo.constraintName=cn;}continue;}
+      if(u==='PRIMARY'){pos++;if(cur()?.upper==='KEY'){pos++;colInfo.pk=true;colInfo.notNull=true;}continue;}
+      if(u==='UNIQUE'){pos++;colInfo.unique=true;continue;}
+      if(u==='REFERENCES'){pos++;const[,refTable]=parseSchemaObject();let refCols=[];if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')'){if(cur()?.type!=='PUNCT')refCols.push(cur().upper);pos++;}if(cur()?.value===')')pos++;}colInfo.references={table:refTable,cols:refCols};continue;}
+      if(u==='CHECK'){pos++;if(cur()?.value==='('){let d=1;pos++;while(pos<toks.length&&d>0){if(cur()?.value==='(')d++;else if(cur()?.value===')')d--;pos++;}}continue;}
+      if(['ENABLE','DISABLE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','NOVALIDATE','VALIDATE','USING','INDEX'].includes(u)){pos++;continue;}
+      break;
+    }
+  }
+  function collectParenContent() {
+    if(cur()?.value!=='(')return[];
+    pos++;const parts=[];let depth=0;
+    while(pos<toks.length){
+      const t=cur();
+      if(t.value==='(')depth++;
+      if(t.value===')'){if(depth===0){pos++;break;}depth--;}
+      parts.push(consume());
+    }
+    return parts;
+  }
+  function parseTableConstraint(tableName, tableObj) {
+    const cLine=cur()?.line;
+    let cname=parseConstraintName();
+    const u=cur()?.upper; if(!u)return;
+    if(u==='PRIMARY'){
+      pos++;if(cur()?.upper==='KEY'){pos++;
+        const cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
+        if(cols.length===0) schema.errors.push({msg:`PRIMARY KEY constraint "${cname||'<unnamed>'}" has empty column list — template: CONSTRAINT pk_name PRIMARY KEY (col1, col2)`,line:cLine});
+        if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}
+        tableObj.constraints.push({type:'PK',name:cname,cols,line:cLine});
+        cols.forEach(c=>{if(tableObj.columns[c])tableObj.columns[c].notNull=true;});
+      }else schema.errors.push({msg:'Expected KEY after PRIMARY — template: CONSTRAINT name PRIMARY KEY (column)',line:cur()?.line});
+    } else if(u==='UNIQUE'){
+      pos++;const cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
+      if(cols.length===0) schema.errors.push({msg:`UNIQUE constraint "${cname||'<unnamed>'}" has empty column list — template: CONSTRAINT uq_name UNIQUE (col1)`,line:cLine});
+      if(cname)schema.constraintNames.add(cname);
+      tableObj.constraints.push({type:'UNIQUE',name:cname,cols,line:cLine});
+    } else if(u==='FOREIGN'){
+      pos++;if(cur()?.upper==='KEY'){pos++;
+        const fkCols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
+        if(fkCols.length===0) schema.errors.push({msg:`FOREIGN KEY constraint "${cname||'<unnamed>'}" has empty column list — template: FOREIGN KEY (local_col) REFERENCES target_table (target_col)`,line:cLine});
+        if(cur()?.upper==='REFERENCES'){pos++;
+          const[,refTable]=parseSchemaObject();let refCols=[];
+          if(cur()?.value==='('){
+            // Check for empty ()
+            const savedPos=pos;
+            const raw=collectParenContent();
+            refCols=raw.filter(t=>t.type!=='PUNCT').map(t=>t.upper);
+            if(raw.length===0||refCols.length===0){
+              schema.errors.push({msg:`FK "${cname||'<unnamed>'}" has empty REFERENCES column list — you must specify the referenced column: REFERENCES ${refTable||'table'} (column_name)`,line:cLine});
+            }
+          }
+          let onDelete=null;
+          if(cur()?.upper==='ON'){pos++;if(cur()?.upper==='DELETE'){pos++;onDelete=consume()?.upper;}}
+          if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}
+          tableObj.constraints.push({type:'FK',name:cname,cols:fkCols,refTable,refCols,onDelete,line:cLine});
+        }else schema.errors.push({msg:'Expected REFERENCES after FOREIGN KEY — template: FOREIGN KEY (col) REFERENCES target_table (target_col)',line:cur()?.line});
+      }else schema.errors.push({msg:'Expected KEY after FOREIGN — template: FOREIGN KEY (col) REFERENCES table (col)',line:cur()?.line});
+    } else if(u==='CHECK'){
+      pos++;
+      const checkContent=collectParenContent();
+      if(checkContent.length===0) schema.errors.push({msg:`CHECK constraint "${cname||'<unnamed>'}" has empty condition — template: CONSTRAINT ck_name CHECK (condition)`,line:cLine});
+      if(cname)schema.constraintNames.add(cname);
+      tableObj.constraints.push({type:'CHECK',name:cname,line:cLine});
+    }
+    while(pos<toks.length&&cur()?.value!==','&&cur()?.value!==')'&&cur()?.value!==';'){
+      if(['ENABLE','DISABLE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','NOVALIDATE','VALIDATE','USING','INDEX'].includes(cur()?.upper))pos++;
+      else break; pos++;
+    }
+  }
+  function parseCreateTable() {
+    const line=cur()?.line;
+    if(!expectKeyword('TABLE','Expected TABLE after CREATE')){skipToSemicolon();return;}
+    const[,tableName]=parseSchemaObject();
+    if(!tableName){schema.errors.push({msg:'Missing table name',line});skipToSemicolon();return;}
+    const tblUp=tableName.toUpperCase();
+    if(schema.tables[tblUp])schema.errors.push({msg:`Duplicate table "${tblUp}"`,line});
+    const tableObj={columns:{},constraints:[],line,colOrder:[]};
+    schema.tables[tblUp]=tableObj;
+    if(cur()?.value!=='('){schema.errors.push({msg:`Expected '(' after table name "${tblUp}"`,line:cur()?.line});skipToSemicolon();return;}
+    pos++;
+    let lastCommaLine=null;
+    while(pos<toks.length&&cur()?.value!==')'&&cur()?.value!==';'){
+      if(cur()?.value===','){
+        lastCommaLine=cur()?.line;
+        // Peek ahead: if next non-space token is ')' this is a trailing comma
+        pos++;
+        // skip any extra commas
+        while(pos<toks.length&&cur()?.value===',')pos++;
+        if(cur()?.value===')'||cur()?.value===';'){
+          schema.errors.push({msg:`Trailing comma before ')' is not allowed in Oracle — remove the last ','`,line:lastCommaLine});
+        }
+        continue;
+      }
+      const u=cur()?.upper;
+      if(['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(u)){parseTableConstraint(tblUp,tableObj);continue;}
+      const colLine=cur()?.line;
+      const colId=parseIdentifierFull();
+      if(!colId){schema.errors.push({msg:'Expected column name',line:colLine});pos++;continue;}
+      const colUp=colId.nameU;
+      if(tableObj.columns[colUp])schema.errors.push({msg:`Duplicate column "${colUp}" in "${tblUp}"`,line:colLine});
+      const dataType=parseDataType();
+      if(!dataType){schema.errors.push({msg:`Missing data type for column "${colId.origCase}"`,line:colLine});pos++;continue;}
+      const colInfo={type:dataType,notNull:false,pk:false,default:null,unique:false,line:colLine,
+                     quoted:colId.quoted, origCase:colId.origCase};
+      tableObj.columns[colUp]=colInfo;
+      tableObj.colOrder.push(colUp);
+      parseColCons(colInfo,tblUp,colLine);
+    }
+    if(cur()?.value===')')pos++;
+    else schema.errors.push({msg:`Missing closing ')' for table "${tblUp}"`,line:cur()?.line});
+    while(pos<toks.length&&cur()?.value!==';')pos++;
+  }
+  function parseCreateSequence() {
+    const line=cur()?.line;
+    if(!expectKeyword('SEQUENCE','Expected SEQUENCE')){skipToSemicolon();return;}
+    const[,name]=parseSchemaObject();
+    if(!name){schema.errors.push({msg:'Missing sequence name',line});skipToSemicolon();return;}
+    const seqObj={line,increment:1,start:1,maxValue:null,minValue:1,cycle:false,cache:20};
+    while(pos<toks.length&&cur()?.value!==';'){
+      const u=cur()?.upper;
+      if(u==='INCREMENT'){pos++;if(cur()?.upper==='BY')pos++;if(cur()?.type==='NUMBER')seqObj.increment=parseFloat(consume().value);}
+      else if(u==='START'){pos++;if(cur()?.upper==='WITH')pos++;if(cur()?.type==='NUMBER')seqObj.start=parseFloat(consume().value);}
+      else if(u==='MAXVALUE'){pos++;if(cur()?.type==='NUMBER')seqObj.maxValue=parseFloat(consume().value);else seqObj.maxValue='UNLIMITED';}
+      else if(u==='MINVALUE'){pos++;if(cur()?.type==='NUMBER')seqObj.minValue=parseFloat(consume().value);}
+      else if(u==='CYCLE'){pos++;seqObj.cycle=true;}
+      else if(u==='NOCYCLE'){pos++;seqObj.cycle=false;}
+      else if(u==='CACHE'){pos++;if(cur()?.type==='NUMBER')seqObj.cache=parseFloat(consume().value);}
+      else if(u==='NOCACHE'){pos++;seqObj.cache=0;}
+      else pos++;
+    }
+    schema.sequences[name.toUpperCase()]=seqObj;
+  }
+  function parseCreateIndex() {
+    const line=cur()?.line; let unique=false;
+    if(cur()?.upper==='UNIQUE'){pos++;unique=true;}
+    if(cur()?.upper==='BITMAP')pos++;
+    if(!expectKeyword('INDEX','Expected INDEX')){skipToSemicolon();return;}
+    const[,idxName]=parseSchemaObject();
+    if(!expectKeyword('ON','Expected ON after index name')){skipToSemicolon();return;}
+    const[,tableName]=parseSchemaObject();
+    if(!tableName){schema.errors.push({msg:'Missing table name for index',line});skipToSemicolon();return;}
+    let cols=[];
+    if(cur()?.value==='(')cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
+    while(pos<toks.length&&cur()?.value!==';')pos++;
+    schema.indexes.push({name:idxName?.toUpperCase(),table:tableName?.toUpperCase(),cols,unique,line});
+  }
+  function parseAlterTable() {
+    const line=cur()?.line;
+    if(!expectKeyword('TABLE','Expected TABLE after ALTER')){skipToSemicolon();return;}
+    const[,tableName]=parseSchemaObject();
+    if(!tableName){schema.errors.push({msg:'Missing table name in ALTER',line});skipToSemicolon();return;}
+    const tblUp=tableName.toUpperCase();
+    const op=expectOneOf(['ADD','MODIFY','DROP','RENAME','ENABLE','DISABLE'],'Expected ADD/MODIFY/DROP/RENAME after table name');
+    if(!op){skipToSemicolon();return;}
+    if(op==='ADD'){
+      if(cur()?.upper==='CONSTRAINT'){
+        const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+        parseTableConstraint(tblUp,tObj);
+      } else if(cur()?.value==='('){
+        pos++;
+        while(pos<toks.length&&cur()?.value!==')'&&cur()?.value!==';'){
+          if(cur()?.value===','){pos++;continue;}
+          const nu=cur()?.upper;
+          if(['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(nu)){
+            parseTableConstraint(tblUp,schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]}));
+          } else {
+            const cl=cur()?.line; const cn=parseIdentifier();
+            if(!cn){schema.errors.push({msg:'Expected column name in ADD',line:cl});break;}
+            const dt=parseDataType();
+            if(!dt){schema.errors.push({msg:`Missing data type for "${cn}"`,line:cl});break;}
+            const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+            const cu=cn.toUpperCase();
+            if(tObj.columns[cu])schema.errors.push({msg:`Column "${cu}" already exists in "${tblUp}"`,line:cl});
+            const ci={type:dt,notNull:false,pk:false,default:null,line:cl};
+            tObj.columns[cu]=ci; tObj.colOrder.push(cu);
+            parseColCons(ci,tblUp,cl);
+          }
+        }
+        if(cur()?.value===')')pos++;
+      } else {
+        const cl=cur()?.line; const colId=parseIdentifierFull();
+        if(!colId){schema.errors.push({msg:'Expected column name in ADD',line:cl});skipToSemicolon();return;}
+        const dt=parseDataType();
+        if(!dt){schema.errors.push({msg:`Missing data type for "${colId.origCase}"`,line:cl});skipToSemicolon();return;}
+        const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+        const cu=colId.nameU;
+        const ci={type:dt,notNull:false,pk:false,default:null,line:cl,quoted:colId.quoted,origCase:colId.origCase};
+        tObj.columns[cu]=ci; tObj.colOrder.push(cu);
+        parseColCons(ci,tblUp,cl);
+      }
+    } else if(op==='MODIFY'){
+      if(cur()?.value==='(')pos++;
+      const cl=cur()?.line; const cn=parseIdentifier();
+      if(!cn){schema.errors.push({msg:'Expected column name in MODIFY',line:cl});skipToSemicolon();return;}
+      const dt=parseDataType();
+      if(!dt){schema.errors.push({msg:`Missing data type in MODIFY`,line:cl});skipToSemicolon();return;}
+      const tObj=schema.tables[tblUp];
+      if(tObj){
+        const cu=cn.toUpperCase();
+        if(!tObj.columns[cu])schema.warnings.push({msg:`Column "${cn}" not found in "${tblUp}" (MODIFY)`,line:cl});
+        else tObj.columns[cu].type=dt;
+      }
+      while(pos<toks.length&&cur()?.value!==';'&&cur()?.value!==')')pos++;
+      if(cur()?.value===')')pos++;
+    } else if(op==='DROP'){
+      const what=expectOneOf(['COLUMN','CONSTRAINT'],'Expected COLUMN or CONSTRAINT after DROP');
+      if(!what){skipToSemicolon();return;}
+      parseIdentifier();
+    } else if(op==='RENAME'){
+      if(cur()?.upper==='COLUMN'){
+        pos++;
+        const _renColLine=cur()?.line;
+        const _oldCol=parseIdentifier();
+        if(!_oldCol){schema.errors.push({msg:'Expected old column name after RENAME COLUMN',line:_renColLine});skipToSemicolon();return;}
+        if(cur()?.upper==='TO'){pos++;if(!parseIdentifier())schema.errors.push({msg:'Expected new column name after TO',line:cur()?.line});}
+        else if(cur()&&cur()?.value!==';'){
+          schema.errors.push({msg:`Missing TO keyword — use: RENAME COLUMN ${_oldCol} TO new_name`,line:cur()?.line});
+          parseIdentifier();
+        } else {schema.errors.push({msg:`Missing TO keyword in RENAME COLUMN ${_oldCol} — use: RENAME COLUMN ${_oldCol} TO new_name`,line:_renColLine});}
+      } else if(cur()?.upper==='CONSTRAINT'){
+        pos++;
+        const _renConLine=cur()?.line;
+        const _oldCon=parseIdentifier();
+        if(!_oldCon){schema.errors.push({msg:'Expected constraint name after RENAME CONSTRAINT',line:_renConLine});skipToSemicolon();return;}
+        if(cur()?.upper==='TO'){pos++;if(!parseIdentifier())schema.errors.push({msg:'Expected new constraint name after TO',line:cur()?.line});}
+        else if(cur()&&cur()?.value!==';'){
+          schema.errors.push({msg:`Missing TO keyword — use: RENAME CONSTRAINT ${_oldCon} TO new_name`,line:cur()?.line});
+          parseIdentifier();
+        } else {schema.errors.push({msg:`Missing TO keyword in RENAME CONSTRAINT — expected: RENAME CONSTRAINT ${_oldCon} TO new_name`,line:_renConLine});}
+      } else if(cur()?.upper==='TO'){pos++;parseIdentifier();}
+      else schema.errors.push({msg:'Invalid RENAME syntax — expected COLUMN, CONSTRAINT, or TO',line:cur()?.line});
+    }
+    while(pos<toks.length&&cur()?.value!==';')pos++;
+  }
+
+  // Main parse loop
+  // Skip to matching END for a PL/SQL block.
+  // Call this when cur() IS the BEGIN token (or the first token inside the block).
+  function skipPlsqlBlock() {
+    // Consume the opening BEGIN (or CASE) if we haven't yet
+    if (cur()?.upper === 'BEGIN' || cur()?.upper === 'CASE') pos++;
+
+    // depth=1 means we're inside one block; we look for depth to reach 0
+    let depth = 1;
+    while (pos < toks.length) {
+      const t = cur();
+      if (!t) break;
+      // These keywords open a new nested block that needs its own END
+      if (['BEGIN','CASE','IF','LOOP'].includes(t.upper)) {
+        depth++;
+        pos++;
+      } else if (t.upper === 'END') {
+        depth--;
+        pos++;
+        if (depth === 0) break; // found the matching END
+        // skip optional IF / LOOP / CASE suffix after nested END
+        if (cur()?.upper && ['IF','LOOP','CASE'].includes(cur().upper)) pos++;
+      } else {
+        pos++;
+      }
+    }
+    // skip optional label after END (e.g.  END my_proc)
+    if (cur()?.type === 'IDENT') pos++;
+    // skip the terminating semicolon
+    if (cur()?.value === ';') pos++;
+  }
+
+  while(pos<toks.length){
+    const t=cur(); if(!t)break;
+
+    // Skip any stray semicolons between statements
+    if(t.value===';'){pos++;continue;}
+
+    // Skip any stray punctuation / operators that aren't valid statement starters
+    // (em-dash, equals, dashes written outside comments, etc.)
+    if(t.type==='PUNCT'||t.type==='OP'){pos++;continue;}
+
+    // PL/SQL anonymous block: BEGIN ... END;
+    if(t.type==='KEYWORD'&&t.upper==='BEGIN'){
+      skipPlsqlBlock(); continue;
+    }
+
+    // PL/SQL block with DECLARE section
+    if(t.type==='KEYWORD'&&t.upper==='DECLARE'){
+      pos++; // consume DECLARE
+      // Skip ALL tokens — including variable declaration semicolons — until we find BEGIN
+      // Variable declarations look like:  v_name  TYPE;
+      // We just need to skip everything until BEGIN
+      while(pos<toks.length && cur()?.upper!=='BEGIN') {
+        pos++;
+      }
+      if(cur()?.upper==='BEGIN') skipPlsqlBlock();
+      continue;
+    }
+
+    if(t.type==='IDENT'){
+      const next=peek(1);
+      if(next&&next.type==='KEYWORD'&&['TABLE','SEQUENCE','INDEX','VIEW'].includes(next.upper)){
+        schema.errors.push({msg:`Unexpected identifier "${t.value}" — did you mean CREATE?`,line:t.line});
+        pos++;continue;
+      }
+    }
+    if(t.type==='KEYWORD'&&t.upper==='CREATE'){
+      pos++;
+      if(cur()?.upper==='OR'){pos++;if(cur()?.upper==='REPLACE')pos++;}
+      if(cur()?.upper==='GLOBAL'){pos++;if(cur()?.upper==='TEMPORARY')pos++;}
+      const what=cur()?.upper;
+      if(what==='TABLE')parseCreateTable();
+      else if(what==='SEQUENCE')parseCreateSequence();
+      else if(what==='INDEX'||what==='UNIQUE'||what==='BITMAP')parseCreateIndex();
+      else if(what==='VIEW'||what==='MATERIALIZED'){pos++;parseSchemaObject();while(pos<toks.length&&cur()?.value!==';')pos++;}
+      // PL/SQL objects — skip body (may contain nested ;) using block skip
+      else if(['PROCEDURE','FUNCTION','PACKAGE','TRIGGER','TYPE'].includes(what)){
+        pos++; // consume PROCEDURE/FUNCTION/etc keyword
+        // skip header until IS or AS or BEGIN
+        while(pos<toks.length){
+          const u=cur()?.upper;
+          if(u==='BEGIN'){ skipPlsqlBlock(); break; }
+          if(u==='IS'||u==='AS'){ pos++; break; }
+          if(cur()?.value===';'){ pos++; break; }
+          pos++;
+        }
+        // if we hit IS/AS, now skip to BEGIN then block
+        if(pos<toks.length&&cur()?.upper!=='BEGIN'){
+          while(pos<toks.length&&cur()?.upper!=='BEGIN'&&cur()?.value!==';') pos++;
+          if(cur()?.upper==='BEGIN') skipPlsqlBlock();
+          else if(cur()?.value===';') pos++;
+        }
+      }
+      else{schema.errors.push({msg:`Expected TABLE/SEQUENCE/INDEX/VIEW after CREATE, found "${what||'EOF'}"`,line:cur()?.line||t.line});while(pos<toks.length&&cur()?.value!==';')pos++;}
+    } else if(t.type==='KEYWORD'&&t.upper==='ALTER'){
+      pos++;
+      if(cur()?.upper==='TABLE')parseAlterTable();
+      else{schema.errors.push({msg:'Expected TABLE after ALTER',line:cur()?.line});while(pos<toks.length&&cur()?.value!==';')pos++;}
+    } else if(t.type==='KEYWORD'&&(t.upper==='DROP'||t.upper==='TRUNCATE')){
+      while(pos<toks.length&&cur()?.value!==';')pos++;
+    // DML statements — silently skip (no DDL validation needed)
+    } else if(t.type==='KEYWORD'&&['SELECT','INSERT','UPDATE','DELETE','MERGE',
+        'COMMIT','ROLLBACK','SAVEPOINT','GRANT','REVOKE','COMMENT','ANALYZE',
+        'EXPLAIN','LOCK','RENAME','EXECUTE','OPEN','CLOSE','FETCH','RAISE',
+        'RETURN','EXIT','CONTINUE','GOTO','NULL','EXCEPTION','IF','LOOP',
+        'WHILE','FOR','FORALL','PIPE','BULK'].includes(t.upper)){
+      while(pos<toks.length&&cur()?.value!==';')pos++;
+    } else if(t.type==='IDENT'){
+      // Unknown identifier at statement level — silently skip (could be PL/SQL label, pragma, etc.)
+      while(pos<toks.length&&cur()?.value!==';')pos++;
+    } else {
+      // Only report truly unexpected tokens for known statement-starting keywords
+      schema.errors.push({msg:`Unexpected keyword "${t.value}" at statement level — did you mean CREATE, ALTER, DROP, or a PL/SQL block?`,line:t.line});
+      while(pos<toks.length&&cur()?.value!==';')pos++;
+    }
+    if(cur()?.value===';')pos++;
+  }
+  return schema;
+}
+
+// ============================================================================
+// PARENTHESIS BALANCE CHECKER
+// ============================================================================
+function checkParenBalance(sql) {
+  const issues = [];
+  let depth = 0;
+  let inStr = false;
+  let lineNum = 1;
+  let stmtStartLine = 1;
+  let firstOpenLine = null;
+  let i = 0;
+  while (i < sql.length) {
+    const ch = sql[i];
+    if (ch === '\n') { lineNum++; i++; continue; }
+    if (ch === '-' && sql[i+1] === '-') { while (i < sql.length && sql[i] !== '\n') i++; continue; }
+    if (ch === "'" && !inStr) { inStr = true; i++; continue; }
+    if (ch === "'" && inStr)  { inStr = false; i++; continue; }
+    if (inStr) { i++; continue; }
+    if (ch === '(') {
+      if (depth === 0) firstOpenLine = lineNum;
+      depth++; i++; continue;
+    }
+    if (ch === ')') {
+      depth--;
+      if (depth < 0) {
+        issues.push({ sev:'error', msg:`Extra closing ')' — too many closing parentheses before ';'`, line:lineNum });
+        depth = 0;
+      }
+      i++; continue;
+    }
+    if (ch === ';') {
+      if (depth > 0) {
+        issues.push({ sev:'error', msg:`Unclosed '(' — ${depth} opening parenthesis${depth>1?'es':''} without matching ')'`, line:firstOpenLine||stmtStartLine });
+      }
+      depth = 0; firstOpenLine = null; stmtStartLine = lineNum;
+      i++; continue;
+    }
+    i++;
+  }
+  return issues;
+}
+
+// ============================================================================
+// VALIDATOR
+// ============================================================================
+function validateSchema(schema, sql) {
+  const issues = [];
+  const err  = (msg, table, col, line) => issues.push({sev:'error',   msg, table, col, line});
+  const warn = (msg, table, col, line) => issues.push({sev:'warning', msg, table, col, line});
+  const info = (msg, table, col, line) => issues.push({sev:'info',    msg, table, col, line});
+
+  // Paren balance check
+  if (sql) {
+    checkParenBalance(sql).forEach(i => issues.push(i));
+  }
+
+  const VALID_TYPES = new Set([
+    'NUMBER','VARCHAR2','CHAR','NVARCHAR2','NCHAR','DATE','TIMESTAMP','CLOB','NCLOB',
+    'BLOB','RAW','LONG','INTEGER','INT','SMALLINT','FLOAT','REAL','DECIMAL','NUMERIC',
+    'BINARY_FLOAT','BINARY_DOUBLE','DOUBLE PRECISION','LONG RAW','INTERVAL','XMLTYPE',
+    'ROWID','UROWID','BOOLEAN','PLS_INTEGER','BINARY_INTEGER','VARCHAR'
+  ]);
+
+  for (const [tblName, tbl] of Object.entries(schema.tables)) {
+    if (tbl.colOrder.length === 0 && tbl.constraints.length === 0)
+      err(`Table "${tblName}" has no columns`, tblName, null, tbl.line);
+
+    // Column-level checks
+    for (const [colName, col] of Object.entries(tbl.columns)) {
+      const dt = col.type;
+      if (!dt) { err(`Column "${colName}" in "${tblName}" has no data type`, tblName, colName, col.line); continue; }
+      const baseUp = dt.base?.toUpperCase();
+      if (baseUp && !VALID_TYPES.has(baseUp) && !baseUp.startsWith('INTERVAL'))
+        err(`Invalid Oracle datatype "${dt.base}" on column "${colName}"`, tblName, colName, col.line);
+      if (baseUp === 'VARCHAR2' && dt.precision == null)
+        err(`VARCHAR2 requires a size — "${colName}" missing size e.g. VARCHAR2(100)`, tblName, colName, col.line);
+      if (baseUp === 'NVARCHAR2' && dt.precision == null)
+        err(`NVARCHAR2 requires a size — "${colName}"`, tblName, colName, col.line);
+      if (baseUp === 'RAW' && dt.precision == null)
+        err(`RAW requires a size — "${colName}"`, tblName, colName, col.line);
+      if (baseUp === 'VARCHAR2' && dt.precision != null && dt.precision > 4000)
+        warn(`VARCHAR2(${dt.precision}) exceeds 4000 bytes — EXTENDED STRINGS must be enabled`, tblName, colName, col.line);
+      if (baseUp === 'CHAR' && dt.precision != null && dt.precision > 2000)
+        err(`CHAR(${dt.precision}) exceeds max size of 2000`, tblName, colName, col.line);
+      if (baseUp === 'NUMBER' && dt.precision != null && (dt.precision < 1 || dt.precision > 38))
+        err(`NUMBER precision must be between 1 and 38`, tblName, colName, col.line);
+      if (colName.length > 128) err(`Column name "${colName}" exceeds 128 chars`, tblName, colName, col.line);
+      else if (colName.length > 30) warn(`Column name "${colName}" exceeds 30 chars (pre-12.1 limit)`, tblName, colName, col.line);
+
+      // Reserved word checks — depends on whether the identifier was quoted
+      const colUp = colName.toUpperCase();
+      if (col.quoted) {
+        // Exact uppercase "ROWID" as quoted column name is forbidden in Oracle
+        if (col.origCase === 'ROWID') {
+          err(`Column "ROWID" (exact uppercase) is forbidden even as a quoted identifier in Oracle — use "Rowid" or "rowid" instead`, tblName, colName, col.line);
+        } else if (ORACLE_TRUE_RESERVED.has(colUp)) {
+          // Other reserved words are valid when quoted
+          info(`Column "${col.origCase}" uses quoted reserved word — valid, but all queries must use double quotes: SELECT "${col.origCase}" FROM ${tblName}`, tblName, colName, col.line);
+        }
+      } else {
+        // Unquoted identifier
+        if (ORACLE_TRUE_RESERVED.has(colUp)) {
+          err(`Column name "${colName}" is an Oracle reserved word and cannot be used as an unquoted identifier — either rename it or quote it with double quotes: "${colName.toLowerCase()}"`, tblName, colName, col.line);
+        } else if (ORACLE_UNRESERVED_KW.has(colUp)) {
+          warn(`Column name "${colName}" is an Oracle unreserved keyword — while technically allowed, it is risky and harms readability. Consider renaming or quoting it`, tblName, colName, col.line);
+        }
+      }
+
+      // Inline FK reference
+      if (col.references?.table) {
+        const refTbl = col.references.table.toUpperCase();
+        const refTblObj = schema.tables[refTbl];
+        if (!refTblObj) {
+          err(`FK references unknown table "${refTbl}"`, tblName, colName, col.line);
+        } else {
+          const refColName = col.references.cols[0];
+          if (refColName) {
+            const refCol = refTblObj.columns[refColName.toUpperCase()];
+            if (!refCol)
+              err(`FK references non-existent column "${refColName}" in table "${refTbl}"`, tblName, colName, col.line);
+            else if (dt?.base && refCol?.type?.base && !areFKTypesCompatible(dt.base, refCol.type.base))
+              err(`FK type mismatch: "${tblName}.${colName}" is ${dt.base} but "${refTbl}.${refColName}" is ${refCol.type.base} — incompatible types`, tblName, colName, col.line);
+          }
+        }
+      }
+    }
+
+    // Table-level constraint checks
+    for (const con of tbl.constraints) {
+      if (con.type === 'PK') {
+        con.cols.forEach(colName => {
+          if (!tbl.columns[colName.toUpperCase()])
+            err(`PK column "${colName}" does not exist in table "${tblName}"`, tblName, null, con.line);
+        });
+      } else if (con.type === 'UNIQUE') {
+        con.cols.forEach(colName => {
+          if (!tbl.columns[colName.toUpperCase()])
+            err(`UNIQUE column "${colName}" does not exist in table "${tblName}"`, tblName, null, con.line);
+        });
+      } else if (con.type === 'FK') {
+        const refTblName = con.refTable?.toUpperCase();
+        if (!refTblName) continue;
+        const refTbl = schema.tables[refTblName];
+        if (!refTbl) {
+          err(`FK "${con.name||'<unnamed>'}" references unknown table "${refTblName}"`, tblName, null, con.line);
+          continue;
+        }
+        con.cols.forEach((fkColName, idx) => {
+          const fkCol = tbl.columns[fkColName.toUpperCase()];
+          if (!fkCol) {
+            err(`FK column "${fkColName}" does not exist in table "${tblName}"`, tblName, null, con.line);
+            return;
+          }
+          const refColName = con.refCols[idx];
+          if (refColName) {
+            const refCol = refTbl.columns[refColName.toUpperCase()];
+            if (!refCol) {
+              err(`FK "${con.name||'<unnamed>'}" references non-existent column "${refColName}" in "${refTblName}"`, tblName, fkColName, con.line);
+            } else {
+              // TYPE MISMATCH CHECK
+              if (fkCol.type?.base && refCol.type?.base && !areFKTypesCompatible(fkCol.type.base, refCol.type.base)) {
+                err(`FK type mismatch: "${tblName}.${fkColName}" is ${fkCol.type.base} (${getTypeFamily(fkCol.type.base)} family) but "${refTblName}.${refColName}" is ${refCol.type.base} (${getTypeFamily(refCol.type.base)} family) — types must be from the same family`, tblName, fkColName, con.line);
+              }
+              // Check referenced col is PK or UNIQUE
+              const isPK  = refTbl.constraints.some(c => c.type==='PK'   && c.cols.includes(refColName.toUpperCase()));
+              const isUNQ = refTbl.constraints.some(c => c.type==='UNIQUE'&& c.cols.includes(refColName.toUpperCase()));
+              const isInlinePK  = refTbl.columns[refColName.toUpperCase()]?.pk;
+              const isInlineUNQ = refTbl.columns[refColName.toUpperCase()]?.unique;
+              if (!isPK && !isUNQ && !isInlinePK && !isInlineUNQ) {
+                warn(`FK "${con.name||'<unnamed>'}" references "${refTblName}.${refColName}" which is not declared as PRIMARY KEY or UNIQUE — Oracle requires the referenced column to have a unique constraint`, tblName, fkColName, con.line);
+              }
+            }
+          } else if (con.refCols.length === 0) {
+            // No explicit ref cols — check referenced table has a PK
+            const hasPK = refTbl.constraints.some(c => c.type==='PK') ||
+                          Object.values(refTbl.columns).some(c => c.pk);
+            if (!hasPK)
+              warn(`FK "${con.name||'<unnamed>'}" references table "${refTblName}" which has no PRIMARY KEY defined`, tblName, null, con.line);
+          }
+        });
+      }
+    }
+
+    // Check table name length and reserved words
+    if (tblName.length > 128) err(`Table name "${tblName}" exceeds 128 chars`, tblName, null, tbl.line);
+    else if (tblName.length > 30) warn(`Table name "${tblName}" exceeds 30 chars (pre-12.1 limit)`, tblName, null, tbl.line);
+    if (ORACLE_TRUE_RESERVED.has(tblName))
+      err(`Table name "${tblName}" is an Oracle reserved word — cannot be used as an unquoted identifier`, tblName, null, tbl.line);
+    else if (ORACLE_UNRESERVED_KW.has(tblName))
+      warn(`Table name "${tblName}" is an Oracle unreserved keyword — allowed but risky; consider renaming`, tblName, null, tbl.line);
+  }
+
+  // Index checks
+  schema.indexes.forEach(idx => {
+    const tblObj = schema.tables[idx.table];
+    if (!tblObj) { warn(`Index "${idx.name||'?'}" references unknown table "${idx.table}"`, null, null, idx.line); return; }
+    idx.cols.forEach(col => {
+      if (!tblObj.columns[col.toUpperCase()])
+        err(`Index "${idx.name||'?'}" column "${col}" does not exist in table "${idx.table}"`, idx.table, null, idx.line);
+    });
+  });
+
+  // Propagate syntax errors/warnings from parser
+  schema.errors?.forEach(e  => err(e.msg,  e.table, e.col, e.line));
+  schema.warnings?.forEach(w => warn(w.msg, w.table, w.col, w.line));
+  return issues;
+}
+
+// ============================================================================
+// FORMATTER (real implementation)
+// ============================================================================
+function formatDDLText(sql) {
+  let toks;
+  try { toks = tokenize(sql); } catch(e) { return sql; }
+  const stmts = [];
+  let i = 0;
+  while (i < toks.length) {
+    const stmt = [];
+    while (i < toks.length && toks[i].value !== ';') stmt.push(toks[i++]);
+    if (i < toks.length) i++; // consume ;
+    if (stmt.length > 0) stmts.push(stmt);
+  }
+  if (stmts.length === 0) return sql;
+  return stmts.map(s => fmtStmt(s)).join('\n\n') + '\n';
+}
+
+function fmtToken(tok) {
+  if (!tok) return '';
+  if (tok.type === 'KEYWORD' || KW_SET.has(tok.upper) || DTYPE_SET.has(tok.upper)) return tok.upper;
+  return tok.value;
+}
+
+function fmtTokensGeneric(toks) {
+  let out = '';
+  for (let i = 0; i < toks.length; i++) {
+    const tok = toks[i], prev = toks[i-1];
+    if (i > 0 && tok.value !== ',' && tok.value !== ')' && tok.value !== '.'
+        && prev.value !== '(' && prev.value !== '.') {
+      out += ' ';
+    }
+    out += fmtToken(tok);
+  }
+  return out;
+}
+
+function fmtStmt(toks) {
+  if (!toks.length) return '';
+  const firstUp = toks.find(t => t.type === 'KEYWORD')?.upper;
+  if (firstUp === 'CREATE') {
+    const tableIdx = toks.findIndex(t => t.upper === 'TABLE');
+    if (tableIdx >= 0) return fmtCreateTable(toks);
+  }
+  return fmtTokensGeneric(toks) + ';';
+}
+
+function fmtCreateTable(toks) {
+  // Build header (everything before the opening '(')
+  let i = 0, header = '';
+  while (i < toks.length && toks[i].value !== '(') {
+    if (header.length > 0) header += ' ';
+    header += fmtToken(toks[i++]);
+  }
+  if (i >= toks.length) return header + ';';
+  i++; // skip (
+
+  // Collect items separated by ',' at depth 0
+  const items = [];
+  let current = [], depth = 0;
+  while (i < toks.length) {
+    const tok = toks[i];
+    if (tok.value === '(') { depth++; current.push(tok); i++; }
+    else if (tok.value === ')') {
+      if (depth === 0) { if (current.length) items.push(current); break; }
+      depth--; current.push(tok); i++;
+    }
+    else if (tok.value === ',' && depth === 0) { items.push(current); current = []; i++; }
+    else { current.push(tok); i++; }
+  }
+
+  if (items.length === 0) return header + '();\n';
+
+  const colItems = [], conItems = [];
+  items.forEach(item => {
+    if (!item.length) return;
+    const fu = item[0]?.upper;
+    if (['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(fu)) {
+      conItems.push(fmtTokensGeneric(item));
+    } else {
+      // Parse: colName datatype [precision] [rest...]
+      let j = 0;
+      const colName = fmtToken(item[j++]);
+      let typePart = '';
+      if (j < item.length) {
+        typePart = fmtToken(item[j]);
+        // Handle DOUBLE PRECISION / LONG RAW
+        if ((item[j]?.upper === 'DOUBLE' && item[j+1]?.upper === 'PRECISION') ||
+            (item[j]?.upper === 'LONG'   && item[j+1]?.upper === 'RAW')) {
+          typePart += ' ' + item[j+1].upper; j++;
+        }
+        j++;
+        if (item[j]?.value === '(') {
+          let pd = 1, tp = '('; j++;
+          while (j < item.length && pd > 0) {
+            if (item[j].value === '(') pd++;
+            else if (item[j].value === ')') { pd--; if (pd === 0) { j++; break; } }
+            if (pd > 0) tp += fmtToken(item[j]);
+            j++;
+          }
+          typePart += tp + ')';
+        }
+      }
+      const rest = item.slice(j).map(fmtToken).join(' ');
+      colItems.push({ name: colName, type: typePart, rest });
+    }
+  });
+
+  const maxNameLen = Math.max(0, ...colItems.map(c => c.name.length));
+  const maxTypeLen = Math.max(0, ...colItems.map(c => c.type.length));
+
+  const lines = [
+    ...colItems.map(c => {
+      const namePad = c.name.padEnd(maxNameLen + 3);
+      const typePad = c.type.padEnd(maxTypeLen + 3);
+      return '    ' + namePad + typePad + c.rest.trim();
+    }),
+    ...conItems.map(c => '    ' + c)
+  ];
+
+  return header + ' (\n' + lines.join(',\n') + '\n);';
+}
+
+// ============================================================================
+// AUTO-FIX  (validation-aware smart fixer)
+// ============================================================================
+// ============================================================================
+// SMART AUTO-FIX — works line-by-line, inserts missing words at correct position
+// ============================================================================
+function autoFixDDL(sql) {
+  const lines = sql.split('\n');
+  const fixes = [];
+
+  // ── PASS 1: line-level targeted keyword insertion ─────────────
+  // Each rule: test regex on the line, apply transform, record fix message
+  const lineRules = [
+    // ALTER missing TABLE  → "ALTER EMPLOYEES" → "ALTER TABLE EMPLOYEES"
+    {
+      test: /\bALTER\s+(?!TABLE\b|INDEX\b|SEQUENCE\b|SESSION\b|SYSTEM\b|DATABASE\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(
+        /\bALTER\s+(?!TABLE\b|INDEX\b|SEQUENCE\b|SESSION\b|SYSTEM\b|DATABASE\b)([A-Z_]\w*)/i,
+        (_, name) => `ALTER TABLE ${name}`
+      ),
+      msg: 'Inserted TABLE after ALTER'
+    },
+    // CREATE missing TABLE/keyword → "CREATE EMPLOYEES" → "CREATE TABLE EMPLOYEES"
+    {
+      test: /\bCREATE\s+(?!TABLE\b|OR\b|UNIQUE\b|INDEX\b|BITMAP\b|SEQUENCE\b|VIEW\b|MATERIALIZED\b|PROCEDURE\b|FUNCTION\b|PACKAGE\b|TRIGGER\b|TYPE\b|SYNONYM\b|PUBLIC\b|GLOBAL\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(
+        /\bCREATE\s+(?!TABLE\b|OR\b|UNIQUE\b|INDEX\b|BITMAP\b|SEQUENCE\b|VIEW\b|MATERIALIZED\b|PROCEDURE\b|FUNCTION\b|PACKAGE\b|TRIGGER\b|TYPE\b|SYNONYM\b|PUBLIC\b|GLOBAL\b)([A-Z_]\w*)/i,
+        (_, name) => `CREATE TABLE ${name}`
+      ),
+      msg: 'Inserted TABLE after CREATE'
+    },
+    // NOT missing NULL (but not NOT IN / NOT BETWEEN / NOT LIKE / NOT EXISTS / NOT NULL)
+    {
+      test: /\bNOT\s+(?!NULL\b|IN\b|BETWEEN\b|LIKE\b|EXISTS\b|FOUND\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(
+        /\bNOT\s+(?!NULL\b|IN\b|BETWEEN\b|LIKE\b|EXISTS\b|FOUND\b)([A-Z_]\w*)/i,
+        () => 'NOT NULL'
+      ),
+      msg: 'Inserted NULL after NOT'
+    },
+    // ALTER TABLE missing ADD/MODIFY/DROP → "ALTER TABLE EMP SALARY NUMBER" → "ALTER TABLE EMP ADD SALARY NUMBER"
+    {
+      test: /\bALTER\s+TABLE\s+\w+\s+(?!ADD\b|MODIFY\b|DROP\b|RENAME\b|ENABLE\b|DISABLE\b|MOVE\b|EXCHANGE\b|SPLIT\b|MERGE\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(
+        /\bALTER\s+TABLE\s+(\w+)\s+(?!ADD\b|MODIFY\b|DROP\b|RENAME\b|ENABLE\b|DISABLE\b|MOVE\b|EXCHANGE\b|SPLIT\b|MERGE\b)([A-Z_]\w*)/i,
+        (_, tbl, col) => `ALTER TABLE ${tbl} ADD ${col}`
+      ),
+      msg: 'Inserted ADD after ALTER TABLE <name>'
+    },
+    // PRIMARY missing KEY → "CONSTRAINT pk_x PRIMARY (id)" → "CONSTRAINT pk_x PRIMARY KEY (id)"
+    {
+      test: /\bPRIMARY\s+(?!KEY\b)(\()/i,
+      fix: (line) => line.replace(/\bPRIMARY\s+(?!KEY\b)(\()/, 'PRIMARY KEY $1'),
+      msg: 'Inserted KEY after PRIMARY'
+    },
+    // FOREIGN missing KEY → "CONSTRAINT fk_x FOREIGN (col)" → "CONSTRAINT fk_x FOREIGN KEY (col)"
+    {
+      test: /\bFOREIGN\s+(?!KEY\b)(\()/i,
+      fix: (line) => line.replace(/\bFOREIGN\s+(?!KEY\b)(\()/, 'FOREIGN KEY $1'),
+      msg: 'Inserted KEY after FOREIGN'
+    },
+    // DROP TABLE missing table name → just DROP TABLE; — can't guess, skip
+    // INSERT missing INTO → "INSERT EMPLOYEES" → "INSERT INTO EMPLOYEES"
+    {
+      test: /\bINSERT\s+(?!INTO\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(/\bINSERT\s+(?!INTO\b)([A-Z_]\w*)/, (_, name) => `INSERT INTO ${name}`),
+      msg: 'Inserted INTO after INSERT'
+    },
+    // DELETE missing FROM → "DELETE EMPLOYEES" → "DELETE FROM EMPLOYEES"
+    {
+      test: /\bDELETE\s+(?!FROM\b)([A-Z_]\w*)/i,
+      fix: (line) => line.replace(/\bDELETE\s+(?!FROM\b)([A-Z_]\w*)/, (_, name) => `DELETE FROM ${name}`),
+      msg: 'Inserted FROM after DELETE'
+    },
+    // Trailing comma before closing paren
+    {
+      test: /,\s*\)/,
+      fix: (line) => line.replace(/,(\s*\))/g, '$1'),
+      msg: 'Removed trailing comma before )'
+    },
+    // VARCHAR( → VARCHAR2(
+    {
+      test: /\bVARCHAR\s*\(/i,
+      fix: (line) => line.replace(/\bVARCHAR\s*\(/gi, 'VARCHAR2('),
+      msg: 'Converted VARCHAR → VARCHAR2'
+    },
+    // VARCHAR2 without size
+    {
+      test: /\bVARCHAR2(?!\s*\()/i,
+      fix: (line) => line.replace(/\bVARCHAR2(?!\s*\()/gi, 'VARCHAR2(255)'),
+      msg: 'Added default size VARCHAR2(255)'
+    },
+    // RENAME COLUMN missing TO  →  RENAME COLUMN old new  →  RENAME COLUMN old TO new
+    {
+      test: /\bRENAME\s+COLUMN\s+(\w+)\s+(?!TO\b)(\w)/i,
+      fix: (line) => line.replace(
+        /\bRENAME\s+COLUMN\s+(\w+)\s+(?!TO\b)(\w)/gi,
+        (_, old, firstChar) => `RENAME COLUMN ${old} TO ${firstChar}`
+      ),
+      msg: 'Inserted missing TO in RENAME COLUMN'
+    },
+    // RENAME CONSTRAINT missing TO  →  RENAME CONSTRAINT old new  →  RENAME CONSTRAINT old TO new
+    {
+      test: /\bRENAME\s+CONSTRAINT\s+(\w+)\s+(?!TO\b)(\w)/i,
+      fix: (line) => line.replace(
+        /\bRENAME\s+CONSTRAINT\s+(\w+)\s+(?!TO\b)(\w)/gi,
+        (_, old, firstChar) => `RENAME CONSTRAINT ${old} TO ${firstChar}`
+      ),
+      msg: 'Inserted missing TO in RENAME CONSTRAINT'
+    },
+  ];
+
+  const fixedLines = lines.map((line, lineIdx) => {
+    // Skip comment lines
+    if (/^\s*--/.test(line)) return line;
+    let result = line;
+    for (const rule of lineRules) {
+      if (rule.test.test(result)) {
+        const before = result;
+        result = rule.fix(result);
+        if (result !== before) {
+          fixes.push({ msg: rule.msg, lineNum: lineIdx + 1 });
+        }
+      }
+      // Reset stateful regex lastIndex
+      rule.test.lastIndex = 0;
+    }
+    return result;
+  });
+  let fixed = fixedLines.join('\n');
+
+  // ── PASS 2: typo corrections (whole-text, case-insensitive) ───
+  const typoMap = {
+    'NUMBR\\b':           'NUMBER',
+    'VACHAR2\\b':         'VARCHAR2',
+    'INTERGER\\b':        'INTEGER',
+    'FORIEGN\\b':         'FOREIGN',
+    'REFRENCES\\b':       'REFERENCES',
+    'PRIAMRY\\b':         'PRIMARY',
+    'PRIMRAY\\b':         'PRIMARY',
+    'FOREGN\\b':          'FOREIGN',
+    'UNIUQE\\b':          'UNIQUE',
+    'DEFUALT\\b':         'DEFAULT',
+    'NOTNULL\\b':         'NOT NULL',
+    'NOTT\\s+NULL':       'NOT NULL',
+    'CONSTRAINTNAME\\b':  'CONSTRAINT',
+    '\\bADD\\s+COLUM\\b': 'ADD COLUMN',
+  };
+  Object.entries(typoMap).forEach(([pat, rep]) => {
+    const re = new RegExp(pat, 'gi');
+    const before = fixed;
+    fixed = fixed.replace(re, rep);
+    if (fixed !== before) fixes.push({ msg: `Fixed typo → ${rep}`, lineNum: null });
+  });
+
+  // ── PASS 2b: duplicate semicolons ─────────────────────────────
+  {
+    const before = fixed;
+    // Multiple consecutive semicolons (possibly with whitespace between) → single ;
+    fixed = fixed.replace(/;(\s*;)+/g, ';');
+    if (fixed !== before) fixes.push({ msg: 'Removed duplicate semicolons', lineNum: null });
+  }
+
+  // ── PASS 2c: unquoted Oracle reserved words used as identifiers ─
+  // Scan for patterns like:  colName DATATYPE  where colName is a true reserved word
+  // Also catch table names after CREATE TABLE / ALTER TABLE that are reserved
+  {
+    const reservedQuoteFixes = [];
+    // Match unquoted identifiers that are true reserved words in column position:
+    //   identifier  followed by a known Oracle datatype
+    fixed = fixed.replace(
+      /(?<!["\.\w])(ACCESS|AUDIT|CHECK|CLUSTER|COLUMN|COMMENT|COMPRESS|CONNECT|DATE|DECIMAL|DEFAULT|DEFINITION|DROP|ELSE|EXCLUSIVE|EXISTS|FILE|FLOAT|FOR|FROM|GRANT|GROUP|HAVING|IDENTIFIED|IMMEDIATE|INCREMENT|INDEX|INITIAL|INSERT|INTEGER|INTERSECT|LEVEL|LIKE|LOCK|LONG|MAXEXTENTS|MINUS|MODE|MODIFY|NOAUDIT|NOCOMPRESS|NOT|NOWAIT|NULL|NUMBER|OFFLINE|ONLINE|OPTION|OR|ORDER|PCTFREE|PRIOR|PUBLIC|RAW|RENAME|RESOURCE|REVOKE|ROW|ROWID|ROWNUM|ROWS|SELECT|SESSION|SET|SHARE|SIZE|SMALLINT|START|SUCCESSFUL|SYNONYM|SYSDATE|TABLE|THEN|TO|TRIGGER|UID|UNION|UNIQUE|UPDATE|USER|VALIDATE|VALUES|VARCHAR|VARCHAR2|VIEW|WHENEVER|WHERE|WITH)(?=\s+(?:NUMBER|VARCHAR2|VARCHAR|CHAR|NCHAR|NVARCHAR2|DATE|TIMESTAMP|CLOB|BLOB|INTEGER|INT|SMALLINT|FLOAT|REAL|DECIMAL|NUMERIC|BINARY_FLOAT|BINARY_DOUBLE|RAW|ROWID|BOOLEAN|LONG|XMLTYPE))/gi,
+      (match) => {
+        reservedQuoteFixes.push(match);
+        return `"${match}"`;
+      }
+    );
+    if (reservedQuoteFixes.length > 0)
+      fixes.push({ msg: `Quoted ${reservedQuoteFixes.length} reserved word(s) used as column names: ${[...new Set(reservedQuoteFixes)].slice(0,3).join(', ')}`, lineNum: null });
+  }
+
+  // ── PASS 3: extra closing parens (per statement) ───────────────
+  const stmtParts = [];
+  let current = '', inStr = false;
+  for (let i = 0; i < fixed.length; i++) {
+    const ch = fixed[i];
+    if (ch === "'" && !inStr) inStr = true;
+    else if (ch === "'" && inStr) inStr = false;
+    current += ch;
+    if (!inStr && ch === ';') { stmtParts.push(current); current = ''; }
+  }
+  if (current.trim()) stmtParts.push(current);
+
+  const fixedParts = stmtParts.map(stmt => {
+    // First pass: find positions of all unmatched closing parens
+    const positions = [];
+    let depth = 0, iS = false;
+    for (let i = 0; i < stmt.length; i++) {
+      const ch = stmt[i];
+      if (ch === "'" && !iS) iS = true;
+      else if (ch === "'" && iS) iS = false;
+      if (iS) continue;
+      if (ch === '-' && stmt[i+1] === '-') { while (i < stmt.length && stmt[i] !== '\n') i++; continue; }
+      if (ch === '(') depth++;
+      else if (ch === ')') {
+        depth--;
+        if (depth < 0) { positions.push(i); depth = 0; }
+      }
+    }
+    if (positions.length === 0) return stmt;
+    // Remove the unmatched closing parens (right-to-left to preserve indices)
+    const chars = stmt.split('');
+    for (const idx of [...positions].reverse()) chars[idx] = '';
+    fixes.push({ msg: `Removed ${positions.length} unmatched ')'`, lineNum: null });
+    return chars.join('');
+  });
+  fixed = fixedParts.join('');
+
+  // ── PASS 4: missing semicolons between top-level statements ───
+  fixed = fixed.replace(/(\))\s*\n(\s*(?:CREATE|ALTER|DROP|BEGIN|DECLARE)\b)/gi, (_, paren, next) => {
+    fixes.push({ msg: 'Added missing semicolon', lineNum: null });
+    return paren + ';\n' + next;
+  });
+
+  return { fixed, fixes };
+}
+
+// ============================================================================
+// DICTIONARY
+// ============================================================================
+const DICT_KEY = 'oracle_ddl_dict_v3';
+function loadDictionary() {
+  try { return JSON.parse(localStorage.getItem(DICT_KEY)||'null')||{tables:[],columns:[],objects:[],custom_kw:[],custom_types:[]}; }
+  catch { return {tables:[],columns:[],objects:[],custom_kw:[],custom_types:[]}; }
+}
+function saveDictionary(d) {
+  try { localStorage.setItem(DICT_KEY,JSON.stringify(d)); }
+  catch(e) { statusMsg('⚠ Could not save dictionary','warn'); }
+}
+function learnFromSchema(schema) {
+  const d=loadDictionary();
+  Object.keys(schema.tables).forEach(t=>{if(!d.tables.includes(t))d.tables.push(t);});
+  for(const[,tbl] of Object.entries(schema.tables))
+    Object.keys(tbl.columns).forEach(c=>{if(!d.columns.includes(c))d.columns.push(c);});
+  Object.keys(schema.sequences||{}).forEach(s=>{if(!d.objects.includes(s))d.objects.push(s);});
+  Object.keys(schema.views||{}).forEach(v=>{if(!d.objects.includes(v))d.objects.push(v);});
+  saveDictionary(d); renderDictionary();
+}
+
+// ============================================================================
+// COMPREHENSIVE SQL/PLSQL STATEMENT COMPLETIONS
+// Each entry: kw=first keyword trigger, ctx=regex for mid-statement, label, insert, priority
+// ============================================================================
+const DDL_COMPLETIONS = [
+  // ── SELECT ────────────────────────────────────────────────────────────────
+  { kw:'SELECT', priority:1, label:'SELECT %columns% FROM %table_name% WHERE %condition%;',
+    insert:'SELECT %columns%\nFROM %table_name%\nWHERE %condition%;' },
+  { kw:'SELECT', priority:2, label:'SELECT %cols% FROM %table% INNER JOIN %table2% ON %condition%;',
+    insert:'SELECT t1.%col1%, t2.%col2%\nFROM %table_name% t1\n    INNER JOIN %table2% t2 ON t1.%id% = t2.%id%\nWHERE %condition%;' },
+  { kw:'SELECT', priority:3, label:'SELECT %cols% FROM %table% LEFT JOIN %table2% ON %condition%;',
+    insert:'SELECT t1.%col1%, t2.%col2%\nFROM %table_name% t1\n    LEFT JOIN %table2% t2 ON t1.%id% = t2.%id%\nWHERE %condition%;' },
+  { kw:'SELECT', priority:4, label:'SELECT %col%, COUNT(*) FROM %table% GROUP BY %col% HAVING COUNT(*) > 1;',
+    insert:'SELECT %col%, COUNT(*)\nFROM %table_name%\nGROUP BY %col%\nHAVING COUNT(*) > 1;' },
+  { kw:'SELECT', priority:5, label:'SELECT %cols% FROM %table% ORDER BY %col% ASC;',
+    insert:'SELECT %columns%\nFROM %table_name%\nORDER BY %col% ASC;' },
+  { kw:'SELECT', priority:6, label:'SELECT * FROM %table% WHERE ROWNUM <= %n%;',
+    insert:'SELECT *\nFROM %table_name%\nWHERE ROWNUM <= %n%;' },
+  { kw:'SELECT', priority:7, label:'SELECT %col%, ROW_NUMBER() OVER (PARTITION BY %col% ORDER BY %col%);',
+    insert:'SELECT %col%,\n    ROW_NUMBER() OVER (PARTITION BY %part_col% ORDER BY %order_col% DESC) AS rn\nFROM %table_name%\nORDER BY %order_col%;' },
+
+  // ── INSERT ────────────────────────────────────────────────────────────────
+  { kw:'INSERT', priority:1, label:'INSERT INTO %table_name% (%columns%) VALUES (%values%);',
+    insert:'INSERT INTO %table_name% (%col1%, %col2%, %col3%)\nVALUES (%val1%, %val2%, %val3%);' },
+  { kw:'INSERT', priority:2, label:'INSERT INTO %table_name% SELECT %columns% FROM %source%;',
+    insert:'INSERT INTO %table_name%\nSELECT %columns%\nFROM %source_table%\nWHERE %condition%;' },
+
+  // ── UPDATE ────────────────────────────────────────────────────────────────
+  { kw:'UPDATE', priority:1, label:'UPDATE %table_name% SET %column% = %value% WHERE %condition%;',
+    insert:'UPDATE %table_name%\nSET %column% = %value%\nWHERE %condition%;' },
+  { kw:'UPDATE', priority:2, label:'UPDATE %table% SET %col1% = %val1%, %col2% = %val2% WHERE %condition%;',
+    insert:'UPDATE %table_name%\nSET %col1% = %val1%,\n    %col2% = %val2%\nWHERE %condition%;' },
+
+  // ── DELETE ────────────────────────────────────────────────────────────────
+  { kw:'DELETE', priority:1, label:'DELETE FROM %table_name% WHERE %condition%;',
+    insert:'DELETE FROM %table_name%\nWHERE %condition%;' },
+  { kw:'DELETE', priority:2, label:'DELETE FROM %table_name% WHERE %col% = %value%;',
+    insert:'DELETE FROM %table_name%\nWHERE %col% = %value%;' },
+
+  // ── MERGE ─────────────────────────────────────────────────────────────────
+  { kw:'MERGE', priority:1, label:'MERGE INTO %target% USING %source% ON (%condition%) WHEN MATCHED ... WHEN NOT MATCHED ...;',
+    insert:'MERGE INTO %target_table% t\nUSING %source_table% s ON (t.%id_col% = s.%id_col%)\nWHEN MATCHED THEN\n    UPDATE SET t.%col% = s.%col%\nWHEN NOT MATCHED THEN\n    INSERT (%col1%, %col2%) VALUES (s.%col1%, s.%col2%);' },
+
+  // ── ALTER ─────────────────────────────────────────────────────────────────
+  { kw:'ALTER', priority:1, label:'ALTER TABLE %table_name% ADD %column_name% %datatype%;',
+    insert:'ALTER TABLE %table_name% ADD %column_name% %datatype%;' },
+  { kw:'ALTER', priority:2, label:'ALTER TABLE %table_name% MODIFY (%column_name% %datatype%);',
+    insert:'ALTER TABLE %table_name% MODIFY (%column_name% %datatype%);' },
+  { kw:'ALTER', priority:3, label:'ALTER TABLE %table_name% DROP COLUMN %column_name%;',
+    insert:'ALTER TABLE %table_name% DROP COLUMN %column_name%;' },
+  { kw:'ALTER', priority:4, label:'ALTER TABLE %table_name% ADD CONSTRAINT %name% PRIMARY KEY (%col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% PRIMARY KEY (%col%);' },
+  { kw:'ALTER', priority:5, label:'ALTER TABLE %table_name% ADD CONSTRAINT %name% FOREIGN KEY (%col%) REFERENCES %ref% (%ref_col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name%\n    FOREIGN KEY (%col%)\n    REFERENCES %ref_table% (%ref_col%);' },
+  { kw:'ALTER', priority:6, label:'ALTER TABLE %table_name% RENAME COLUMN %old_name% TO %new_name%;',
+    insert:'ALTER TABLE %table_name% RENAME COLUMN %old_name% TO %new_name%;' },
+  { kw:'ALTER', priority:7, label:'ALTER TABLE %table_name% DROP CONSTRAINT %constraint_name%;',
+    insert:'ALTER TABLE %table_name% DROP CONSTRAINT %constraint_name%;' },
+  { kw:'ALTER', priority:8, label:'ALTER TABLE %table_name% ENABLE/DISABLE CONSTRAINT %constraint_name%;',
+    insert:'ALTER TABLE %table_name% ENABLE CONSTRAINT %constraint_name%;' },
+
+  // ── CREATE ────────────────────────────────────────────────────────────────
+  { kw:'CREATE', priority:1, label:'CREATE TABLE %table_name% (...NOT NULL, CONSTRAINT pk_... PRIMARY KEY (...));',
+    insert:'CREATE TABLE %table_name% (\n    %col1%   NUMBER(10)    NOT NULL,\n    %col2%   VARCHAR2(100) NOT NULL,\n    %col3%   DATE          DEFAULT SYSDATE,\n    CONSTRAINT pk_%table_name% PRIMARY KEY (%col1%)\n);' },
+  { kw:'CREATE', priority:2, label:'CREATE SEQUENCE %seq_name% START WITH 1 INCREMENT BY 1 NOCYCLE CACHE 20;',
+    insert:'CREATE SEQUENCE %seq_name%\n    START WITH 1\n    INCREMENT BY 1\n    MAXVALUE 9999999999\n    NOCYCLE\n    CACHE 20;' },
+  { kw:'CREATE', priority:3, label:'CREATE INDEX %idx_name% ON %table_name% (%column_name%);',
+    insert:'CREATE INDEX %idx_name%\n    ON %table_name% (%column_name%);' },
+  { kw:'CREATE', priority:4, label:'CREATE UNIQUE INDEX %idx_name% ON %table_name% (%column_name%);',
+    insert:'CREATE UNIQUE INDEX %idx_name%\n    ON %table_name% (%column_name%);' },
+  { kw:'CREATE', priority:5, label:'CREATE OR REPLACE VIEW %view_name% AS SELECT ... FROM %table_name%;',
+    insert:'CREATE OR REPLACE VIEW %view_name% AS\n    SELECT *\n    FROM %table_name%\n    WHERE 1=1;' },
+  { kw:'CREATE', priority:6, label:'CREATE OR REPLACE PROCEDURE %name% (p_%param% IN %type%) AS ...',
+    insert:'CREATE OR REPLACE PROCEDURE %proc_name% (\n    p_%param%  IN  %datatype%\n) AS\nBEGIN\n    -- procedure body\n    NULL;\nEXCEPTION\n    WHEN OTHERS THEN\n        RAISE;\nEND %proc_name%;' },
+  { kw:'CREATE', priority:7, label:'CREATE OR REPLACE FUNCTION %name% (%param% IN %type%) RETURN %type%;',
+    insert:'CREATE OR REPLACE FUNCTION %func_name% (\n    p_%param%  IN  %datatype%\n) RETURN %return_type% AS\n    v_result  %return_type%;\nBEGIN\n    -- function body\n    RETURN v_result;\nEXCEPTION\n    WHEN OTHERS THEN\n        RAISE;\nEND %func_name%;' },
+  { kw:'CREATE', priority:8, label:'CREATE OR REPLACE TRIGGER %name% BEFORE INSERT OR UPDATE ON %table%;',
+    insert:'CREATE OR REPLACE TRIGGER %trg_name%\n    BEFORE INSERT OR UPDATE ON %table_name%\n    FOR EACH ROW\nBEGIN\n    -- trigger body\n    NULL;\nEND %trg_name%;' },
+  { kw:'CREATE', priority:9, label:'CREATE OR REPLACE PACKAGE %pkg_name% AS ... END;',
+    insert:'CREATE OR REPLACE PACKAGE %pkg_name% AS\n    PROCEDURE %proc_name%(%param% IN %type%);\n    FUNCTION %func_name%(%param% IN %type%) RETURN %type%;\nEND %pkg_name%;' },
+
+  // ── DROP ──────────────────────────────────────────────────────────────────
+  { kw:'DROP', priority:1, label:'DROP TABLE %table_name%;',
+    insert:'DROP TABLE %table_name%;' },
+  { kw:'DROP', priority:2, label:'DROP TABLE %table_name% CASCADE CONSTRAINTS;',
+    insert:'DROP TABLE %table_name% CASCADE CONSTRAINTS;' },
+  { kw:'DROP', priority:3, label:'DROP INDEX %idx_name%;',
+    insert:'DROP INDEX %idx_name%;' },
+  { kw:'DROP', priority:4, label:'DROP SEQUENCE %seq_name%;',
+    insert:'DROP SEQUENCE %seq_name%;' },
+  { kw:'DROP', priority:5, label:'DROP VIEW %view_name%;',
+    insert:'DROP VIEW %view_name%;' },
+
+  // ── PL/SQL DECLARE/BEGIN ───────────────────────────────────────────────────
+  { kw:'DECLARE', priority:1, label:'DECLARE v_%var% %type%; BEGIN ... EXCEPTION ... END;',
+    insert:'DECLARE\n    v_%variable%  %datatype%;\n    v_%var2%      %datatype%;\nBEGIN\n    -- PL/SQL block\n    NULL;\nEXCEPTION\n    WHEN NO_DATA_FOUND THEN\n        NULL;\n    WHEN OTHERS THEN\n        RAISE;\nEND;' },
+  { kw:'BEGIN', priority:1, label:'BEGIN ... EXCEPTION WHEN OTHERS THEN RAISE; END;',
+    insert:'BEGIN\n    -- statements\n    NULL;\nEXCEPTION\n    WHEN NO_DATA_FOUND THEN\n        NULL;\n    WHEN OTHERS THEN\n        RAISE;\nEND;' },
+
+  // ── PL/SQL FLOW CONTROL ────────────────────────────────────────────────────
+  { kw:'IF', priority:1, label:'IF %condition% THEN ... END IF;',
+    insert:'IF %condition% THEN\n    NULL;\nEND IF;' },
+  { kw:'IF', priority:2, label:'IF %condition% THEN ... ELSE ... END IF;',
+    insert:'IF %condition% THEN\n    NULL;\nELSE\n    NULL;\nEND IF;' },
+  { kw:'IF', priority:3, label:'IF ... ELSIF ... ELSE ... END IF;',
+    insert:'IF %condition1% THEN\n    NULL;\nELSIF %condition2% THEN\n    NULL;\nELSE\n    NULL;\nEND IF;' },
+  { kw:'CASE', priority:1, label:'CASE %expr% WHEN %val1% THEN %res1% ELSE %default% END;',
+    insert:'CASE %expr%\n    WHEN %val1% THEN %result1%\n    WHEN %val2% THEN %result2%\n    ELSE %default_result%\nEND' },
+  { kw:'CASE', priority:2, label:'CASE WHEN %condition1% THEN %res1% ELSE %default% END;',
+    insert:'CASE\n    WHEN %condition1% THEN %result1%\n    WHEN %condition2% THEN %result2%\n    ELSE %default_result%\nEND' },
+  { kw:'LOOP', priority:1, label:'LOOP ... EXIT WHEN %condition%; END LOOP;',
+    insert:'LOOP\n    -- loop body\n    EXIT WHEN %condition%;\nEND LOOP;' },
+  { kw:'WHILE', priority:1, label:'WHILE %condition% LOOP ... END LOOP;',
+    insert:'WHILE %condition% LOOP\n    NULL;\nEND LOOP;' },
+  { kw:'FOR', priority:1, label:'FOR %i% IN 1..%n% LOOP ... END LOOP;',
+    insert:'FOR %i% IN 1..%n% LOOP\n    NULL;\nEND LOOP;' },
+  { kw:'FOR', priority:2, label:'FOR %rec% IN (SELECT ... FROM ...) LOOP ... END LOOP;',
+    insert:'FOR %rec% IN (\n    SELECT %columns% FROM %table_name% WHERE %condition%\n) LOOP\n    -- %rec%.%column%\n    NULL;\nEND LOOP;' },
+  { kw:'CURSOR', priority:1, label:'CURSOR %cursor_name% IS SELECT %cols% FROM %table%;',
+    insert:'CURSOR %cursor_name% IS\n    SELECT %columns%\n    FROM %table_name%\n    WHERE %condition%;' },
+  { kw:'EXCEPTION', priority:1, label:'EXCEPTION WHEN NO_DATA_FOUND THEN ... WHEN OTHERS THEN RAISE;',
+    insert:'EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n        NULL;\n    WHEN TOO_MANY_ROWS THEN\n        NULL;\n    WHEN OTHERS THEN\n        RAISE;' },
+
+  // ── GRANT/REVOKE ──────────────────────────────────────────────────────────
+  { kw:'GRANT', priority:1, label:'GRANT SELECT, INSERT, UPDATE ON %table% TO %user%;',
+    insert:'GRANT SELECT, INSERT, UPDATE, DELETE ON %table_name% TO %user%;' },
+  { kw:'REVOKE', priority:1, label:'REVOKE %privilege% ON %table% FROM %user%;',
+    insert:'REVOKE %privilege% ON %table_name% FROM %user%;' },
+
+  // ── MISC ──────────────────────────────────────────────────────────────────
+  { kw:'TRUNCATE', priority:1, label:'TRUNCATE TABLE %table_name%;',
+    insert:'TRUNCATE TABLE %table_name%;' },
+  { kw:'COMMIT', priority:1, label:'COMMIT;', insert:'COMMIT;' },
+  { kw:'ROLLBACK', priority:1, label:'ROLLBACK;', insert:'ROLLBACK;' },
+  { kw:'ROLLBACK', priority:2, label:'ROLLBACK TO SAVEPOINT %sp_name%;',
+    insert:'ROLLBACK TO SAVEPOINT %sp_name%;' },
+  { kw:'SAVEPOINT', priority:1, label:'SAVEPOINT %sp_name%;',
+    insert:'SAVEPOINT %sp_name%;' },
+  { kw:'COMMENT', priority:1, label:"COMMENT ON TABLE %table_name% IS '%description%';",
+    insert:"COMMENT ON TABLE %table_name% IS '%description%';" },
+  { kw:'COMMENT', priority:2, label:"COMMENT ON COLUMN %table_name%.%col% IS '%description%';",
+    insert:"COMMENT ON COLUMN %table_name%.%column_name% IS '%description%';" },
+
+  // ── Mid-statement context completions ─────────────────────────────────────
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:1,
+    label:'ADD %column_name% %datatype%;',
+    insert:'ALTER TABLE %table_name% ADD %column_name% %datatype%;' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:2,
+    label:'MODIFY (%column_name% %datatype%);',
+    insert:'ALTER TABLE %table_name% MODIFY (%column_name% %datatype%);' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:3,
+    label:'DROP COLUMN %column_name%;',
+    insert:'ALTER TABLE %table_name% DROP COLUMN %column_name%;' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:4,
+    label:'ADD CONSTRAINT %name% PRIMARY KEY (%col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% PRIMARY KEY (%col%);' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:5,
+    label:'ADD CONSTRAINT %name% FOREIGN KEY (%col%) REFERENCES %ref% (%col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name%\n    FOREIGN KEY (%col%)\n    REFERENCES %ref_table% (%ref_col%);' },
+  { ctx:/^SELECT\b/i, priority:1,
+    label:'FROM %table_name% WHERE %condition%;',
+    insert:'SELECT %columns% FROM %table_name% WHERE %condition%;' },
+  { ctx:/^UPDATE\s+\S+\s*$/i, priority:1,
+    label:'SET %column% = %value% WHERE %condition%;',
+    insert:'UPDATE %table_name% SET %column% = %value% WHERE %condition%;' },
+  { ctx:/^INSERT\s+INTO\s+\S+\s*$/i, priority:1,
+    label:'(%columns%) VALUES (%values%);',
+    insert:"INSERT INTO %table_name% (%col1%, %col2%) VALUES (%val1%, %val2%);" },
+  { ctx:/^DELETE\s+FROM\s+\S+\s*$/i, priority:1,
+    label:'WHERE %condition%;',
+    insert:'DELETE FROM %table_name% WHERE %condition%;' },
+];
+
+// ============================================================================
+// FUNCTION ARGUMENT HINTS (shown in italic inside autocomplete)
+// ============================================================================
+const FUNCTION_ARG_HINTS = {
+  'TO_CHAR':        ["date_value, 'YYYY-MM-DD'", "date_value, 'DD/MM/YYYY HH24:MI:SS'", "number_value, '999,999.99'", "SYSDATE, 'YYYY-Q'", "SYSDATE, 'DY DD-MON-YYYY'"],
+  'TO_DATE':        ["'2024-01-01', 'YYYY-MM-DD'", "date_string, 'DD/MM/YYYY'", "date_string, 'YYYY-MM-DD HH24:MI:SS'"],
+  'TO_NUMBER':      ["'12345.67'", "'12,345.67', '99,999.99'", "varchar2_column"],
+  'TO_TIMESTAMP':   ["'2024-01-01 12:00:00', 'YYYY-MM-DD HH24:MI:SS'"],
+  'NVL':            ['column_name, default_value', 'nullable_col, 0', "nullable_col, 'N/A'"],
+  'NVL2':           ['column_name, value_if_not_null, value_if_null', 'col, col * 1.1, 0'],
+  'DECODE':         ["column, value1, result1, value2, result2, default", "status, 'A', 'Active', 'I', 'Inactive', 'Unknown'"],
+  'COALESCE':       ['col1, col2, col3', 'nullable_col, 0', "first_name || ' ' || last_name, 'Unknown'"],
+  'NULLIF':         ['expr1, expr2', 'salary, 0', 'denominator, 0'],
+  'GREATEST':       ['val1, val2, val3', 'start_date, modified_date'],
+  'LEAST':          ['val1, val2, val3', 'price1, price2, price3'],
+  'SUBSTR':         ['string, start_position', 'string, start_position, length', "column_name, 1, 10"],
+  'SUBSTRB':        ['string, byte_position, length'],
+  'INSTR':          ["string, 'search_str'", "string, 'search_str', start_pos", "column_name, '@'"],
+  'REPLACE':        ["string, 'search', 'replacement'", "column_name, ' ', '_'", "col, CHR(10), ''"],
+  'TRANSLATE':      ["string, 'from_chars', 'to_chars'", "col, 'aeiou', 'AEIOU'"],
+  'REGEXP_REPLACE': ["string, 'pattern', 'replacement'", "column_name, '[^0-9]', ''", "col, '^\\s+|\\s+$', ''"],
+  'REGEXP_SUBSTR':  ["string, 'pattern'", "column_name, '[A-Z]+', 1, 1", "email_col, '[^@]+', 1, 2"],
+  'REGEXP_INSTR':   ["string, 'pattern'", "column_name, '[0-9]+', 1, 1"],
+  'REGEXP_LIKE':    ["column_name, '^[A-Z]'", "email_col, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'"],
+  'REGEXP_COUNT':   ["string, 'pattern'", "column_name, '[0-9]'"],
+  'ROUND':          ['number_value, decimal_places', 'salary, 2', 'SYSDATE', "SYSDATE, 'MM'"],
+  'TRUNC':          ['date_value', "date_value, 'MM'", "date_value, 'YYYY'", 'number_value, 2'],
+  'CEIL':           ['number_value', 'salary / 12'],
+  'FLOOR':          ['number_value', 'price * quantity'],
+  'ABS':            ['number_value', 'balance - threshold'],
+  'MOD':            ['dividend, divisor', 'employee_id, 2'],
+  'POWER':          ['base, exponent', 'salary, 2'],
+  'SQRT':           ['number_value'],
+  'LOG':            ['base, number_value', '10, amount'],
+  'EXP':            ['number_value'],
+  'SIGN':           ['number_value'],
+  'NANVL':          ['number_value, value_if_nan'],
+  'BITAND':         ['integer1, integer2'],
+  'WIDTH_BUCKET':   ['expression, min, max, num_buckets'],
+  'UPPER':          ['string_value', 'column_name'],
+  'LOWER':          ['string_value', 'column_name'],
+  'INITCAP':        ['string_value', 'first_name'],
+  'TRIM':           ['string_value', "' ' FROM column_name", "LEADING '0' FROM col", "TRAILING ' ' FROM col"],
+  'LTRIM':          ["string_value", "column_name, '0'"],
+  'RTRIM':          ["string_value", "column_name, ' '"],
+  'LPAD':           ['string_value, total_length', "account_no, 10, '0'"],
+  'RPAD':           ['string_value, total_length', "name, 30, ' '"],
+  'LENGTH':         ['string_value', 'column_name'],
+  'LENGTHB':        ['string_value'],
+  'CHR':            ['ascii_code', '10  -- newline', '13  -- carriage return', '9  -- tab'],
+  'ASCII':          ['single_character', "'A'"],
+  'CONCAT':         ["string1, string2", "first_name, ' '", "col1, col2"],
+  'SOUNDEX':        ['string_value'],
+  'DUMP':           ['expression', "column_name, 16  -- hex format", "column_name, 8  -- octal format"],
+  'ADD_MONTHS':     ['date_value, n_months', 'SYSDATE, 3', 'hire_date, -6'],
+  'MONTHS_BETWEEN': ['date1, date2', 'SYSDATE, hire_date'],
+  'NEXT_DAY':       ["date_value, 'day_name'", "SYSDATE, 'MONDAY'"],
+  'LAST_DAY':       ['date_value', 'SYSDATE'],
+  'EXTRACT':        ["YEAR FROM date_value", "MONTH FROM SYSDATE", "DAY FROM date_col", "HOUR FROM timestamp_col"],
+  'NUMTODSINTERVAL':['n, interval_unit', "1, 'HOUR'", "30, 'MINUTE'", "7, 'DAY'"],
+  'NUMTOYMINTERVAL':['n, interval_unit', "3, 'MONTH'", "1, 'YEAR'"],
+  'CAST':           ['expression AS datatype', "column_name AS VARCHAR2(100)", "salary AS NUMBER(10,2)"],
+  'CONVERT':        ['char_value, dest_charset', "column_name, 'UTF8'", "col, 'WE8ISO8859P1'"],
+  'HEXTORAW':       ["'hex_string'", "'DEADBEEF'"],
+  'RAWTOHEX':       ['raw_value'],
+  'TO_CLOB':        ['varchar2_value', 'long_value'],
+  'SYS_GUID':       ['  -- generates a globally unique identifier'],
+  'SYS_CONTEXT':    ["'USERENV', 'SESSION_USER'", "'USERENV', 'IP_ADDRESS'", "'USERENV', 'MODULE'"],
+  'USERENV':        ["'LANGUAGE'", "'SESSIONID'", "'TERMINAL'"],
+  'LISTAGG':        ["column_name, ', '", "product_name, ', ' WITHIN GROUP (ORDER BY product_name)"],
+  'ROW_NUMBER':     ['() OVER (PARTITION BY col ORDER BY col2)', '() OVER (ORDER BY salary DESC)'],
+  'RANK':           ['() OVER (ORDER BY salary DESC)', '() OVER (PARTITION BY dept ORDER BY hire_date)'],
+  'DENSE_RANK':     ['() OVER (PARTITION BY dept_id ORDER BY salary DESC)'],
+  'PERCENT_RANK':   ['() OVER (ORDER BY salary)'],
+  'CUME_DIST':      ['() OVER (ORDER BY salary)'],
+  'LAG':            ['column_name, offset, default_val OVER (ORDER BY col)', 'salary, 1, 0 OVER (ORDER BY hire_date)'],
+  'LEAD':           ['column_name, offset, default_val OVER (ORDER BY col)', 'salary, 1, 0 OVER (PARTITION BY dept_id ORDER BY hire_date)'],
+  'FIRST_VALUE':    ['column_name OVER (PARTITION BY col ORDER BY col2)'],
+  'LAST_VALUE':     ['column_name OVER (PARTITION BY col ORDER BY col2 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'],
+  'NTH_VALUE':      ['column_name, n OVER (PARTITION BY col ORDER BY col2)'],
+  'NTILE':          ['n OVER (ORDER BY salary DESC)', '4 OVER (ORDER BY hire_date)'],
+  'PERCENTILE_CONT':['0.5 WITHIN GROUP (ORDER BY salary)  -- median'],
+  'PERCENTILE_DISC':['0.5 WITHIN GROUP (ORDER BY salary)'],
+  'MEDIAN':         ['column_name'],
+  'SUM':            ['column_name', 'amount * quantity', 'DISTINCT column_name'],
+  'COUNT':          ['*', 'column_name', 'DISTINCT column_name'],
+  'AVG':            ['column_name', 'DISTINCT salary'],
+  'MIN':            ['column_name', 'hire_date'],
+  'MAX':            ['column_name', 'salary'],
+  'STDDEV':         ['column_name'],
+  'VARIANCE':       ['column_name'],
+  'RAISE_APPLICATION_ERROR': ['-20001, \'Error message here\'', '-20100, \'Custom error: \' || v_msg'],
+};
+
+// ============================================================================
+// AUTOCOMPLETE ENGINE
+// ============================================================================
+function getHintWords() {
+  const d = loadDictionary();
+  return {
+    keywords: [...ORACLE_KEYWORDS, ...(d.custom_kw||[])],
+    datatypes: [...ORACLE_DATATYPES, ...(d.custom_types||[])],
+    tables: d.tables, columns: d.columns, objects: d.objects, functions: ORACLE_FUNCTIONS,
+  };
+}
+
+// Collect the full statement text before the cursor (across lines, after last ;)
+function getCurrentStatementBefore(editor) {
+  const cur = editor.getCursor();
+  let text = '';
+  for (let line = 0; line <= cur.line; line++) {
+    const lineStr = editor.getLine(line);
+    const upTo = line === cur.line ? cur.ch : lineStr.length;
+    text += lineStr.slice(0, upTo) + ' ';
+  }
+  const lastSemi = text.lastIndexOf(';');
+  const stmtText = lastSemi >= 0 ? text.slice(lastSemi + 1) : text;
+  return stmtText.replace(/--[^\n]*/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// Detect if cursor is inside a function call and return the function name
+function getFunctionContext(editor) {
+  const cur = editor.getCursor();
+  const lineStr = editor.getLine(cur.line);
+  let ch = cur.ch - 1, depth = 0;
+  while (ch >= 0) {
+    const c = lineStr[ch];
+    if (c === ')') depth++;
+    else if (c === '(') {
+      if (depth === 0) {
+        let ne = ch - 1;
+        while (ne >= 0 && /\s/.test(lineStr[ne])) ne--;
+        let ns = ne;
+        while (ns >= 0 && /[\w$#_]/.test(lineStr[ns])) ns--;
+        ns++;
+        const fname = lineStr.slice(ns, ne + 1).toUpperCase();
+        return (fname && FUNCTION_ARG_HINTS[fname]) ? fname : null;
+      }
+      depth--;
+    }
+    ch--;
+  }
+  return null;
+}
+
+// Compute what suffix of insertText remains after stmtCtx was already typed
+function computeContinuation(stmtCtx, insertText) {
+  // Normalize: remove newlines, collapse spaces, uppercase for matching
+  const ctxToks  = stmtCtx.trim().toUpperCase().split(/\s+/).filter(Boolean);
+  const insToks  = insertText.replace(/\n/g,' ').trim().split(/\s+/).filter(Boolean);
+  const insToksU = insToks.map(t => t.toUpperCase().replace(/%[^%]+%/g, 'PLACEHOLDER'));
+
+  let matched = 0;
+  for (let i = 0; i < ctxToks.length && i < insToksU.length; i++) {
+    const ct = ctxToks[i];
+    const it = insToksU[i];
+    if (ct === it || it === 'PLACEHOLDER') {
+      matched = i + 1;
+    } else {
+      break;
+    }
+  }
+  if (matched === 0) return insertText; // nothing in common → insert full
+  if (matched >= insToks.length) return '';  // fully covered
+  return insToks.slice(matched).join(' ');
+}
+
+function oracleHint(editor) {
+  const cur      = editor.getCursor();
+  const lineStr  = editor.getLine(cur.line);
+  let tokEnd     = cur.ch, tokStart = tokEnd;
+  while (tokStart > 0 && /[\w$#_]/.test(lineStr[tokStart - 1])) tokStart--;
+  const word     = lineStr.slice(tokStart, tokEnd).toUpperCase();
+  const hints    = getHintWords();
+  const stmtCtx  = getCurrentStatementBefore(editor);
+
+  // ── 1. DDL/SQL/PLSQL statement completions (italic cyan) ──────────────────
+  const ddlSuggestions = [];
+  const seenLabels = new Set();
+
+  for (const comp of DDL_COMPLETIONS) {
+    const firstKw = (comp.kw || '').toUpperCase();
+    let showMode  = null;
+    let hintFrom, hintTo, insertText;
+
+    if (word.length > 0 && firstKw && firstKw.startsWith(word)) {
+      // User is typing the keyword — replace typed word with full template
+      showMode   = 'word';
+      hintFrom   = CodeMirror.Pos(cur.line, tokStart);
+      hintTo     = CodeMirror.Pos(cur.line, tokEnd);
+      insertText = comp.insert;
+    } else if (word.length === 0 && comp.ctx && comp.ctx.test(stmtCtx)) {
+      // Cursor is after a space, mid-statement — insert the continuation suffix
+      const suffix = computeContinuation(stmtCtx, comp.insert);
+      if (!suffix) continue;
+      showMode   = 'ctx';
+      hintFrom   = CodeMirror.Pos(cur.line, tokStart); // tokStart === tokEnd here
+      hintTo     = CodeMirror.Pos(cur.line, tokEnd);
+      insertText = suffix;
+    }
+
+    if (!showMode) continue;
+    if (seenLabels.has(comp.label)) continue;
+    seenLabels.add(comp.label);
+
+    // Capture loop variables for closures
+    const _from = hintFrom, _to = hintTo, _text = insertText, _label = comp.label;
+
+    ddlSuggestions.push({
+      text:        _text,
+      displayText: _label,
+      className:   'hint-ddl-suggestion',
+      priority:    comp.priority || 99,
+      hint(cm) {
+        cm.replaceRange(_text, _from, _to);
+      },
+      render(el) {
+        el.innerHTML = '';
+        el.style.cssText = 'font-style:italic;padding:3px 10px';
+        const icon = document.createElement('span');
+        icon.style.cssText = 'color:var(--cyan);opacity:.6;font-size:.6em;margin-right:4px;font-style:normal';
+        icon.textContent = '✦';
+        const txt = document.createElement('span');
+        txt.style.cssText = 'color:var(--cyan);font-style:italic';
+        txt.textContent = _label;
+        el.appendChild(icon);
+        el.appendChild(txt);
+      }
+    });
+  }
+  ddlSuggestions.sort((a, b) => a.priority - b.priority);
+
+  // ── 2. Function argument hints (italic purple) ─────────────────────────────
+  const fnContext  = getFunctionContext(editor);
+  const fnArgHints = [];
+  if (fnContext && FUNCTION_ARG_HINTS[fnContext]) {
+    for (const argEx of FUNCTION_ARG_HINTS[fnContext]) {
+      if (!argEx) continue;
+      const _fn = fnContext, _arg = argEx;
+      const capturedCur = { line: cur.line, ch: cur.ch };
+      fnArgHints.push({
+        text: argEx,
+        className: 'hint-fn-args',
+        hint(cm) {
+          const ls = cm.getLine(capturedCur.line);
+          let p = capturedCur.ch - 1, d = 0;
+          while (p >= 0) {
+            if (ls[p] === ')') d++;
+            else if (ls[p] === '(') { if (d === 0) { p++; break; } d--; }
+            p--;
+          }
+          cm.replaceRange(_arg, CodeMirror.Pos(capturedCur.line, p),
+                                 CodeMirror.Pos(capturedCur.line, capturedCur.ch));
+        },
+        render(el) {
+          el.innerHTML = '';
+          el.style.cssText = 'padding:3px 10px';
+          const icon = document.createElement('span');
+          icon.style.cssText = 'color:var(--purple);opacity:.6;font-size:.6em;margin-right:4px';
+          icon.textContent = '⚙';
+          const fnSpan = document.createElement('span');
+          fnSpan.style.cssText = 'color:var(--text2)';
+          fnSpan.textContent = _fn + '(';
+          const argSpan = document.createElement('span');
+          argSpan.style.cssText = 'color:var(--purple);font-style:italic';
+          argSpan.textContent = _arg;
+          const closeSpan = document.createElement('span');
+          closeSpan.style.cssText = 'color:var(--text2)';
+          closeSpan.textContent = ')';
+          el.appendChild(icon);
+          el.appendChild(fnSpan);
+          el.appendChild(argSpan);
+          el.appendChild(closeSpan);
+        }
+      });
+    }
+  }
+
+  // ── 3. Standard keyword / object / function completions ───────────────────
+  const stdList = [
+    // Only show keywords/functions when user is actively typing (word.length > 0)
+    ...(word.length > 0 ? hints.keywords.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'🔑 '+w, className:'hint-kw'})) : []),
+    ...(word.length > 0 ? hints.datatypes.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'🔷 '+w, className:'hint-type'})) : []),
+    // Tables and columns show even after space (useful for FROM clause etc.)
+    ...hints.tables.filter(w  => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📋 '+w, className:'hint-table'})),
+    ...hints.columns.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📌 '+w, className:'hint-col'})),
+    ...hints.objects.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'◈ '  +w, className:'hint-obj'})),
+    ...(word.length > 0 ? hints.functions.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'⚙ '+w, className:'hint-obj'})) : []),
+  ];
+  const seen = new Set();
+  const deduped = stdList.filter(h => {
+    const k = h.text.toUpperCase();
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0, 60);
+
+  // ── 4. Compose: statement templates first, then fn args, then standard ────
+  const list = [...ddlSuggestions, ...fnArgHints, ...deduped];
+
+  // Always return a valid hint object (never null) to avoid CodeMirror crash
+  return {
+    list,
+    from: CodeMirror.Pos(cur.line, tokStart),
+    to:   CodeMirror.Pos(cur.line, tokEnd),
+  };
+}
+// ============================================================================
+// HISTORY
+// ============================================================================
+const historyItems = [];
+function addHistoryEntry(text, type) {
+  historyItems.unshift({ text, type: type||'copy', time: new Date(), chars: text.length });
+  if (historyItems.length > 20) historyItems.pop();
+  if (document.getElementById('tab-history').style.display !== 'none') renderHistory();
+}
+function renderHistory() {
+  const el = document.getElementById('hist-list');
+  if (!historyItems.length) {
+    el.innerHTML = '<div class="val-empty"><div style="font-size:1.8rem;opacity:.25">🕐</div><div>No history yet.</div></div>';
+    return;
+  }
+  const fmtTime = d => {
+    const h = d.getHours().toString().padStart(2,'0');
+    const m = d.getMinutes().toString().padStart(2,'0');
+    const s = d.getSeconds().toString().padStart(2,'0');
+    return `${h}:${m}:${s}`;
+  };
+  el.innerHTML = historyItems.map((item, idx) => {
+    const preview = item.text.replace(/</g,'&lt;').substring(0,200);
+    const typeIcon = item.type === 'validate' ? '⚡' : item.type === 'format' ? '⌸' : '📋';
+    return `<div class="hist-item">
+      <div class="hist-item-header">
+        <span style="font-size:.62rem;color:var(--text2)">${typeIcon} ${item.type.toUpperCase()}</span>
+        <span style="display:flex;gap:8px">
+          <span class="hist-item-chars">${item.chars} chars</span>
+          <span class="hist-item-time">${fmtTime(item.time)}</span>
+        </span>
+      </div>
+      <div class="hist-preview">${preview}${item.text.length>200?'…':''}</div>
+      <div class="hist-actions">
+        <button class="hist-small-btn restore" onclick="restoreHistory(${idx})">⟲ Restore</button>
+        <button class="hist-small-btn" onclick="copyHistoryItem(${idx})">📋 Copy</button>
+        <button class="hist-small-btn" style="color:var(--red)" onclick="deleteHistoryItem(${idx})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function restoreHistory(idx) {
+  if (!cm || !historyItems[idx]) return;
+  if (isDirty && !confirm('Replace editor content with history item?')) return;
+  cm.setValue(historyItems[idx].text);
+  setDirty(true);
+  statusMsg('Restored from history', 'ok');
+}
+function copyHistoryItem(idx) {
+  if (!historyItems[idx]) return;
+  navigator.clipboard.writeText(historyItems[idx].text).then(() => statusMsg('Copied!', 'ok'));
+}
+function deleteHistoryItem(idx) {
+  historyItems.splice(idx, 1);
+  renderHistory();
+}
+function clearHistory() {
+  if (!confirm('Clear all history?')) return;
+  historyItems.length = 0;
+  renderHistory();
+  statusMsg('History cleared', 'ok');
+}
+
+// ============================================================================
+// TEMPLATES
+// ============================================================================
+const TEMPLATES = [
+  {
+    group: '🏗 CREATE TABLE',
+    color: 'var(--amber)',
+    bgColor: 'rgba(245,158,11,.06)',
+    items: [
+      {
+        name: 'Basic Table',
+        desc: 'Simple table with NUMBER PK and VARCHAR2 columns',
+        sql: `CREATE TABLE my_table (
+    id          NUMBER(10)      NOT NULL,
+    name        VARCHAR2(100)   NOT NULL,
+    description VARCHAR2(500),
+    created_at  DATE            DEFAULT SYSDATE,
+    CONSTRAINT pk_my_table PRIMARY KEY (id)
+);`
+      },
+      {
+        name: 'Full Constraints Table',
+        desc: 'Table with PK, FK, UNIQUE, CHECK, DEFAULT',
+        sql: `CREATE TABLE orders (
+    order_id     NUMBER(10)      NOT NULL,
+    customer_id  NUMBER(10)      NOT NULL,
+    order_date   DATE            DEFAULT SYSDATE NOT NULL,
+    status       VARCHAR2(20)    DEFAULT 'PENDING',
+    amount       NUMBER(12,2)    NOT NULL,
+    CONSTRAINT pk_orders       PRIMARY KEY (order_id),
+    CONSTRAINT fk_orders_cust  FOREIGN KEY (customer_id) REFERENCES customers (customer_id) ON DELETE CASCADE,
+    CONSTRAINT chk_order_amt   CHECK (amount > 0),
+    CONSTRAINT chk_status      CHECK (status IN ('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED'))
+);`
+      },
+      {
+        name: 'Audit Table',
+        desc: 'Table with full audit columns (created_by, updated_by, etc.)',
+        sql: `CREATE TABLE employees (
+    employee_id  NUMBER(10)      NOT NULL,
+    first_name   VARCHAR2(50)    NOT NULL,
+    last_name    VARCHAR2(50)    NOT NULL,
+    email        VARCHAR2(150)   NOT NULL,
+    hire_date    DATE            NOT NULL,
+    salary       NUMBER(10,2),
+    dept_id      NUMBER(10),
+    created_by   VARCHAR2(100)   DEFAULT SYS_CONTEXT('USERENV','SESSION_USER'),
+    created_at   DATE            DEFAULT SYSDATE NOT NULL,
+    updated_by   VARCHAR2(100),
+    updated_at   DATE,
+    CONSTRAINT pk_employees  PRIMARY KEY (employee_id),
+    CONSTRAINT uq_emp_email  UNIQUE (email)
+);`
+      },
+      {
+        name: 'Quoted Reserved-Word Columns',
+        desc: 'How to use reserved words safely as column names',
+        sql: `-- Use double quotes to use reserved words as column names
+-- Queries MUST also use double quotes for these columns
+CREATE TABLE my_rules (
+    rule_id     NUMBER(10)   NOT NULL,
+    "create"    VARCHAR2(10),
+    "DATE"      DATE,
+    "Rowid"     VARCHAR2(50),   -- "rowid" or "Rowid" is OK (not exact uppercase "ROWID")
+    CONSTRAINT pk_my_rules PRIMARY KEY (rule_id)
+);
+-- When querying: SELECT "create", "DATE", "Rowid" FROM my_rules;`
+      },
+    ]
+  },
+  {
+    group: '🔗 FOREIGN KEY Constraints',
+    color: 'var(--cyan)',
+    bgColor: 'rgba(34,211,238,.05)',
+    items: [
+      {
+        name: 'FK Syntax Template',
+        desc: 'Canonical template — fill in the %placeholders%',
+        sql: `-- TEMPLATE:
+-- ALTER TABLE %child_table%
+--     ADD CONSTRAINT %constraint_name%
+--     FOREIGN KEY (%child_column%)
+--     REFERENCES %parent_table% (%parent_column%);
+-- Rules:
+--   • %parent_column% must be PRIMARY KEY or UNIQUE in %parent_table%
+--   • %child_column% and %parent_column% must be compatible types
+--   • Do NOT leave the REFERENCES column list empty: REFERENCES tbl () is an ERROR
+
+ALTER TABLE orders
+    ADD CONSTRAINT fk_orders_customer
+    FOREIGN KEY (customer_id)
+    REFERENCES customers (customer_id)
+    ON DELETE CASCADE;`
+      },
+      {
+        name: 'FK with ON DELETE SET NULL',
+        desc: 'FK that nullifies child rows when parent is deleted',
+        sql: `ALTER TABLE order_items
+    ADD CONSTRAINT fk_items_order
+    FOREIGN KEY (order_id)
+    REFERENCES orders (order_id)
+    ON DELETE SET NULL;`
+      },
+      {
+        name: 'Multi-Column FK',
+        desc: 'Composite foreign key referencing a composite PK',
+        sql: `ALTER TABLE shipments
+    ADD CONSTRAINT fk_shipment_loc
+    FOREIGN KEY (country_code, region_code)
+    REFERENCES locations (country_code, region_code);`
+      },
+      {
+        name: 'Inline FK in CREATE TABLE',
+        desc: 'Declare FK inside the CREATE TABLE body',
+        sql: `CREATE TABLE order_items (
+    item_id     NUMBER(10)  NOT NULL,
+    order_id    NUMBER(10)  NOT NULL,
+    product_id  NUMBER(10)  NOT NULL,
+    quantity    NUMBER(5)   NOT NULL,
+    CONSTRAINT pk_order_items   PRIMARY KEY (item_id),
+    CONSTRAINT fk_items_order   FOREIGN KEY (order_id)   REFERENCES orders   (order_id),
+    CONSTRAINT fk_items_product FOREIGN KEY (product_id) REFERENCES products (product_id)
+);`
+      },
+    ]
+  },
+  {
+    group: '🔑 PRIMARY KEY Constraints',
+    color: 'var(--amber)',
+    bgColor: 'rgba(245,158,11,.05)',
+    items: [
+      {
+        name: 'PK Syntax Template',
+        desc: 'Canonical template for PRIMARY KEY constraints',
+        sql: `-- TEMPLATE:
+-- CONSTRAINT %constraint_name% PRIMARY KEY (%column1% [, %column2%, ...])
+-- Rules:
+--   • Column(s) automatically become NOT NULL
+--   • Only ONE primary key per table allowed
+--   • Constraint name must be unique in the schema
+
+-- As ADD CONSTRAINT on existing table:
+ALTER TABLE my_table
+    ADD CONSTRAINT pk_my_table PRIMARY KEY (id);
+
+-- Inline in CREATE TABLE:
+CREATE TABLE my_table (
+    id  NUMBER(10) NOT NULL,
+    CONSTRAINT pk_my_table PRIMARY KEY (id)
+);`
+      },
+      {
+        name: 'Composite PK',
+        desc: 'Primary key spanning multiple columns',
+        sql: `CREATE TABLE enrollment (
+    student_id  NUMBER(10)  NOT NULL,
+    course_id   NUMBER(10)  NOT NULL,
+    enrolled_at DATE        DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_enrollment PRIMARY KEY (student_id, course_id)
+);`
+      },
+    ]
+  },
+  {
+    group: '◈ UNIQUE Constraints',
+    color: 'var(--purple)',
+    bgColor: 'rgba(167,139,250,.05)',
+    items: [
+      {
+        name: 'UNIQUE Syntax Template',
+        desc: 'Canonical template for UNIQUE constraints',
+        sql: `-- TEMPLATE:
+-- CONSTRAINT %constraint_name% UNIQUE (%column1% [, %column2%, ...])
+-- Rules:
+--   • NULL values are allowed (multiple NULLs do NOT violate UNIQUE in Oracle)
+--   • Can be referenced by a FOREIGN KEY (as target)
+
+ALTER TABLE employees
+    ADD CONSTRAINT uq_emp_email UNIQUE (email);`
+      },
+      {
+        name: 'Multi-Column UNIQUE',
+        desc: 'Unique constraint across multiple columns',
+        sql: `ALTER TABLE products
+    ADD CONSTRAINT uq_prod_name_cat
+    UNIQUE (product_name, category_id);`
+      },
+    ]
+  },
+  {
+    group: '✓ CHECK Constraints',
+    color: 'var(--green)',
+    bgColor: 'rgba(52,211,153,.05)',
+    items: [
+      {
+        name: 'CHECK Syntax Template',
+        desc: 'Canonical template for CHECK constraints',
+        sql: `-- TEMPLATE:
+-- CONSTRAINT %constraint_name% CHECK (%condition%)
+-- Rules:
+--   • Condition must evaluate to TRUE or NULL (never FALSE)
+--   • Cannot reference other tables or use sequences/functions like SYSDATE
+--   • Can reference multiple columns within the SAME table
+
+ALTER TABLE employees
+    ADD CONSTRAINT chk_salary CHECK (salary > 0 AND salary < 1000000);`
+      },
+      {
+        name: 'CHECK with IN list',
+        desc: 'Restrict a column to allowed values',
+        sql: `ALTER TABLE orders
+    ADD CONSTRAINT chk_status
+    CHECK (status IN ('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED'));`
+      },
+      {
+        name: 'CHECK date range',
+        desc: 'Ensure a date column is within valid bounds',
+        sql: `ALTER TABLE contracts
+    ADD CONSTRAINT chk_contract_dates
+    CHECK (end_date > start_date);`
+      },
+    ]
+  },
+  {
+    group: '🔧 ALTER TABLE',
+    color: 'var(--orange)',
+    bgColor: 'rgba(251,146,60,.05)',
+    items: [
+      {
+        name: 'ADD Column(s)',
+        desc: 'Add one or more columns to an existing table',
+        sql: `ALTER TABLE my_table ADD (
+    new_column   VARCHAR2(200),
+    another_col  NUMBER(5)  DEFAULT 0  NOT NULL
+);`
+      },
+      {
+        name: 'MODIFY Column',
+        desc: 'Change type, size or nullability of a column',
+        sql: `ALTER TABLE my_table
+    MODIFY (column_name VARCHAR2(500) NOT NULL);`
+      },
+      {
+        name: 'DROP Column',
+        desc: 'Remove a column permanently',
+        sql: `ALTER TABLE my_table
+    DROP COLUMN column_name;`
+      },
+      {
+        name: 'DROP Constraint',
+        desc: 'Remove a named constraint',
+        sql: `ALTER TABLE my_table
+    DROP CONSTRAINT constraint_name;`
+      },
+    ]
+  },
+  {
+    group: '⏩ SEQUENCES & INDEXES',
+    color: 'var(--blue)',
+    bgColor: 'rgba(96,165,250,.05)',
+    items: [
+      {
+        name: 'Standard Sequence',
+        desc: 'Auto-increment sequence starting at 1',
+        sql: `CREATE SEQUENCE seq_my_table
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9999999999
+    NOCYCLE
+    CACHE 20;`
+      },
+      {
+        name: 'Unique Index',
+        desc: 'Unique index to enforce uniqueness with query speedup',
+        sql: `CREATE UNIQUE INDEX idx_my_table_email
+    ON my_table (email);`
+      },
+      {
+        name: 'Composite Index',
+        desc: 'Multi-column index for join/filter optimization',
+        sql: `CREATE INDEX idx_orders_cust_date
+    ON orders (customer_id, order_date DESC);`
+      },
+    ]
+  },
+  {
+    group: '💡 Reserved Words Guide',
+    color: 'var(--pink)',
+    bgColor: 'rgba(244,114,182,.05)',
+    items: [
+      {
+        name: 'Reserved Word as Column',
+        desc: 'Using Oracle reserved words safely with double quotes',
+        sql: `-- TRUE reserved words (e.g. DATE, SELECT, TABLE, SESSION) CANNOT
+-- be used as unquoted identifiers — Oracle will reject them.
+-- Wrap them in double quotes to use them:
+
+CREATE TABLE event_log (
+    log_id      NUMBER(10)  NOT NULL,
+    "date"      DATE,           -- lowercase quoted — safe
+    "session"   NUMBER(10),     -- lowercase quoted — safe
+    "level"     NUMBER(3),      -- lowercase quoted — safe
+    CONSTRAINT pk_event_log PRIMARY KEY (log_id)
+);
+
+-- In queries, always use the same case + quotes:
+-- SELECT "date", "session" FROM event_log;`
+      },
+      {
+        name: 'Unreserved Keyword as Column',
+        desc: 'Unreserved keywords (PASSWORD, NAME, etc.) — allowed but risky',
+        sql: `-- Unreserved keywords CAN be used unquoted, but it is risky.
+-- Oracle may change their status in future versions.
+-- Best practice: avoid or quote them.
+
+CREATE TABLE user_accounts (
+    account_id  NUMBER(10)   NOT NULL,
+    username    VARCHAR2(50) NOT NULL,   -- safe, not a keyword
+    password    VARCHAR2(255),           -- WARNING: unreserved keyword
+    name        VARCHAR2(100),           -- WARNING: unreserved keyword
+    CONSTRAINT pk_user_accounts PRIMARY KEY (account_id)
+);`
+      },
+    ]
+  },
+];
+
+function renderTemplates() {
+  const el = document.getElementById('templates-list');
+  el.innerHTML = TEMPLATES.map(group => {
+    const items = group.items.map(item => {
+      const sqlJson = JSON.stringify(item.sql);
+      return `
+      <div class="tmpl-item" style="border-left:2px solid ${group.color}20">
+        <div class="tmpl-name" style="color:${group.color}">${item.name}</div>
+        <div class="tmpl-desc">${item.desc}</div>
+        <div class="tmpl-actions">
+          <button class="hist-small-btn restore" style="color:${group.color};border-color:${group.color}40"
+            onclick='insertTemplate(${sqlJson})'>⊕ Insert</button>
+          <button class="hist-small-btn"
+            onclick='replaceTemplate(${sqlJson})'>⟲ Replace</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="tmpl-section">
+      <div class="tmpl-head" onclick="toggleSection(this)" style="background:${group.bgColor}">
+        <span style="color:${group.color}">${group.group}</span>
+        <span style="color:${group.color}">▾</span>
+      </div>
+      <div>${items}</div>
+    </div>`;
+  }).join('');
+}
+
+function insertTemplate(sql) {
+  if (!cm) return;
+  const cursor = cm.getCursor();
+  cm.replaceRange('\n' + sql + '\n', cursor);
+  setDirty(true);
+  statusMsg('Template inserted', 'ok');
+}
+function replaceTemplate(sql) {
+  if (!cm) return;
+  if (cm.getValue().trim() && !confirm('Replace editor content with template?')) return;
+  cm.setValue(sql);
+  setDirty(true);
+  statusMsg('Template loaded', 'ok');
+}
+
+// ============================================================================
+// GLOBAL STATE & EDITOR INIT
+// ============================================================================
+let cm, currentSchema = null, isDirty = false, currentFileName = 'untitled.sql', lineMarks = [];
+
+function initEditor() {
+  const textarea = document.getElementById('editor');
+  cm = CodeMirror.fromTextArea(textarea, {
+    mode: 'text/x-plsql',
+    theme: 'oracle',
+    lineNumbers: true,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    styleActiveLine: true,
+    foldGutter: true,
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'issue-gutter'],
+    extraKeys: {
+      'Ctrl-Space': cm => cm.showHint({ hint: oracleHint, completeSingle: false }),
+      'Ctrl-Shift-F': () => formatDDL(),
+      'Ctrl-Shift-X': () => fixDDL(),
+      'F5': () => validateDDL(),
+      'Ctrl-S': () => saveFile(),
+      'Ctrl-/': cm => cm.execCommand('toggleComment'),
+      'Ctrl-Z': cm => cm.undo(),
+      'Ctrl-Y': cm => cm.redo(),
+      'Tab': cm => {
+        // If hint widget is open, pick the active item
+        if (cm.state.completionActive) {
+          cm.state.completionActive.pick();
+          return;
+        }
+        // Otherwise insert soft-tab spaces
+        const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      },
+    },
+    hintOptions: { hint: oracleHint, completeSingle: false },
+    indentWithTabs: false,
+    tabSize: 4,
+    indentUnit: 4,
+  });
+  cm.on('inputRead', (editor, change) => {
+    if (change.text[0].length === 1 && /\w/.test(change.text[0])) {
+      setTimeout(() => { if (!editor.state.completionActive) editor.showHint({ hint: oracleHint, completeSingle: false }); }, 150);
+    }
+  });
+  cm.on('cursorActivity', updateCursorInfo);
+  cm.on('change', () => setDirty(true));
+  cm.setValue(`-- Oracle DDL Studio v3 — Validation Demo
+-- Hit F5 to validate. All errors below are intentional demos.
+
+-- 1. Trailing comma before ) — ERROR
+CREATE TABLE test (
+    id   NUMBER    NOT NULL,
+    nom  VARCHAR2(100),
+    CONSTRAINT pk_test PRIMARY KEY (id),
+);
+
+-- 2. FK with empty REFERENCES () — ERROR
+CREATE TABLE test2 (
+    ident   NUMBER  NOT NULL,
+    acount  DATE,
+    CONSTRAINT pk_test2 PRIMARY KEY (ident)
+);
+ALTER TABLE test2 ADD CONSTRAINT fk_empty
+    FOREIGN KEY (ident) REFERENCES test ();
+
+-- 3. FK type mismatch: NUMBER vs VARCHAR2 — ERROR
+ALTER TABLE test2 ADD CONSTRAINT fk_mismatch
+    FOREIGN KEY (ident) REFERENCES test (nom);
+
+-- 4. Reserved words as column names
+CREATE TABLE demo_reserved (
+    "create"   VARCHAR2(10),   -- OK: quoted reserved word (info)
+    "DATE"     DATE,           -- OK: quoted reserved word (info)
+    password   VARCHAR2(50),   -- WARNING: unreserved keyword
+    session    NUMBER          -- ERROR: true reserved word, unquoted
+);
+
+-- 5. Extra parens — ERROR
+ALTER TABLE test ADD ts NUMBER()))));
+`);
+  setDirty(false);
+  updateCursorInfo();
+}
+
+function updateCursorInfo() {
+  if (!cm) return;
+  const cur = cm.getCursor();
+  document.getElementById('cursor-info').textContent = `Ln ${cur.line+1}, Col ${cur.ch+1}`;
+  const sel = cm.getSelection();
+  document.getElementById('sel-info').textContent = sel ? `${sel.length} sel` : '';
+  const words = (cm.getValue().match(/\b\w+\b/g)||[]).length;
+  document.getElementById('stat-words').textContent = `${words} words`;
+}
+
+function setDirty(d) {
+  isDirty = d;
+  const dot = document.getElementById('dirtyDot');
+  if (dot) dot.className = 'file-dot' + (d ? ' dirty' : '');
+}
+
+function statusMsg(msg, type, duration) {
+  const el = document.getElementById('sb-msg');
+  el.textContent = msg;
+  el.style.color = type === 'ok' ? 'var(--ok)' : type === 'err' ? 'var(--err)' : type === 'warn' ? 'var(--warn)' : 'var(--text3)';
+  clearTimeout(window._statusTimer);
+  window._statusTimer = setTimeout(() => { el.textContent = ''; el.style.color = ''; }, duration||3500);
+}
+
+// ============================================================================
+// CORE ACTIONS
+// ============================================================================
+function doUndo() { if (cm) { cm.undo(); statusMsg('Undo', 'ok'); } }
+function doRedo() { if (cm) { cm.redo(); statusMsg('Redo', 'ok'); } }
+
+function validateDDL() {
+  if (!cm) return;
+  const sql = cm.getValue();
+  statusMsg('Validating…', 'info', 60000);
+  // Clear markers
+  lineMarks.forEach(m => m.clear?.());
+  lineMarks = [];
+  for (let i = 0; i < cm.lineCount(); i++) {
+    cm.removeLineClass(i, 'background', 'cm-err-line');
+    cm.removeLineClass(i, 'background', 'cm-warn-line');
+    cm.setGutterMarker(i, 'issue-gutter', null);
+  }
+  let schema;
+  try { schema = parseDDL(sql); }
+  catch(e) { showValidationResults([{sev:'error',msg:'Parse error: '+e.message,line:1}],null); statusMsg('❌ Parse error','err'); return; }
+
+  addHistoryEntry(sql, 'validate');
+  const issues = validateSchema(schema, sql);
+  currentSchema = schema;
+
+  issues.forEach(issue => {
+    if (!issue.line || issue.line < 1) return;
+    const l = issue.line - 1;
+    if (l >= cm.lineCount()) return;
+    if (issue.sev === 'error') {
+      cm.addLineClass(l, 'background', 'cm-err-line');
+      const m = document.createElement('div');
+      m.innerHTML = '●'; m.className = 'err-gutter'; m.title = issue.msg;
+      cm.setGutterMarker(l, 'issue-gutter', m);
+    } else if (issue.sev === 'warning') {
+      cm.addLineClass(l, 'background', 'cm-warn-line');
+      const m = document.createElement('div');
+      m.innerHTML = '▲'; m.className = 'warn-gutter'; m.title = issue.msg;
+      cm.setGutterMarker(l, 'issue-gutter', m);
+    }
+  });
+
+  showValidationResults(issues, schema);
+  learnFromSchema(schema);
+
+  const errCount  = issues.filter(i => i.sev === 'error').length;
+  const warnCount = issues.filter(i => i.sev === 'warning').length;
+  const tblCount  = Object.keys(schema.tables).length;
+
+  document.getElementById('sb-status').textContent = errCount > 0 ? '● Error' : '◉ OK';
+  document.getElementById('sb-status').className = 'sb-item ' + (errCount > 0 ? 'err' : 'ok');
+
+  const errEl = document.getElementById('sb-err');
+  errEl.style.display = errCount > 0 ? '' : 'none';
+  errEl.textContent = `● ${errCount} error${errCount!==1?'s':''}`;
+  errEl.className = 'sb-item err';
+
+  const warnEl = document.getElementById('sb-warn');
+  warnEl.style.display = warnCount > 0 ? '' : 'none';
+  warnEl.textContent = `▲ ${warnCount} warning${warnCount!==1?'s':''}`;
+  warnEl.className = 'sb-item warn';
+
+  const tblEl = document.getElementById('sb-tables');
+  tblEl.style.display = '';
+  tblEl.textContent = `🏛 ${tblCount} table${tblCount!==1?'s':''}`;
+
+  if (errCount === 0 && warnCount === 0)
+    statusMsg(`✓ Valid — ${tblCount} table(s), no issues`, 'ok');
+  else
+    statusMsg(`${errCount} error(s), ${warnCount} warning(s)`, errCount > 0 ? 'err' : 'warn');
+
+  switchRTab('validation');
+  renderSchemaPanel(schema);
+}
+
+function showValidationResults(issues, schema) {
+  const listEl = document.getElementById('val-list');
+  const summEl = document.getElementById('val-summary');
+  const errors   = issues.filter(i => i.sev === 'error');
+  const warnings = issues.filter(i => i.sev === 'warning');
+  const infos    = issues.filter(i => i.sev === 'info');
+  const tblCount = schema ? Object.keys(schema.tables).length : 0;
+  summEl.innerHTML = `
+    <span class="val-badge ${errors.length?'err':'ok'}">● ${errors.length} error${errors.length!==1?'s':''}</span>
+    <span class="val-badge ${warnings.length?'warn':'ok'}">▲ ${warnings.length} warning${warnings.length!==1?'s':''}</span>
+    ${infos.length?`<span class="val-badge info">ℹ ${infos.length} info</span>`:''}
+    ${schema?`<span class="val-badge ok" style="margin-left:auto">🏛 ${tblCount} table${tblCount!==1?'s':''}</span>`:''}
+  `;
+  if (issues.length === 0) {
+    listEl.innerHTML = `<div class="val-empty"><div style="font-size:2rem">✅</div><div><strong style="color:var(--green)">DDL is valid!</strong><br>No errors or warnings found.</div></div>`;
+    return;
+  }
+  listEl.innerHTML = issues.map((issue, i) => {
+    const icons = {error:'●', warning:'▲', info:'ℹ'};
+    const msg = issue.msg
+      .replace(/("[\w$#_]+")/g, '<strong>$1</strong>')
+      .replace(/(\bORA-\d+\b)/g, '<span style="color:var(--red);font-family:var(--mono)">$1</span>');
+    return `<div class="val-item ${issue.sev}" onclick="goToLine(${issue.line||0})">
+      <div class="val-icon">${icons[issue.sev]||'?'}</div>
+      <div>
+        <div class="val-msg">${msg}</div>
+        ${issue.line?`<div class="val-loc">Line ${issue.line}${issue.table?' · '+issue.table:''}${issue.col?' · '+issue.col:''}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function goToLine(line) {
+  if (!line || line < 1 || !cm) return;
+  cm.setCursor({line: line - 1, ch: 0});
+  cm.scrollIntoView({line: line - 1, ch: 0}, 80);
+  cm.focus();
+}
+
+function formatDDL() {
+  if (!cm) return;
+  const sql = cm.getValue();
+  try {
+    const formatted = formatDDLText(sql);
+    addHistoryEntry(sql, 'format');
+    cm.setValue(formatted);
+    setDirty(true);
+    statusMsg('✓ DDL formatted & aligned', 'ok');
+  } catch(e) {
+    statusMsg('Format error: ' + e.message, 'err');
+  }
+}
+
+// Holds the pending fix result for the popup
+let _pendingFix = null;
+
+function fixDDL() {
+  if (!cm) return;
+  const sql = cm.getValue();
+  const { fixed, fixes } = autoFixDDL(sql);
+
+  if (fixes.length === 0) {
+    let issues = [];
+    try { const s = parseDDL(sql); issues = validateSchema(s, sql).filter(i => i.sev === 'error'); } catch(e){}
+    if (issues.length > 0) {
+      statusMsg(`⚠ ${issues.length} error(s) found that require manual correction — see Validation tab`, 'warn', 6000);
+      switchRTab('validation');
+      validateDDL();
+    } else {
+      statusMsg('✓ No fixable issues found — DDL looks clean!', 'ok');
+    }
+    return;
+  }
+
+  // Show preview popup instead of applying immediately
+  _pendingFix = { sql, fixed, fixes };
+  showFixPopup(fixes, sql, fixed);
+}
+
+function showFixPopup(fixes, originalSql, fixedSql) {
+  const overlay = document.getElementById('fix-popup-overlay');
+  const list    = document.getElementById('fix-popup-list');
+  const subtitle = document.getElementById('fix-popup-subtitle');
+  const summary = document.getElementById('fix-popup-summary');
+
+  subtitle.textContent = `${fixes.length} fix${fixes.length !== 1 ? 'es' : ''} ready to apply — review below`;
+
+  // Categorize fixes with icons
+  const iconMap = {
+    'TO': '🔤', 'semicol': '⚡', 'paren': ')', 'trailing': ',',
+    'Inserted': '➕', 'Removed': '➖', 'Fixed': '🔧', 'Converted': '🔄',
+    'Added': '➕', 'Quoted': '🔒', 'VARCHAR': '🔄'
+  };
+  const getIcon = (msg) => {
+    for (const [k,v] of Object.entries(iconMap)) if (msg.includes(k)) return v;
+    return '🔧';
+  };
+
+  list.innerHTML = fixes.map(f => {
+    const icon  = getIcon(f.msg);
+    const lineTag = f.lineNum ? `<span class="fix-item-line">Line ${f.lineNum}</span>` : '';
+    return `<div class="fix-item">
+      <span class="fix-item-icon">${icon}</span>
+      <span class="fix-item-msg">${escHtml(f.msg)}</span>
+      ${lineTag}
+    </div>`;
+  }).join('');
+
+  // Count remaining errors after fix
+  let remaining = 0;
+  try { const s2 = parseDDL(fixedSql); remaining = validateSchema(s2, fixedSql).filter(i=>i.sev==='error').length; } catch(e){}
+  summary.innerHTML = remaining === 0
+    ? '<span style="color:var(--green)">✓ After applying these fixes, the DDL will be error-free</span>'
+    : `<span style="color:var(--warn)">⚠ After fixes, ${remaining} error(s) will still need manual correction</span>`;
+
+  overlay.style.display = 'flex';
+}
+
+function applyFix() {
+  if (!_pendingFix || !cm) return;
+  const { sql, fixed, fixes } = _pendingFix;
+  closeFix();
+  addHistoryEntry(sql, 'fix');
+  cm.setValue(fixed);
+  setDirty(true);
+
+  let remaining = [];
+  try { const s2 = parseDDL(fixed); remaining = validateSchema(s2, fixed).filter(i=>i.sev==='error'); } catch(e){}
+  const summary = fixes.slice(0,4).map(f=>f.lineNum?`L${f.lineNum}: ${f.msg}`:f.msg).join(' · ');
+  if (remaining.length === 0)
+    statusMsg(`🔧 Applied ${fixes.length} fix(es) — DDL is now valid! ${summary}`, 'ok', 7000);
+  else
+    statusMsg(`🔧 Applied ${fixes.length} fix(es) · ${remaining.length} still need manual fix`, 'warn', 7000);
+  validateDDL();
+  switchRTab('validation');
+  _pendingFix = null;
+}
+
+function closeFix() {
+  document.getElementById('fix-popup-overlay').style.display = 'none';
+  _pendingFix = null;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function copyDDL() {
+  if (!cm) return;
+  const sql = cm.getValue();
+  navigator.clipboard.writeText(sql).then(() => {
+    addHistoryEntry(sql, 'copy');
+    statusMsg('Copied to clipboard', 'ok');
+  });
+}
+
+function clearEditor() {
+  if (!cm) return;
+  if (isDirty && !confirm('Discard unsaved changes?')) return;
+  addHistoryEntry(cm.getValue(), 'copy');
+  cm.setValue('');
+  currentSchema = null;
+  setDirty(false);
+  document.getElementById('val-list').innerHTML = '<div class="val-empty"><div style="font-size:2rem;opacity:.3">✓</div><div>Press F5 to validate</div></div>';
+  document.getElementById('val-summary').innerHTML = '';
+  statusMsg('Editor cleared', 'ok');
+}
+
+function newFile() {
+  if (!cm) return;
+  if (isDirty && !confirm('Discard unsaved changes?')) return;
+  cm.setValue('-- New Oracle DDL Script\n\n');
+  currentFileName = 'untitled.sql';
+  document.getElementById('fileName').textContent = currentFileName;
+  setDirty(false);
+}
+
+function openFile() { document.getElementById('fileInput').click(); }
+
+function handleFileOpen(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    if (cm) cm.setValue(ev.target.result);
+    currentFileName = file.name;
+    document.getElementById('fileName').textContent = file.name;
+    setDirty(false);
+    statusMsg(`Opened: ${file.name}`, 'ok');
+    validateDDL();
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function saveFile() {
+  if (!cm) return;
+  const blob = new Blob([cm.getValue()], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = currentFileName;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  setDirty(false);
+  statusMsg(`Saved: ${currentFileName}`, 'ok');
+}
+
+// ============================================================================
+// PANEL / TABS
+// ============================================================================
+function switchRTab(tab) {
+  const tabOrder = ['validation','schema','dictionary','history','templates'];
+  document.querySelectorAll('.r-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', tabOrder[i] === tab);
+  });
+  tabOrder.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.style.display = (t === tab) ? '' : 'none';
+  });
+  if (tab === 'dictionary') renderDictionary();
+  if (tab === 'history') renderHistory();
+  if (tab === 'templates') renderTemplates();
+  if (tab === 'schema' && currentSchema) renderSchemaPanel(currentSchema);
+}
+
+let panelPinned = true;
+function togglePanelPin() {
+  panelPinned = !panelPinned;
+  const pane = document.getElementById('right-pane');
+  const btn = document.getElementById('pinBtn');
+  if (panelPinned) {
+    pane.classList.remove('auto-hide');
+    btn.textContent = '📌 PIN';
+    btn.classList.add('pinned');
+    statusMsg('Panel pinned', 'ok');
+  } else {
+    pane.classList.add('auto-hide');
+    btn.textContent = '👁 AUTO';
+    btn.classList.remove('pinned');
+    statusMsg('Panel auto-hide (hover to show)', 'ok');
+  }
+  if (cm) setTimeout(() => cm.refresh(), 300);
+}
+
+function renderSchemaPanel(schema) {
+  if (!schema) { document.getElementById('schema-list').innerHTML = '<div class="val-empty"><div>No schema</div></div>'; return; }
+  const el = document.getElementById('schema-list');
+  const tables = Object.entries(schema.tables);
+  const seqEntries = Object.entries(schema.sequences||{});
+  const idxEntries = schema.indexes||[];
+  if (!tables.length && !seqEntries.length && !idxEntries.length) {
+    el.innerHTML = '<div class="val-empty"><div style="font-size:1.5rem;opacity:.3">🏛</div><div>No objects found</div></div>'; return;
+  }
+  let html = '';
+  if (tables.length) {
+    html += `<div class="obj-section"><div class="obj-section-head" onclick="toggleSection(this)"><span style="color:var(--amber)">📋 TABLES (${tables.length})</span><span>▾</span></div><div>`;
+    tables.forEach(([tblName, tbl]) => {
+      const colCount = Object.keys(tbl.columns).length;
+      const conCount = tbl.constraints.length;
+      html += `<div class="obj-table-item" onclick="toggleTableCols('cols_${tblName}',${tbl.line})">
+        <div class="obj-table-name">${tblName}</div>
+        <div class="obj-table-meta">${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+( conCount!==1?'s':''):''}</div>
+      </div>
+      <div id="cols_${tblName}" class="obj-col-list" style="display:none">`;
+      tbl.colOrder.forEach(colName => {
+        const col = tbl.columns[colName];
+        const flags = [col.notNull?'NOT NULL':'', col.pk?'PK':'', col.unique?'UQ':''].filter(Boolean).join(' ');
+        html += `<div class="obj-col">
+          <span class="obj-col-name">${colName}</span>
+          <span class="obj-col-type">${col.type?.full||col.type?.base||'?'}</span>
+          ${flags?`<span class="obj-col-flags">${flags}</span>`:''}
+        </div>`;
+      });
+      tbl.constraints.forEach(con => {
+        const ctype = {PK:'🔑',FK:'🔗',UNIQUE:'◈',CHECK:'✓'}[con.type]||'•';
+        const detail = con.cols?.join(', ')||'';
+        const ref = con.refTable ? ` → ${con.refTable}(${con.refCols?.join(',')||''})` : '';
+        html += `<div class="obj-con">${ctype} ${con.name||'<unnamed>'} ${detail}${ref}</div>`;
+      });
+      html += '</div>';
+    });
+    html += '</div></div>';
+  }
+  if (seqEntries.length) {
+    html += `<div class="obj-section"><div class="obj-section-head" onclick="toggleSection(this)"><span style="color:var(--purple)">⏩ SEQUENCES (${seqEntries.length})</span><span>▾</span></div><div>`;
+    seqEntries.forEach(([name, s]) => {
+      html += `<div class="obj-table-item" onclick="goToLine(${s.line})"><div class="obj-table-name" style="color:var(--purple)">${name}</div><div class="obj-table-meta">START ${s.start} · INC ${s.increment} · CACHE ${s.cache}</div></div>`;
+    });
+    html += '</div></div>';
+  }
+  if (idxEntries.length) {
+    html += `<div class="obj-section"><div class="obj-section-head" onclick="toggleSection(this)"><span style="color:var(--cyan)">📑 INDEXES (${idxEntries.length})</span><span>▾</span></div><div>`;
+    idxEntries.forEach(idx => {
+      html += `<div class="obj-table-item" onclick="goToLine(${idx.line})"><div class="obj-table-name" style="color:var(--cyan)">${idx.name||'?'}</div><div class="obj-table-meta">${idx.unique?'UNIQUE · ':''}on ${idx.table} (${idx.cols.join(', ')})</div></div>`;
+    });
+    html += '</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function toggleTableCols(id, line) {
+  const el = document.getElementById(id);
+  if (!el) { goToLine(line); return; }
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function toggleSection(head) {
+  const body = head.nextElementSibling;
+  const arr = head.querySelector('span:last-child');
+  if (!body) return;
+  if (body.style.display === 'none') { body.style.display = ''; arr.textContent = '▾'; }
+  else { body.style.display = 'none'; arr.textContent = '▸'; }
+}
+
+// ============================================================================
+// DICTIONARY UI
+// ============================================================================
+function renderDictionary() {
+  const d = loadDictionary();
+  const q = document.getElementById('dictSearch')?.value?.toLowerCase()||'';
+  const container = document.getElementById('dict-list');
+  if (!container) return;
+  const all = [
+    ...d.tables.map(w=>({word:w,cat:'table'})),
+    ...d.columns.map(w=>({word:w,cat:'col'})),
+    ...d.objects.map(w=>({word:w,cat:'obj'})),
+    ...(d.custom_kw||[]).map(w=>({word:w,cat:'kw'})),
+    ...(d.custom_types||[]).map(w=>({word:w,cat:'type'})),
+  ].filter(({word})=>!q||word.toLowerCase().includes(q));
+  if (!all.length) {
+    container.innerHTML = `<div class="dict-empty">${q?'No matches':'No learned objects yet. Validate DDL to auto-learn names.'}</div>`;
+    return;
+  }
+  const catMap = {table:'tables',col:'columns',obj:'objects',kw:'custom_kw',type:'custom_types'};
+  container.innerHTML = all.map(({word,cat})=>
+    `<span class="dict-tag ${cat}">${word}<span class="del-x" onclick="deleteDictEntry('${catMap[cat]}','${word.replace(/'/g,"\\'")}')">✕</span></span>`
+  ).join('');
+}
+
+function deleteDictEntry(cat, word) {
+  const d = loadDictionary(); d[cat] = d[cat].filter(w => w !== word);
+  saveDictionary(d); renderDictionary();
+}
+function clearDictionary() {
+  if (!confirm('Clear all learned objects?')) return;
+  saveDictionary({tables:[],columns:[],objects:[],custom_kw:[],custom_types:[]});
+  renderDictionary(); statusMsg('Dictionary cleared','ok');
+}
+function addDictWord() { document.getElementById('aw-word').value=''; document.getElementById('addword-modal').style.display='flex'; }
+function confirmAddWord() {
+  const word = document.getElementById('aw-word').value.trim().toUpperCase();
+  const type = document.getElementById('aw-type').value;
+  if (!word) { alert('Please enter a word'); return; }
+  const d = loadDictionary();
+  const catMap = {table:'tables',col:'columns',obj:'objects',kw:'custom_kw',type:'custom_types'};
+  const arr = d[catMap[type]]; if (!arr.includes(word)) arr.push(word);
+  saveDictionary(d); renderDictionary(); closeModal('addword-modal');
+  statusMsg(`Added "${word}"`, 'ok');
+}
+
+// ============================================================================
+// IMPORT / EXPORT
+// ============================================================================
+function showImportExport(mode) {
+  document.getElementById('ie-modal').style.display = 'flex';
+  const isImport = mode === 'import';
+  document.getElementById('ie-title').textContent = isImport ? 'IMPORT DICTIONARY' : 'EXPORT DICTIONARY';
+  document.getElementById('ie-import-section').style.display = isImport ? '' : 'none';
+  document.getElementById('ie-export-section').style.display = isImport ? 'none' : '';
+  const btn = document.getElementById('ie-action-btn');
+  if (isImport) { btn.textContent = '⬇ IMPORT'; btn.onclick = doImport; }
+  else {
+    document.getElementById('ie-export-ta').value = JSON.stringify(loadDictionary(), null, 2);
+    btn.textContent = '📋 COPY JSON';
+    btn.onclick = () => { navigator.clipboard.writeText(document.getElementById('ie-export-ta').value).then(() => statusMsg('Copied!','ok')); };
+  }
+}
+function doImport() {
+  try {
+    const data = JSON.parse(document.getElementById('ie-import-ta').value);
+    const d = loadDictionary();
+    ['tables','columns','objects','custom_kw','custom_types'].forEach(k => {
+      if (Array.isArray(data[k])) data[k].forEach(w => { if (!d[k].includes(w)) d[k].push(w); });
+    });
+    saveDictionary(d); renderDictionary(); closeModal('ie-modal');
+    statusMsg('Dictionary imported', 'ok');
+  } catch(e) { alert('Invalid JSON: ' + e.message); }
+}
+
+// ============================================================================
+// THEME
+// ============================================================================
+function setTheme(theme) {
+  document.documentElement.removeAttribute('data-theme');
+  if (theme !== 'dark') document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('oracle_studio_theme', theme);
+  statusMsg(`Theme: ${theme}`, 'ok');
+}
+
+function loadSavedTheme() {
+  const saved = localStorage.getItem('oracle_studio_theme');
+  if (saved) {
+    setTheme(saved);
+    const sel = document.querySelector('.theme-select');
+    if (sel) sel.value = saved;
+  }
+}
+
+// ============================================================================
+// MODAL
+// ============================================================================
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function showHelp() { document.getElementById('help-modal').style.display = 'flex'; }
+
+// ============================================================================
+// WINDOW INIT
+// ============================================================================
+window.onload = function() {
+  initEditor();
+  renderDictionary();
+  renderTemplates();
+  switchRTab('validation');
+  loadSavedTheme();
+
+  // Sync editor size
+  const wrap = document.getElementById('cm-wrap');
+  if (cm && wrap) cm.setSize('100%', wrap.offsetHeight + 'px');
+
+  // Resizer drag
+  const resizer = document.getElementById('resizer');
+  const rightPane = document.getElementById('right-pane');
+  let dragging = false, startX, startW;
+  resizer.addEventListener('mousedown', e => {
+    if (rightPane.classList.contains('auto-hide')) return;
+    dragging = true; startX = e.clientX; startW = rightPane.offsetWidth;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const newW = Math.max(240, Math.min(700, startW + (startX - e.clientX)));
+    rightPane.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false; resizer.classList.remove('dragging');
+    document.body.style.cursor = ''; document.body.style.userSelect = '';
+    if (cm) cm.refresh();
+  });
+
+  // Keyboard shortcuts not in CodeMirror
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newFile(); }
+  });
+};
+</script>
+</body>
+</html>
