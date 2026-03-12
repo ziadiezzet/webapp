@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Oracle DDL Studio v4 · Professional SQL Editor</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
@@ -493,6 +493,186 @@ input.modal-input:focus{border-color:var(--amber)}
 .fix-item-line{font-size:.55rem;color:var(--text3);white-space:nowrap;margin-left:auto;padding-left:8px}
 .fix-popup-summary{font-size:.58rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;flex-shrink:0}
 .fix-popup-actions{display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE / MOBILE LAYOUT
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Shared touch improvements ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .tb-btn { min-height: 32px; padding: 5px 8px; font-size: .58rem; }
+  .r-tab  { padding: 7px 8px; font-size: .58rem; }
+}
+
+/* ── TABLET (≤ 768px) ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Stack main layout vertically */
+  #main { flex-direction: column; }
+
+  /* Editor takes top portion */
+  #editor-pane { min-width: 0; flex: 1; min-height: 40vh; }
+
+  /* Hide drag-resizer, use fixed split instead */
+  #resizer { display: none; }
+
+  /* Right pane becomes bottom panel */
+  #right-pane {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 42vh;
+    min-height: 180px;
+    border-left: none !important;
+    border-top: 2px solid var(--border2);
+    flex-shrink: 0;
+  }
+  #right-pane.auto-hide { height: 36px !important; width: 100% !important; }
+  #right-pane.auto-hide:hover { height: 42vh !important; width: 100% !important; }
+  #right-pane.auto-hide::before {
+    content: '▲ PANEL'; left: 50%; top: 50%;
+    transform: translate(-50%, -50%); font-size: .58rem;
+  }
+  .right-pane-inner { min-width: 0; }
+
+  /* Toolbar: allow wrap, shrink buttons */
+  #toolbar { flex-wrap: wrap; gap: 2px; }
+  .tb-btn  { padding: 5px 7px; font-size: .57rem; }
+  .tb-sep  { height: 16px; margin: 0 2px; }
+  .theme-select { font-size: .57rem; padding: 3px 4px; }
+
+  /* Logo compact */
+  .logo-text { font-size: .72rem; letter-spacing: 1.5px; }
+  .logo-sub  { display: none; }
+
+  /* Editor header compact */
+  #editor-actions { font-size: .55rem; gap: 5px; }
+  #sel-info { display: none; }
+
+  /* Modals full-width */
+  .modal-box { padding: 16px 14px; border-radius: 8px; }
+  .modal-title { font-size: .78rem; }
+
+  /* Fix popup full-width */
+  #fix-popup-box { width: 96vw; padding: 14px 12px; }
+
+  /* Right tabs scrollable */
+  #right-tabs { overflow-x: auto; scrollbar-width: none; }
+  #right-tabs::-webkit-scrollbar { display: none; }
+  .r-tab { white-space: nowrap; padding: 7px 10px; }
+}
+
+/* ── PHONE (≤ 480px) ───────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Header row: logo + minimal toolbar */
+  #header { padding: 0 8px; gap: 0; height: 44px; }
+  .logo-icon { width: 24px; height: 24px; font-size: .75rem; }
+  .logo-text  { font-size: .65rem; letter-spacing: 1px; }
+
+  /* Toolbar: only show critical buttons, rest hidden behind scroll */
+  #toolbar { gap: 2px; padding: 0; }
+  .tb-btn  { padding: 4px 6px; font-size: .55rem; min-height: 28px; }
+
+  /* Hide button labels on extra small — show only icons */
+  .tb-btn-label { display: none; }
+
+  /* Editor takes 50vh, panel takes the rest */
+  #editor-pane { min-height: 38vh; }
+  #right-pane  { height: 44vh; }
+  #right-pane.auto-hide { height: 30px !important; }
+
+  /* CodeMirror smaller font on phone */
+  .CodeMirror { font-size: 12px !important; line-height: 1.6 !important; }
+
+  /* Tabs icon-only on very small */
+  .r-tab { padding: 6px 8px; font-size: .54rem; letter-spacing: 0; }
+  .pane-pin-btn { padding: 4px 7px; font-size: .54rem; }
+
+  /* Statusbar compact */
+  #statusbar { gap: 6px; padding: 0 8px; font-size: .52rem; }
+  #sb-msg { display: none; }
+
+  /* Val items more compact */
+  .val-item { padding: 6px 10px; }
+  .val-msg  { font-size: .61rem; }
+
+  /* Dict tags smaller */
+  .dict-tag { font-size: .55rem; padding: 2px 5px; }
+
+  /* History items compact */
+  .hist-preview { max-height: 40px; font-size: .58rem; }
+
+  /* Modal box: full-screen on phone */
+  .modal-overlay { padding: 8px; align-items: flex-end; }
+  .modal-box {
+    max-width: 100% !important;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 16px 14px 24px;
+  }
+
+  /* io-tab scrollable on phone */
+  #io-modal .modal-box > div:nth-child(3) {
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .io-tab { padding: 5px 8px; font-size: .55rem; }
+
+  /* Fix popup */
+  #fix-popup-box { width: 100%; max-width: 100%; border-radius: 14px 14px 0 0; }
+}
+
+/* ── Touch: remove hover effects that feel wrong on touch ──────────── */
+@media (hover: none) {
+  .tb-btn:hover       { background: transparent; color: var(--text3); border-color: transparent; }
+  .tb-btn.primary:hover { background: var(--amber); color: #000; }
+  .tb-btn.success:hover { background: transparent; }
+  .tb-btn.danger:hover  { background: transparent; }
+  .tb-btn.cyan:hover    { background: transparent; }
+  .r-tab:hover          { background: transparent; }
+  .tmpl-item:hover      { background: transparent; }
+  .hist-item:hover      { background: transparent; }
+  .obj-table-item:hover { background: transparent; }
+
+  /* Bigger tap targets */
+  .tb-btn, .r-tab, .hist-small-btn, .pane-pin-btn {
+    min-height: 36px;
+  }
+  /* Active state for touch feedback */
+  .tb-btn:active       { background: var(--bg3) !important; transform: scale(.96); }
+  .r-tab:active        { background: var(--bg3) !important; }
+  .tmpl-item:active    { background: rgba(245,158,11,.08) !important; }
+  .hist-item:active    { background: var(--bg3) !important; }
+}
+
+/* ── Mobile vertical resize handle (touch drag) ───────────────────── */
+@media (max-width: 768px) {
+  #mobile-resizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    background: var(--bg1);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    cursor: ns-resize;
+    flex-shrink: 0;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #mobile-resizer::after {
+    content: '';
+    width: 36px; height: 4px;
+    border-radius: 2px;
+    background: var(--border2);
+  }
+  #mobile-resizer:active::after { background: var(--amber); }
+}
+@media (min-width: 769px) {
+  #mobile-resizer { display: none; }
+}
+
 </style>
 </head>
 <body>
@@ -575,6 +755,7 @@ input.modal-input:focus{border-color:var(--amber)}
   </div>
 
   <div id="resizer"></div>
+  <div id="mobile-resizer" title="Drag to resize"></div>
 
   <!-- Right panel -->
   <div id="right-pane">
@@ -2161,11 +2342,15 @@ function autoFixDDL(sql) {
 // MISSING-SEMICOLON DETECTOR
 // ============================================================================
 function detectMissingSemicolons(sql) {
-  // DDL_TRACK: any of these resets our "statement started here" pointer
-  // DDL_FLAG: only these as the SECOND keyword trigger the error
-  // (DROP/TRUNCATE can appear as clause words inside ALTER TABLE ... DROP CONSTRAINT)
-  var DDL_TRACK = /^(CREATE|ALTER|DROP|TRUNCATE)$/i;
-  var DDL_FLAG  = /^(CREATE|ALTER)$/i;
+  // Detects missing ";" between ANY two consecutive SQL statements at depth-0.
+  // Statement-opening keywords: DDL (CREATE/ALTER/DROP/TRUNCATE/RENAME/COMMENT)
+  //   + DML (INSERT/UPDATE/DELETE/SELECT/MERGE)
+  //   + DCL (GRANT/REVOKE/ANALYZE/FLASHBACK/CALL/EXECUTE)
+  // Skips PL/SQL blocks (tracks BEGIN/END depth so bodies are not scanned).
+  var STMT_KW = /^(CREATE|ALTER|DROP|TRUNCATE|RENAME|COMMENT|INSERT|UPDATE|DELETE|SELECT|MERGE|GRANT|REVOKE|ANALYZE|FLASHBACK|CALL|EXECUTE)$/i;
+  // Keywords that open a PL/SQL block body — we skip scanning inside these
+  var BLOCK_OPEN  = /^(BEGIN|DECLARE)$/i;
+  var BLOCK_CLOSE = /^END$/i;
   var issues = [];
   var stripped = sql
     .replace(/--[^\n]*/g, function(m){ return ' '.repeat(m.length); })
@@ -2174,23 +2359,56 @@ function detectMissingSemicolons(sql) {
     var n=1; for(var i=0;i<idx;i++){if(sql[i]==='\n')n++;} return n;
   }
   var tokenRe = /[A-Za-z_][A-Za-z0-9_]*|;|\(|\)|,|\S/g;
-  var m, depth=0, lastSemi=-1, prevDDL=null;
-  while ((m=tokenRe.exec(stripped))!==null) {
-    var tok=m[0], pos=m.index;
-    if(tok==='('){depth++;continue;}
-    if(tok===')'){depth=Math.max(0,depth-1);continue;}
-    if(tok===';'){depth=0;lastSemi=pos;prevDDL=null;continue;}
-    if(depth>0)continue;
-    if(DDL_TRACK.test(tok)){
-      // Flag only when the incoming DDL keyword is CREATE or ALTER (never clause-level)
-      if(DDL_FLAG.test(tok)&&prevDDL!==null&&lastSemi<prevDDL.pos){
-        issues.push({sev:'error',
-          msg:'Missing ";" between two DDL statements — "'+prevDDL.kw.toUpperCase()+'..."' +
-              ' and "'+tok.toUpperCase()+'..." must be separated by a semicolon',
-          line:prevDDL.line});
+  var m;
+  var parenDepth  = 0;   // depth inside ( … ) — subqueries, column lists
+  var blockDepth  = 0;   // depth inside BEGIN … END — PL/SQL bodies
+  var lastSemiPos = -1;
+  var prevStmt    = null; // {kw, pos, line} of the last statement-opening keyword seen
+  var sawAs       = false; // tracks whether AS appeared since last semicolon (for INSERT/CTAS SELECT)
+  while ((m = tokenRe.exec(stripped)) !== null) {
+    var tok = m[0], pos = m.index;
+    // Paren tracking (handles subqueries — we ignore tokens inside parens)
+    if (tok === '(') { parenDepth++; continue; }
+    if (tok === ')') { parenDepth = Math.max(0, parenDepth - 1); continue; }
+    if (parenDepth > 0) continue; // inside subquery / column list
+    // Semicolon resets statement tracking
+    if (tok === ';') {
+      lastSemiPos = pos;
+      prevStmt    = null;
+      blockDepth  = 0; // semicolon after END resets block depth (e.g. END;)
+      sawAs       = false;
+      continue;
+    }
+    // PL/SQL block depth — skip contents of BEGIN…END bodies
+    if (BLOCK_OPEN.test(tok))  { blockDepth++; continue; }
+    if (BLOCK_CLOSE.test(tok)) { if (blockDepth > 0) blockDepth--; continue; }
+    if (blockDepth > 0) continue; // inside PL/SQL body
+    // Statement-opening keyword at depth 0
+    // Track AS keyword for CREATE/INSERT...SELECT detection
+    if (/^AS$/i.test(tok)) { sawAs = true; continue; }
+
+    if (STMT_KW.test(tok)) {
+      var tokUp = tok.toUpperCase();
+      if (prevStmt !== null && lastSemiPos < prevStmt.pos) {
+        // SELECT is a continuation when:
+        //   INSERT … SELECT  (INSERT INTO tbl SELECT …)
+        //   CREATE … AS SELECT  / ALTER … AS SELECT  (CTAS, view body)
+        var isContinuation = (tokUp === 'SELECT') && (
+          /^(INSERT)$/i.test(prevStmt.kw) ||
+          (sawAs && /^(CREATE|ALTER|REPLACE)$/i.test(prevStmt.kw))
+        );
+        if (!isContinuation) {
+          issues.push({ sev: 'error',
+            msg: 'Missing ";" between statements — "'
+                 + prevStmt.kw.toUpperCase() + '…" and "'
+                 + tokUp + '…" must be separated by a semicolon',
+            line: prevStmt.line });
+        }
+        // If it IS a continuation, don't advance prevStmt — keep the original one
+        if (isContinuation) continue;
       }
-      // Always advance prevDDL to the latest DDL keyword seen
-      prevDDL={kw:tok,pos:pos,line:lineOf(pos)};
+      sawAs = false;
+      prevStmt = { kw: tok, pos: pos, line: lineOf(pos) };
     }
   }
   return issues;
@@ -2203,7 +2421,7 @@ function detectTrailingSemicolon(sql) {
   var stripped = sql
     .replace(/--[^\n]*/g, function(m){ return ' '.repeat(m.length); })
     .replace(/'(?:[^']|'')*'/g, function(m){ return "'" + ' '.repeat(m.length-2) + "'"; });
-  var DDL_START = /^(CREATE|ALTER|DROP|TRUNCATE)$/i;
+  var DDL_START = /^(CREATE|ALTER|DROP|TRUNCATE|RENAME|COMMENT|INSERT|UPDATE|DELETE|SELECT|MERGE|GRANT|REVOKE)$/i;
   var tokenRe = /[A-Za-z_][A-Za-z0-9_]*|;|[()|,]|\S/g;
   var m, depth=0, lastSemiPos=-1, lastDDL=null;
   while ((m=tokenRe.exec(stripped))!==null) {
@@ -4090,6 +4308,66 @@ function importUserTemplatesFile(evt) {
   };
   reader.readAsText(file);
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MOBILE VERTICAL RESIZER (touch drag between editor and bottom panel)
+// ─────────────────────────────────────────────────────────────────────────────
+(function() {
+  var handle = document.getElementById('mobile-resizer');
+  if (!handle) return;
+  var main      = document.getElementById('main');
+  var editorPane = document.getElementById('editor-pane');
+  var rightPane  = document.getElementById('right-pane');
+  var dragging   = false;
+  var startY, startEditorH, startRightH;
+
+  function onStart(e) {
+    if (window.innerWidth > 768) return;
+    dragging = true;
+    startY       = (e.touches ? e.touches[0].clientY : e.clientY);
+    startEditorH = editorPane.getBoundingClientRect().height;
+    startRightH  = rightPane.getBoundingClientRect().height;
+    handle.style.background = 'var(--bg3)';
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    var delta   = clientY - startY;
+    var totalH  = startEditorH + startRightH;
+    var newEditorH = Math.min(Math.max(startEditorH + delta, 80), totalH - 80);
+    var newRightH  = totalH - newEditorH;
+    editorPane.style.flex = 'none';
+    editorPane.style.height = newEditorH + 'px';
+    rightPane.style.height  = newRightH  + 'px';
+    if (window.cm) window.cm.refresh();
+    e.preventDefault();
+  }
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false;
+    handle.style.background = '';
+    if (window.cm) window.cm.refresh();
+  }
+
+  handle.addEventListener('mousedown',  onStart, {passive: false});
+  handle.addEventListener('touchstart', onStart, {passive: false});
+  document.addEventListener('mousemove', onMove,  {passive: false});
+  document.addEventListener('touchmove', onMove,  {passive: false});
+  document.addEventListener('mouseup',   onEnd);
+  document.addEventListener('touchend',  onEnd);
+
+  // On window resize: reset inline styles so CSS takes over again
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+      editorPane.style.flex   = '';
+      editorPane.style.height = '';
+      rightPane.style.height  = '';
+      if (window.cm) window.cm.refresh();
+    }
+  });
+})();
 
 </script>
 </body>
