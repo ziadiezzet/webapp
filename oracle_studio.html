@@ -43,6 +43,57 @@
 }
 [data-theme="contrast"] {
   --bg0:#000; --bg1:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --bg4:#222;
+/* ===== MIXED THEMES ===== */
+[data-theme="nord"] {
+  --bg0:#1e2430; --bg1:#242c3b; --bg2:#2c3547; --bg3:#354057; --bg4:#3e4c66;
+  --border:#2c3a50; --border2:#3d5070;
+  --amber:#ebcb8b; --amber2:#f0d89c; --amber3:#2a2010;
+  --cyan:#88c0d0; --cyan2:#8fd9e8; --green:#a3be8c; --green2:#1a2a14;
+  --red:#bf616a; --red2:#2d1012; --orange:#d08770; --purple:#b48ead;
+  --blue:#81a1c1; --pink:#b48ead;
+  --text:#eceff4; --text2:#d8dee9; --text3:#7a8fa8; --text4:#3d5070;
+  --err:#bf616a; --warn:#ebcb8b; --info:#88c0d0; --ok:#a3be8c;
+}
+[data-theme="rosepine"] {
+  --bg0:#191724; --bg1:#1f1d2e; --bg2:#26233a; --bg3:#312e45; --bg4:#3a3754;
+  --border:#2a2740; --border2:#3d3960;
+  --amber:#f6c177; --amber2:#f8d090; --amber3:#2a1c08;
+  --cyan:#9ccfd8; --cyan2:#b0dde6; --green:#31748f; --green2:#0c2030;
+  --red:#eb6f92; --red2:#2d0e1c; --orange:#f6c177; --purple:#c4a7e7;
+  --blue:#9ccfd8; --pink:#eb6f92;
+  --text:#e0def4; --text2:#c4c0d8; --text3:#6e6a8a; --text4:#312e45;
+  --err:#eb6f92; --warn:#f6c177; --info:#9ccfd8; --ok:#31748f;
+}
+[data-theme="catppuccin"] {
+  --bg0:#1e1e2e; --bg1:#181825; --bg2:#313244; --bg3:#45475a; --bg4:#585b70;
+  --border:#313244; --border2:#45475a;
+  --amber:#f9e2af; --amber2:#faecc5; --amber3:#2a2010;
+  --cyan:#89dceb; --cyan2:#a6e3ef; --green:#a6e3a1; --green2:#1a2c18;
+  --red:#f38ba8; --red2:#2d1018; --orange:#fab387; --purple:#cba6f7;
+  --blue:#89b4fa; --pink:#f5c2e7;
+  --text:#cdd6f4; --text2:#bac2de; --text3:#6c7086; --text4:#313244;
+  --err:#f38ba8; --warn:#f9e2af; --info:#89dceb; --ok:#a6e3a1;
+}
+[data-theme="ayu-mirage"] {
+  --bg0:#1f2430; --bg1:#242936; --bg2:#2d3344; --bg3:#383f52; --bg4:#424b60;
+  --border:#2d3444; --border2:#3d4660;
+  --amber:#ffd173; --amber2:#ffe090; --amber3:#2a2008;
+  --cyan:#5ccfe6; --cyan2:#7ddbf0; --green:#d5ff80; --green2:#1e2c0a;
+  --red:#ff6b66; --red2:#2d0d0c; --orange:#ffad66; --purple:#dfbfff;
+  --blue:#73d0ff; --pink:#f28779;
+  --text:#cbccc6; --text2:#a2a8c0; --text3:#5c6480; --text4:#2d3444;
+  --err:#ff6b66; --warn:#ffd173; --info:#73d0ff; --ok:#d5ff80;
+}
+[data-theme="material-ocean"] {
+  --bg0:#0f111a; --bg1:#14171f; --bg2:#1b1f2e; --bg3:#232840; --bg4:#2c3452;
+  --border:#1f2438; --border2:#2e3860;
+  --amber:#ffcb6b; --amber2:#ffe080; --amber3:#28200a;
+  --cyan:#89ddff; --cyan2:#a6e6ff; --green:#c3e88d; --green2:#1a2a08;
+  --red:#f07178; --red2:#2c1014; --orange:#f78c6c; --purple:#c792ea;
+  --blue:#82aaff; --pink:#f07178;
+  --text:#a6accd; --text2:#8a91b4; --text3:#4a5280; --text4:#1f2848;
+  --err:#f07178; --warn:#ffcb6b; --info:#89ddff; --ok:#c3e88d;
+}
   --border:#333; --border2:#555;
   --amber:#ffcc00; --cyan:#00ffff; --green:#00ff88;
   --text:#ffffff; --text2:#dddddd; --text3:#888888; --text4:#444444;
@@ -76,6 +127,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 .tb-btn.active-btn{background:var(--bg3);color:var(--cyan);border-color:var(--cyan)}
 .theme-select{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:3px 6px;font-family:var(--mono);font-size:.6rem;outline:none;cursor:pointer}
 .theme-select:focus{border-color:var(--amber)}
+.io-tab{font-family:var(--mono);font-size:.58rem;font-weight:600;letter-spacing:.5px;padding:5px 11px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .13s}
+.io-tab:hover{color:var(--text);background:var(--bg2)}
+.io-tab-active{color:var(--amber)!important;border-bottom-color:var(--amber)!important;background:var(--bg2)!important}
+.io-sub-tab{font-size:.57rem!important;padding:3px 8px!important}
+.io-sub-active{color:var(--cyan)!important;border-color:var(--cyan)!important;background:rgba(34,211,238,.07)!important}
 
 /* ===== LAYOUT ===== */
 #main{display:flex;flex:1;overflow:hidden;position:relative}
@@ -84,9 +140,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 #resizer:hover,#resizer.dragging{background:var(--amber)}
 
 /* ===== RIGHT PANEL (pin/auto-hide) ===== */
-#right-pane{width:360px;min-width:240px;max-width:640px;display:flex;flex-direction:column;flex-shrink:0;border-left:1px solid var(--border);transition:var(--panel-transition);position:relative}
+#right-pane{width:480px;min-width:240px;max-width:700px;display:flex;flex-direction:column;flex-shrink:0;border-left:1px solid var(--border);transition:var(--panel-transition);position:relative}
 #right-pane.auto-hide{width:28px!important;min-width:28px!important;overflow:hidden}
-#right-pane.auto-hide:hover{width:380px!important}
+#right-pane.auto-hide:hover{width:480px!important}
 #right-pane.auto-hide .right-pane-inner{opacity:0;pointer-events:none;transition:opacity .2s}
 #right-pane.auto-hide:hover .right-pane-inner{opacity:1;pointer-events:all}
 .right-pane-inner{display:flex;flex-direction:column;flex:1;overflow:hidden;min-width:240px}
@@ -465,8 +521,7 @@ input.modal-input:focus{border-color:var(--amber)}
     <button class="tb-btn dim" onclick="copyDDL()">📋 COPY</button>
     <button class="tb-btn danger" onclick="clearEditor()">🗑 CLEAR</button>
     <div class="tb-sep"></div>
-    <button class="tb-btn dim" onclick="showImportExport('import')">⬇ IMPORT</button>
-    <button class="tb-btn dim" onclick="showImportExport('export')">⬆ EXPORT</button>
+    <button class="tb-btn dim" onclick="showIOPanel()" title="Import / Export DDL, Dictionary & Schema">⇅ I/O</button>
     <div class="tb-sep"></div>
     <select class="theme-select" onchange="setTheme(this.value)" title="Theme">
       <option value="dark">🌑 Dark</option>
@@ -480,11 +535,19 @@ input.modal-input:focus{border-color:var(--amber)}
       <option value="warm-light">🌅 Warm Light</option>
       <option value="sepia">📜 Sepia</option>
       <option value="ice-light">🧊 Ice Light</option>
+      <optgroup label="── Mixed / Special ──">
+      <option value="nord">❄️ Nord</option>
+      <option value="rosepine">🌹 Rosé Pine</option>
+      <option value="catppuccin">🐈 Catppuccin</option>
+      <option value="ayu-mirage">🌅 Ayu Mirage</option>
+      <option value="material-ocean">🌊 Material Ocean</option>
+      </optgroup>
     </select>
     <div class="tb-sep"></div>
     <button class="tb-btn dim" onclick="showHelp()">? HELP</button>
   </div>
   <input type="file" id="fileInput" style="display:none" accept=".sql,.ddl,.txt" onchange="handleFileOpen(event)">
+  <input type="file" id="schemaJsInput" style="display:none" accept=".js" onchange="handleSchemaJsFile(event)">
 </div>
 
 <!-- ===== MAIN ===== -->
@@ -537,7 +600,10 @@ input.modal-input:focus{border-color:var(--amber)}
         </div>
         <!-- Schema Tab -->
         <div id="tab-schema" style="display:none">
-          <div id="schema-list"><div class="val-empty"><div style="font-size:2rem;opacity:.25">🏛</div><div>Validate to build schema tree</div></div></div>
+          <div id="ext-schema-badge" style="display:none;padding:3px 10px;font-size:.58rem;background:rgba(34,211,238,.08);border-bottom:1px solid var(--border);color:var(--cyan);letter-spacing:.5px">
+  🗂 <span id="ext-schema-count">0</span> external table(s) loaded — schema-aware validation active
+</div>
+<div id="schema-list"><div class="val-empty"><div style="font-size:2rem;opacity:.25">🏛</div><div>Validate to build schema tree</div></div></div>
         </div>
         <!-- Dictionary Tab -->
         <div id="tab-dictionary" style="display:none">
@@ -566,8 +632,17 @@ input.modal-input:focus{border-color:var(--amber)}
           </div>
         </div>
         <!-- Templates Tab -->
-        <div id="tab-templates" style="display:none">
-          <div id="templates-list"></div>
+        <div id="tab-templates" style="display:none;flex-direction:column;height:100%">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px 4px;border-bottom:1px solid var(--border);flex-shrink:0;gap:4px">
+            <span style="font-size:.58rem;color:var(--text3);letter-spacing:.8px;white-space:nowrap">USER TEMPLATES</span>
+            <div style="display:flex;gap:3px;flex-shrink:0">
+              <button class="tb-btn success" style="padding:2px 7px;font-size:.57rem" onclick="saveEditorAsTemplate()" title="Save editor content as User-Defined template">＋ SAVE</button>
+              <button class="tb-btn dim" style="padding:2px 7px;font-size:.7rem;line-height:1" onclick="exportUserTemplates()" title="Export user templates to JSON">⬆</button>
+              <button class="tb-btn dim" style="padding:2px 7px;font-size:.7rem;line-height:1" onclick="document.getElementById('tmpl-file-in').click()" title="Import user templates from JSON">⬇</button>
+            </div>
+          </div>
+          <div id="templates-list" style="overflow-y:auto;flex:1"></div>
+          <input type="file" id="tmpl-file-in" accept=".json" style="display:none" onchange="importUserTemplatesFile(event)">
         </div>
       </div>
     </div>
@@ -584,6 +659,75 @@ input.modal-input:focus{border-color:var(--amber)}
 </div>
 
 <!-- ===== MODALS ===== -->
+<!-- I/O Panel Modal (new) -->
+<div class="modal-overlay" id="io-modal" style="display:none" onclick="if(event.target===this)closeModal('io-modal')">
+  <div class="modal-box" style="max-width:540px">
+    <button class="modal-close" onclick="closeModal('io-modal')">✕ CLOSE</button>
+    <div class="modal-title">⇅ IMPORT / EXPORT</div>
+    <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:12px;gap:0">
+      <button class="io-tab io-tab-active" id="iotab-dict" onclick="switchIOTab('dict')">📚 Dictionary</button>
+      <button class="io-tab" id="iotab-schema" onclick="switchIOTab('schema')">🗂 Schema JS</button>
+      <button class="io-tab" id="iotab-ddl" onclick="switchIOTab('ddl')">📄 DDL File</button>
+    </div>
+    <!-- Dict section -->
+    <div id="io-sect-dict">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tb-btn dim io-sub-tab io-sub-active" id="io-dict-imp-btn" onclick="switchIODictTab('import')">⬇ Import</button>
+        <button class="tb-btn dim io-sub-tab" id="io-dict-exp-btn" onclick="switchIODictTab('export')">⬆ Export</button>
+      </div>
+      <div id="io-dict-import-body">
+        <div class="modal-hint">Paste JSON dictionary data below.</div>
+        <textarea class="modal-ta" id="io-dict-import-ta" placeholder='{"tables":["EMPLOYEES"],"columns":["ID"],"objects":["SEQ_EMP"]}'></textarea>
+        <div class="modal-actions">
+          <button class="tb-btn primary" onclick="doIODictImport()">⬇ IMPORT DICTIONARY</button>
+          <button class="tb-btn" onclick="closeModal('io-modal')">CANCEL</button>
+        </div>
+      </div>
+      <div id="io-dict-export-body" style="display:none">
+        <div class="modal-hint">Copy or download your dictionary as JSON.</div>
+        <textarea class="modal-ta" id="io-dict-export-ta" readonly></textarea>
+        <div class="modal-actions">
+          <button class="tb-btn primary" onclick="doIODictDownload()">⬇ DOWNLOAD JSON</button>
+          <button class="tb-btn cyan" onclick="navigator.clipboard.writeText(document.getElementById('io-dict-export-ta').value).then(()=>statusMsg('Copied!','ok'))">📋 COPY</button>
+          <button class="tb-btn" onclick="closeModal('io-modal')">CLOSE</button>
+        </div>
+      </div>
+    </div>
+    <!-- Schema JS section -->
+    <div id="io-sect-schema" style="display:none">
+      <div class="modal-hint">Select a <code>pdmData</code> JS schema file to import object names into autocomplete.</div>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="tb-btn primary" onclick="importJsSchema();closeModal('io-modal')">🗂 PICK SCHEMA JS FILE</button>
+        <button class="tb-btn" onclick="closeModal('io-modal')">CANCEL</button>
+      </div>
+    </div>
+    <!-- DDL File section -->
+    <div id="io-sect-ddl" style="display:none">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="tb-btn dim io-sub-tab io-sub-active" id="io-ddl-imp-btn" onclick="switchIODdlTab('import')">⬇ Load into Editor</button>
+        <button class="tb-btn dim io-sub-tab" id="io-ddl-exp-btn" onclick="switchIODdlTab('export')">⬆ Export from Editor</button>
+      </div>
+      <div id="io-ddl-import-body">
+        <div class="modal-hint">Paste DDL SQL — will replace editor content.</div>
+        <textarea class="modal-ta" id="io-ddl-import-ta" placeholder="CREATE TABLE ...&#10;..."></textarea>
+        <div class="modal-actions">
+          <button class="tb-btn primary" onclick="doIODdlImport()">⬇ LOAD INTO EDITOR</button>
+          <button class="tb-btn" onclick="closeModal('io-modal')">CANCEL</button>
+        </div>
+      </div>
+      <div id="io-ddl-export-body" style="display:none">
+        <div class="modal-hint">Current editor content — copy or download as <code>.sql</code>.</div>
+        <textarea class="modal-ta" id="io-ddl-export-ta" readonly></textarea>
+        <div class="modal-actions">
+          <button class="tb-btn primary" onclick="doIODdlDownload()">⬇ DOWNLOAD .SQL</button>
+          <button class="tb-btn cyan" onclick="navigator.clipboard.writeText(document.getElementById('io-ddl-export-ta').value).then(()=>statusMsg('Copied!','ok'))">📋 COPY</button>
+          <button class="tb-btn" onclick="closeModal('io-modal')">CLOSE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="ie-modal" style="display:none" onclick="if(event.target===this)closeModal('ie-modal')">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('ie-modal')">✕ CLOSE</button>
@@ -880,7 +1024,7 @@ function parseDDL(sql) {
   const schema = {
     tables:{}, sequences:{}, indexes:[], synonyms:{}, views:{},
     constraintNames: new Set(),
-    errors:[], warnings:[], infos:[]
+    errors:[], warnings:[], infos:[], renames:[]
   };
   const peek = (o=0) => toks[pos+o]||null;
   const cur  = ()    => toks[pos]||null;
@@ -1292,6 +1436,19 @@ function parseDDL(sql) {
       else{schema.errors.push({msg:'Expected TABLE after ALTER',line:cur()?.line});while(pos<toks.length&&cur()?.value!==';')pos++;}
     } else if(t.type==='KEYWORD'&&(t.upper==='DROP'||t.upper==='TRUNCATE')){
       while(pos<toks.length&&cur()?.value!==';')pos++;
+    // RENAME oldtable TO newtable — Oracle top-level rename
+    } else if(t.type==='KEYWORD'&&t.upper==='RENAME'){
+      pos++;
+      const _renOld=parseIdentifier();
+      if(cur()?.upper==='TO'){pos++;const _renNew=parseIdentifier();
+        if(_renOld&&_renNew){
+          const _ro=(_renOld.nameU||String(_renOld)).toUpperCase();
+          const _rn=(_renNew.nameU||String(_renNew)).toUpperCase();
+          schema.renames.push({old:_ro,new:_rn});
+          if(schema.tables[_ro]){schema.tables[_rn]=schema.tables[_ro];delete schema.tables[_ro];}
+        }
+      }
+      while(pos<toks.length&&cur()?.value!==';')pos++;
     // DML statements — silently skip (no DDL validation needed)
     } else if(t.type==='KEYWORD'&&['SELECT','INSERT','UPDATE','DELETE','MERGE',
         'COMMIT','ROLLBACK','SAVEPOINT','GRANT','REVOKE','COMMENT','ANALYZE',
@@ -1368,12 +1525,79 @@ function validateSchema(schema, sql) {
     checkParenBalance(sql).forEach(i => issues.push(i));
   }
 
+  // Missing semicolons between DDL statements + missing trailing semicolon
+  if (sql) {
+    detectMissingSemicolons(sql).forEach(i => issues.push(i));
+    detectTrailingSemicolon(sql).forEach(i => issues.push(i));
+  }
+
+  // ── Duplicate consecutive keyword detection ──────────────────────────────
+  if (sql) {
+    const _dupPatterns = [
+      { re: /\b(ALTER)\s+\1\b/gi }, { re: /\b(TABLE)\s+\1\b/gi },
+      { re: /\b(CREATE)\s+\1\b/gi }, { re: /\b(DROP)\s+\1\b/gi },
+      { re: /\b(ADD)\s+\1\b/gi },   { re: /\b(COLUMN)\s+\1\b/gi },
+      { re: /\b(NOT)\s+\1\b/gi },   { re: /\b(NULL)\s+\1\b/gi },
+      { re: /\b(PRIMARY)\s+\1\b/gi },{ re: /\b(KEY)\s+\1\b/gi },
+      { re: /\b(FOREIGN)\s+\1\b/gi },{ re: /\b(REFERENCES)\s+\1\b/gi },
+      { re: /\b(CONSTRAINT)\s+\1\b/gi },{ re: /\b(UNIQUE)\s+\1\b/gi },
+      { re: /\b(DEFAULT)\s+\1\b/gi },{ re: /\b(MODIFY)\s+\1\b/gi },
+      { re: /\b(INDEX)\s+\1\b/gi },  { re: /\b(ON)\s+\1\b/gi },
+    ];
+    _dupPatterns.forEach(({ re }) => {
+      let m; re.lastIndex = 0;
+      while ((m = re.exec(sql)) !== null) {
+        const lineNum = sql.slice(0, m.index).split('\n').length;
+        err('Duplicate keyword "' + m[1].toUpperCase() + ' ' + m[1].toUpperCase() + '" — remove the extra occurrence', null, null, lineNum);
+      }
+    });
+  }
+
+  // ── Stray symbol detection ───────────────────────────────────────────────
+  if (sql) {
+    sql.split('\n').forEach((line, idx) => {
+      const ln = idx + 1;
+      const s = line.replace(/--.*$/, '').replace(/'[^']*'/g, "''");
+      if (/,\s*\)/.test(s))     err('Trailing comma before ")" on line ' + ln + ' — remove extra comma', null, null, ln);
+      if (/;;/.test(s))           warn('Double semicolon ";;" on line ' + ln, null, null, ln);
+      if (/^\s*,\s*$/.test(s))  warn('Orphan comma on line ' + ln + ' — likely a leftover separator', null, null, ln);
+      if (/,\s*,/.test(s))       err('Consecutive commas ",,' + (s.match(/,\s*,\s*,/)?'+':'') + '" on line ' + ln + ' — remove extra commas', null, null, ln);
+    });
+  }
+
   const VALID_TYPES = new Set([
     'NUMBER','VARCHAR2','CHAR','NVARCHAR2','NCHAR','DATE','TIMESTAMP','CLOB','NCLOB',
     'BLOB','RAW','LONG','INTEGER','INT','SMALLINT','FLOAT','REAL','DECIMAL','NUMERIC',
     'BINARY_FLOAT','BINARY_DOUBLE','DOUBLE PRECISION','LONG RAW','INTERVAL','XMLTYPE',
     'ROWID','UROWID','BOOLEAN','PLS_INTEGER','BINARY_INTEGER','VARCHAR'
   ]);
+
+  // ── External schema FK cross-check ──────────────────────────────────────
+  if (externalSchema && externalSchema.tables) {
+    const _ddlTbls = new Set(Object.keys(schema.tables));
+    for (const [tblName, tbl] of Object.entries(schema.tables)) {
+      for (const con of tbl.constraints) {
+        if (con.type === 'FK' && con.refTable) {
+          const refUp = con.refTable.toUpperCase();
+          if (!_ddlTbls.has(refUp) && !externalSchema.tables[refUp]) {
+            err('FK "' + (con.name||'<unnamed>') + '" references table "' + refUp + '" — not found in current DDL or imported schema', tblName, null, con.line);
+          }
+        }
+      }
+      const _extTbl = externalSchema.tables[tblName.toUpperCase()];
+      if (_extTbl) {
+        for (const con of tbl.constraints) {
+          if ((con.type === 'PK' || con.type === 'UNIQUE') && con.cols) {
+            con.cols.forEach(colName => {
+              const colUp = colName.toUpperCase();
+              if (!tbl.columns[colUp] && !_extTbl.columns[colUp])
+                warn(con.type + ' column "' + colName + '" not found in table "' + tblName + '" (checked DDL and imported schema)', tblName, null, con.line);
+            });
+          }
+        }
+      }
+    }
+  }
 
   for (const [tblName, tbl] of Object.entries(schema.tables)) {
     if (tbl.colOrder.length === 0 && tbl.constraints.length === 0)
@@ -1824,6 +2048,37 @@ function autoFixDDL(sql) {
       fixes.push({ msg: `Quoted ${reservedQuoteFixes.length} reserved word(s) used as column names: ${[...new Set(reservedQuoteFixes)].slice(0,3).join(', ')}`, lineNum: null });
   }
 
+  // ── PASS 2c2: consecutive commas ──────────────────────────────
+  {
+    const before = fixed;
+    // ,, or more → single comma; handles ",   ,,  ," etc.
+    fixed = fixed.replace(/,(?:\s*,)+/g, ',');
+    if (fixed !== before) fixes.push({ msg: 'Removed consecutive commas (,,,+ → ,)', lineNum: null });
+  }
+
+  // ── PASS 2d: duplicate consecutive keywords ──────────────────
+  {
+    const dupKws = ['ALTER','TABLE','CREATE','DROP','ADD','COLUMN','NOT','NULL',
+      'PRIMARY','KEY','FOREIGN','REFERENCES','CONSTRAINT','UNIQUE','DEFAULT',
+      'MODIFY','INDEX','ON','SET','FROM','WHERE','INTO'];
+    dupKws.forEach(kw => {
+      const re = new RegExp('\\b(' + kw + ')\\s+\\1\\b', 'gi');
+      const before = fixed;
+      fixed = fixed.replace(re, kw);
+      if (fixed !== before) fixes.push({ msg: 'Removed duplicate keyword: ' + kw + ' ' + kw + ' → ' + kw, lineNum: null });
+    });
+  }
+
+  // ── PASS 2e: orphan comma lines & trailing whitespace ─────────
+  {
+    const before = fixed;
+    // Remove lines that contain only a comma (orphan separators)
+    fixed = fixed.replace(/^[ \t]*,[ \t]*$/gm, '');
+    // Strip trailing spaces on every line
+    fixed = fixed.replace(/[ \t]+$/gm, '');
+    if (fixed !== before) fixes.push({ msg: 'Removed orphan comma line(s) / trailing whitespace', lineNum: null });
+  }
+
   // ── PASS 3: extra closing parens (per statement) ───────────────
   const stmtParts = [];
   let current = '', inStr = false;
@@ -1867,9 +2122,113 @@ function autoFixDDL(sql) {
     return paren + ';\n' + next;
   });
 
+  // ── PASS 5: insert ; between back-to-back DDL statements ──────
+  // Same track/flag split: track DROP/TRUNCATE but only insert ; before CREATE/ALTER
+  {
+    var _TRACK5=/^(CREATE|ALTER|DROP|TRUNCATE)$/i,_FLAG5=/^(CREATE|ALTER)$/i;
+    var _re5=/[A-Za-z_][A-Za-z0-9_]*|;|\(|\)|'(?:[^']|'')*'|--[^\n]*/g;
+    var _m5,_depth5=0,_lastSemi5=0,_prevDDL5=null,_insertAt=[];
+    while((_m5=_re5.exec(fixed))!==null){
+      var _t5=_m5[0];
+      if(_t5[0]==='-'||_t5[0]==="'")continue;
+      if(_t5==='('){_depth5++;continue;}
+      if(_t5===')'){_depth5=Math.max(0,_depth5-1);continue;}
+      if(_t5===';'){_depth5=0;_lastSemi5=_m5.index;_prevDDL5=null;continue;}
+      if(_depth5>0)continue;
+      if(_TRACK5.test(_t5)){
+        if(_FLAG5.test(_t5)&&_prevDDL5!==null&&_lastSemi5<_prevDDL5.start){
+          _insertAt.push(_m5.index);
+        }
+        _prevDDL5={kw:_t5.toUpperCase(),start:_m5.index};
+      }
+    }
+    if(_insertAt.length>0){
+      var _f5=fixed;
+      for(var _ri=_insertAt.length-1;_ri>=0;_ri--){
+        var _idx=_insertAt[_ri],_back=_idx-1;
+        while(_back>=0&&(_f5[_back]===' '||_f5[_back]==='\t'||_f5[_back]==='\n'||_f5[_back]==='\r'))_back--;
+        _f5=_f5.slice(0,_back+1)+';\n'+_f5.slice(_idx);
+      }
+      fixed=_f5;
+      fixes.push({msg:'Inserted '+_insertAt.length+' missing semicolon(s) between DDL statements',lineNum:null});
+    }
+  }
+
   return { fixed, fixes };
 }
 
+// ============================================================================
+// MISSING-SEMICOLON DETECTOR
+// ============================================================================
+function detectMissingSemicolons(sql) {
+  // DDL_TRACK: any of these resets our "statement started here" pointer
+  // DDL_FLAG: only these as the SECOND keyword trigger the error
+  // (DROP/TRUNCATE can appear as clause words inside ALTER TABLE ... DROP CONSTRAINT)
+  var DDL_TRACK = /^(CREATE|ALTER|DROP|TRUNCATE)$/i;
+  var DDL_FLAG  = /^(CREATE|ALTER)$/i;
+  var issues = [];
+  var stripped = sql
+    .replace(/--[^\n]*/g, function(m){ return ' '.repeat(m.length); })
+    .replace(/'(?:[^']|'')*'/g, function(m){ return "'" + ' '.repeat(m.length-2) + "'"; });
+  function lineOf(idx) {
+    var n=1; for(var i=0;i<idx;i++){if(sql[i]==='\n')n++;} return n;
+  }
+  var tokenRe = /[A-Za-z_][A-Za-z0-9_]*|;|\(|\)|,|\S/g;
+  var m, depth=0, lastSemi=-1, prevDDL=null;
+  while ((m=tokenRe.exec(stripped))!==null) {
+    var tok=m[0], pos=m.index;
+    if(tok==='('){depth++;continue;}
+    if(tok===')'){depth=Math.max(0,depth-1);continue;}
+    if(tok===';'){depth=0;lastSemi=pos;prevDDL=null;continue;}
+    if(depth>0)continue;
+    if(DDL_TRACK.test(tok)){
+      // Flag only when the incoming DDL keyword is CREATE or ALTER (never clause-level)
+      if(DDL_FLAG.test(tok)&&prevDDL!==null&&lastSemi<prevDDL.pos){
+        issues.push({sev:'error',
+          msg:'Missing ";" between two DDL statements — "'+prevDDL.kw.toUpperCase()+'..."' +
+              ' and "'+tok.toUpperCase()+'..." must be separated by a semicolon',
+          line:prevDDL.line});
+      }
+      // Always advance prevDDL to the latest DDL keyword seen
+      prevDDL={kw:tok,pos:pos,line:lineOf(pos)};
+    }
+  }
+  return issues;
+}
+
+
+function detectTrailingSemicolon(sql) {
+  // Detects a DDL statement that has no terminating semicolon at all
+  // (e.g. the last statement in the editor, or a lone statement with no ;)
+  var stripped = sql
+    .replace(/--[^\n]*/g, function(m){ return ' '.repeat(m.length); })
+    .replace(/'(?:[^']|'')*'/g, function(m){ return "'" + ' '.repeat(m.length-2) + "'"; });
+  var DDL_START = /^(CREATE|ALTER|DROP|TRUNCATE)$/i;
+  var tokenRe = /[A-Za-z_][A-Za-z0-9_]*|;|[()|,]|\S/g;
+  var m, depth=0, lastSemiPos=-1, lastDDL=null;
+  while ((m=tokenRe.exec(stripped))!==null) {
+    var tok=m[0], pos=m.index;
+    if(tok==='('){depth++;continue;}
+    if(tok===')'){if(depth>0)depth--;continue;}
+    if(tok===';'){depth=0;lastSemiPos=pos;lastDDL=null;continue;}
+    if(depth>0)continue;
+    if(DDL_START.test(tok)){
+      function lineOf(idx){var n=1;for(var i=0;i<idx;i++){if(sql[i]==='\n')n++;}return n;}
+      lastDDL={kw:tok,pos:pos,line:lineOf(pos)};
+    }
+  }
+  var issues=[];
+  if(lastDDL!==null){
+    // If there was a DDL keyword after the last semicolon, check the SQL ends with ;
+    var trimmed=sql.replace(/\s+$/,'');
+    if(trimmed.charAt(trimmed.length-1)!==';'){
+      issues.push({sev:'error',
+        msg:'Missing ";" at end of DDL — every statement must be terminated with a semicolon (last statement starts near line '+lastDDL.line+')',
+        line:lastDDL.line});
+    }
+  }
+  return issues;
+}
 // ============================================================================
 // DICTIONARY
 // ============================================================================
@@ -1882,13 +2241,27 @@ function saveDictionary(d) {
   try { localStorage.setItem(DICT_KEY,JSON.stringify(d)); }
   catch(e) { statusMsg('⚠ Could not save dictionary','warn'); }
 }
+function learnFromSchemaExternal() {
+  if (!externalSchema || !externalSchema.tables) return [];
+  const names = [];
+  for (const [code, tbl] of Object.entries(externalSchema.tables)) {
+    names.push(code);
+    if (tbl.name && tbl.name.toUpperCase() !== code) names.push(tbl.name.toUpperCase());
+    for (const col of Object.keys(tbl.columns)) names.push(col);
+    for (const con of tbl.constraints) if (con.name) names.push(con.name.toUpperCase());
+  }
+  return names;
+}
+
 function learnFromSchema(schema) {
   const d=loadDictionary();
+  (schema.renames||[]).forEach(r=>{const oi=d.tables.indexOf(r.old);if(oi>=0){d.tables[oi]=r.new;}else if(!d.tables.includes(r.new)){d.tables.push(r.new);}});
   Object.keys(schema.tables).forEach(t=>{if(!d.tables.includes(t))d.tables.push(t);});
   for(const[,tbl] of Object.entries(schema.tables))
     Object.keys(tbl.columns).forEach(c=>{if(!d.columns.includes(c))d.columns.push(c);});
   Object.keys(schema.sequences||{}).forEach(s=>{if(!d.objects.includes(s))d.objects.push(s);});
   Object.keys(schema.views||{}).forEach(v=>{if(!d.objects.includes(v))d.objects.push(v);});
+  (schema.indexes||[]).forEach(idx=>{if(idx.name&&!d.objects.includes(idx.name))d.objects.push(idx.name);});
   saveDictionary(d); renderDictionary();
 }
 
@@ -1952,6 +2325,10 @@ const DDL_COMPLETIONS = [
     insert:'ALTER TABLE %table_name% DROP CONSTRAINT %constraint_name%;' },
   { kw:'ALTER', priority:8, label:'ALTER TABLE %table_name% ENABLE/DISABLE CONSTRAINT %constraint_name%;',
     insert:'ALTER TABLE %table_name% ENABLE CONSTRAINT %constraint_name%;' },
+  { kw:'ALTER', priority:9, label:'ALTER TABLE %table_name% ADD CONSTRAINT %name% UNIQUE (%col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% UNIQUE (%col%);' },
+  { kw:'ALTER', priority:10, label:'ALTER TABLE %table_name% ADD CONSTRAINT %name% CHECK (%expr%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% CHECK (%expr%);' },
 
   // ── CREATE ────────────────────────────────────────────────────────────────
   { kw:'CREATE', priority:1, label:'CREATE TABLE %table_name% (...NOT NULL, CONSTRAINT pk_... PRIMARY KEY (...));',
@@ -1999,7 +2376,7 @@ const DDL_COMPLETIONS = [
   { kw:'IF', priority:3, label:'IF ... ELSIF ... ELSE ... END IF;',
     insert:'IF %condition1% THEN\n    NULL;\nELSIF %condition2% THEN\n    NULL;\nELSE\n    NULL;\nEND IF;' },
   { kw:'CASE', priority:1, label:'CASE %expr% WHEN %val1% THEN %res1% ELSE %default% END;',
-    insert:'CASE %expr%\n    WHEN %val1% THEN %result1%\n    WHEN %val2% THEN %result2%\n    ELSE %default_result%\nEND' },
+    insert:'CASE %expr%\n    WHEN %val1% THEN %result1%\n    WHEN %val2% THEN %result2%\n    ELSE %default_result%\nEND;' },
   { kw:'CASE', priority:2, label:'CASE WHEN %condition1% THEN %res1% ELSE %default% END;',
     insert:'CASE\n    WHEN %condition1% THEN %result1%\n    WHEN %condition2% THEN %result2%\n    ELSE %default_result%\nEND' },
   { kw:'LOOP', priority:1, label:'LOOP ... EXIT WHEN %condition%; END LOOP;',
@@ -2051,6 +2428,12 @@ const DDL_COMPLETIONS = [
   { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:5,
     label:'ADD CONSTRAINT %name% FOREIGN KEY (%col%) REFERENCES %ref% (%col%);',
     insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name%\n    FOREIGN KEY (%col%)\n    REFERENCES %ref_table% (%ref_col%);' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:6,
+    label:'ADD CONSTRAINT %name% UNIQUE (%col%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% UNIQUE (%col%);' },
+  { ctx:/^ALTER\s+TABLE\s+\S+\s*$/i, priority:7,
+    label:'ADD CONSTRAINT %name% CHECK (%expr%);',
+    insert:'ALTER TABLE %table_name%\n    ADD CONSTRAINT %name% CHECK (%expr%);' },
   { ctx:/^SELECT\b/i, priority:1,
     label:'FROM %table_name% WHERE %condition%;',
     insert:'SELECT %columns% FROM %table_name% WHERE %condition%;' },
@@ -2064,6 +2447,95 @@ const DDL_COMPLETIONS = [
     label:'WHERE %condition%;',
     insert:'DELETE FROM %table_name% WHERE %condition%;' },
 ];
+
+// ============================================================================
+// ============================================================================
+// EXTERNAL SCHEMA (imported from pdmData JS file)
+// ============================================================================
+let externalSchema = null;
+let schemaWorker   = null;
+
+function importJsSchema() {
+  document.getElementById('schemaJsInput').click();
+}
+
+function handleSchemaJsFile(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  evt.target.value = '';
+  statusMsg('📂 Reading schema file (' + (file.size/1024/1024).toFixed(1) + ' MB)…', 'info', 60000);
+
+  // Parse on main thread using chunked setTimeout — no blob:// URL, no tracking prevention issues
+  const reader = new FileReader();
+  reader.onerror = function() { statusMsg('❌ Cannot read file', 'err'); };
+  reader.onload = function(ev) {
+    const text = ev.target.result;
+    statusMsg('⚙ Evaluating schema JS…', 'info', 60000);
+    // Defer so UI can update first
+    setTimeout(function() {
+      let pdmData;
+      try {
+        const fn = new Function(text + '\n; return typeof pdmData !== "undefined" ? pdmData : undefined;');
+        pdmData = fn();
+        if (!Array.isArray(pdmData)) throw new Error('pdmData is not an array — expected: const pdmData = [...]');
+      } catch(e) {
+        statusMsg('❌ Schema parse error: ' + e.message, 'err'); return;
+      }
+      const schema = { tables: {} };
+      const BATCH = 150;
+      let i = 0;
+      function processBatch() {
+        const end = Math.min(i + BATCH, pdmData.length);
+        for (; i < end; i++) {
+          const tbl = pdmData[i];
+          const code = (tbl.Code || tbl.Name || '').trim().toUpperCase();
+          if (!code) continue;
+          const tEntry = { name: tbl.Name || code, code: code, comment: tbl.Comment || '', columns: {}, constraints: [], indexes: [] };
+          (tbl.Columns || []).forEach(function(col) {
+            const ccode = (col.Code || col.Name || '').trim().toUpperCase();
+            if (!ccode) return;
+            tEntry.columns[ccode] = { name: col.Name || ccode, code: ccode, datatype: col.Datatype || '', mandatory: !!col.Mandatory, pk: !!col.Primary, fk: !!col.FK, ak: !!col.AK };
+            if (col.Primary) tEntry.constraints.push({ type:'PK', col: ccode });
+            if (col.AK)      tEntry.constraints.push({ type:'UNIQUE', name: col.AK_Constraint || '', col: ccode });
+          });
+          (tbl.Checks || []).forEach(function(ck) {
+            tEntry.constraints.push({ type:'CHECK', name: (ck.code||ck.name||'').toUpperCase(), expr: ck.ServerExpression||'' });
+          });
+          (tbl.References || []).forEach(function(ref) {
+            tEntry.constraints.push({ type:'FK', name: (ref.name||'').toUpperCase(), refTable: (ref.ParentTable||'').toUpperCase(), childCol: (ref.ChildColumn||'').toUpperCase(), parentCol: (ref.ParentColumn||'').toUpperCase() });
+          });
+          schema.tables[code] = tEntry;
+        }
+        const pct = Math.round(i / pdmData.length * 100);
+        if (i < pdmData.length) {
+          statusMsg('⚙ Parsing schema… ' + pct + '% (' + i + '/' + pdmData.length + ' tables)', 'info', 60000);
+          setTimeout(processBatch, 0); // yield to UI between batches
+        } else {
+          // Done
+          externalSchema = schema;
+          const tCount = Object.keys(schema.tables).length;
+          statusMsg('✅ Schema loaded — ' + tCount + ' table(s)', 'ok');
+          try {
+            const _ed = loadDictionary();
+            for (const [code, _tbl] of Object.entries(schema.tables)) {
+              if (!_ed.tables.includes(code)) _ed.tables.push(code);
+              for (const col of Object.keys(_tbl.columns)) { if (!_ed.columns.includes(col)) _ed.columns.push(col); }
+              for (const con of _tbl.constraints) { if (con.name && !_ed.objects.includes(con.name)) _ed.objects.push(con.name); }
+            }
+            saveDictionary(_ed); renderDictionary();
+          } catch(e) { /* localStorage may be blocked — autocomplete will still work in-session */ }
+          const badge = document.getElementById('ext-schema-badge');
+          const countEl = document.getElementById('ext-schema-count');
+          if (badge) badge.style.display = 'block';
+          if (countEl) countEl.textContent = tCount;
+          if (currentSchema) renderSchemaPanel(currentSchema);
+        }
+      }
+      processBatch();
+    }, 10);
+  };
+  reader.readAsText(file);
+}
 
 // ============================================================================
 // FUNCTION ARGUMENT HINTS (shown in italic inside autocomplete)
@@ -2169,6 +2641,23 @@ function getHintWords() {
     datatypes: [...ORACLE_DATATYPES, ...(d.custom_types||[])],
     tables: d.tables, columns: d.columns, objects: d.objects, functions: ORACLE_FUNCTIONS,
   };
+}
+
+// Get columns of a specific table from currentSchema or externalSchema
+function getTableColumns(tableName) {
+  if (!tableName) return [];
+  const tUp = tableName.toUpperCase();
+  if (currentSchema && currentSchema.tables && currentSchema.tables[tUp])
+    return Object.keys(currentSchema.tables[tUp].columns || {});
+  if (externalSchema && externalSchema.tables && externalSchema.tables[tUp])
+    return Object.keys(externalSchema.tables[tUp].columns || {});
+  return [];
+}
+
+// Detect targeted table name from statement context
+function getContextTableName(stmtCtx) {
+  const m = stmtCtx.match(/^(?:ALTER\s+TABLE|UPDATE|INSERT\s+INTO)\s+(\S+)/i);
+  return m ? m[1].replace(/["`]/g, '') : null;
 }
 
 // Collect the full statement text before the cursor (across lines, after last ;)
@@ -2350,6 +2839,8 @@ function oracleHint(editor) {
     ...(word.length > 0 ? hints.datatypes.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'🔷 '+w, className:'hint-type'})) : []),
     // Tables and columns show even after space (useful for FROM clause etc.)
     ...hints.tables.filter(w  => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📋 '+w, className:'hint-table'})),
+    // Context-specific columns for the targeted table — shown with 🎯 above generic columns
+    ...getTableColumns(getContextTableName(stmtCtx)).filter(c => word.length===0||c.startsWith(word)).map(c => ({text:c, displayText:'🎯 '+c, className:'hint-col'})),
     ...hints.columns.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📌 '+w, className:'hint-col'})),
     ...hints.objects.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'◈ '  +w, className:'hint-obj'})),
     ...(word.length > 0 ? hints.functions.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'⚙ '+w, className:'hint-obj'})) : []),
@@ -2361,8 +2852,10 @@ function oracleHint(editor) {
     seen.add(k); return true;
   }).slice(0, 60);
 
-  // ── 4. Compose: statement templates first, then fn args, then standard ────
-  const list = [...ddlSuggestions, ...fnArgHints, ...deduped];
+  // ── 4. Compose: keywords/types first, then DDL templates, fn args, rest ────
+  const kwFirst  = deduped.filter(h => h.className === 'hint-kw' || h.className === 'hint-type');
+  const restList = deduped.filter(h => h.className !== 'hint-kw' && h.className !== 'hint-type');
+  const list = [...kwFirst, ...ddlSuggestions, ...fnArgHints, ...restList];
 
   // Always return a valid hint object (never null) to avoid CodeMirror crash
   return {
@@ -2763,7 +3256,8 @@ CREATE TABLE user_accounts (
 
 function renderTemplates() {
   const el = document.getElementById('templates-list');
-  el.innerHTML = TEMPLATES.map(group => {
+  // Built-in template groups
+  let html = TEMPLATES.map(group => {
     const items = group.items.map(item => {
       const sqlJson = JSON.stringify(item.sql);
       return `
@@ -2786,6 +3280,34 @@ function renderTemplates() {
       <div>${items}</div>
     </div>`;
   }).join('');
+  // ── User-Defined section ──
+  const uList = loadUserTemplates();
+  const uColor = 'var(--purple)';
+  const uItems = uList.length === 0
+    ? `<div class="val-empty" style="padding:12px;font-size:.62rem;line-height:1.6">No user templates yet.<br>Click <strong style="color:var(--green)">＋ SAVE</strong> to add the current editor content.</div>`
+    : uList.map((t, i) => {
+        const sqlJson = JSON.stringify(t.sql);
+        return `<div class="tmpl-item" style="border-left:2px solid rgba(167,139,250,.25)">
+          <div class="tmpl-name" style="color:${uColor}">${t.name}</div>
+          <div class="tmpl-desc">${t.desc||''}</div>
+          <div class="tmpl-actions">
+            <button class="hist-small-btn restore" style="color:${uColor};border-color:rgba(167,139,250,.3)"
+              onclick='insertTemplate(${sqlJson})'>⊕ Insert</button>
+            <button class="hist-small-btn"
+              onclick='replaceTemplate(${sqlJson})'>⟲ Replace</button>
+            <button class="hist-small-btn" style="color:var(--red);border-color:rgba(248,113,113,.3)"
+              onclick='deleteUserTemplate(${i})'>🗑</button>
+          </div>
+        </div>`;
+      }).join('');
+  html += `<div class="tmpl-section">
+    <div class="tmpl-head" onclick="toggleSection(this)" style="background:rgba(167,139,250,.05)">
+      <span style="color:${uColor}">⭐ User-Defined (${uList.length})</span>
+      <span style="color:${uColor}">▾</span>
+    </div>
+    <div>${uItems}</div>
+  </div>`;
+  el.innerHTML = html;
 }
 
 function insertTemplate(sql) {
@@ -3150,7 +3672,7 @@ function clearEditor() {
   if (isDirty && !confirm('Discard unsaved changes?')) return;
   addHistoryEntry(cm.getValue(), 'copy');
   cm.setValue('');
-  currentSchema = null;
+  currentSchema = null; externalSchema = null;
   setDirty(false);
   document.getElementById('val-list').innerHTML = '<div class="val-empty"><div style="font-size:2rem;opacity:.3">✓</div><div>Press F5 to validate</div></div>';
   document.getElementById('val-summary').innerHTML = '';
@@ -3444,6 +3966,131 @@ window.onload = function() {
     if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newFile(); }
   });
 };
+// ============================================================================
+// I/O PANEL (unified modal — new, keeps showImportExport intact)
+// ============================================================================
+function showIOPanel(defaultTab) {
+  switchIOTab(defaultTab || 'dict');
+  document.getElementById('io-modal').style.display = 'flex';
+}
+function switchIOTab(tab) {
+  ['dict','schema','ddl'].forEach(t => {
+    document.getElementById('io-sect-'+t).style.display = t===tab?'':'none';
+    const b = document.getElementById('iotab-'+t);
+    if(b){ b.classList.toggle('io-tab-active', t===tab); }
+  });
+  if(tab==='dict')    switchIODictTab('import');
+  if(tab==='ddl')     switchIODdlTab('import');
+}
+function switchIODictTab(sub) {
+  document.getElementById('io-dict-import-body').style.display = sub==='import'?'':'none';
+  document.getElementById('io-dict-export-body').style.display = sub==='export'?'':'none';
+  document.getElementById('io-dict-imp-btn').classList.toggle('io-sub-active', sub==='import');
+  document.getElementById('io-dict-exp-btn').classList.toggle('io-sub-active', sub==='export');
+  if(sub==='export'){
+    document.getElementById('io-dict-export-ta').value = JSON.stringify(loadDictionary(),null,2);
+  }
+}
+function switchIODdlTab(sub) {
+  document.getElementById('io-ddl-import-body').style.display = sub==='import'?'':'none';
+  document.getElementById('io-ddl-export-body').style.display = sub==='export'?'':'none';
+  document.getElementById('io-ddl-imp-btn').classList.toggle('io-sub-active', sub==='import');
+  document.getElementById('io-ddl-exp-btn').classList.toggle('io-sub-active', sub==='export');
+  if(sub==='export'){
+    document.getElementById('io-ddl-export-ta').value = cm ? cm.getValue() : '';
+  }
+}
+function doIODictImport() {
+  try {
+    const data = JSON.parse(document.getElementById('io-dict-import-ta').value);
+    const d = loadDictionary();
+    ['tables','columns','objects','custom_kw','custom_types'].forEach(k => {
+      if(Array.isArray(data[k])) data[k].forEach(w=>{ if(!d[k].includes(w)) d[k].push(w); });
+    });
+    saveDictionary(d); renderDictionary();
+    if(typeof invalidateCompletionCache==='function') invalidateCompletionCache();
+    closeModal('io-modal');
+    statusMsg('Dictionary imported — ' + (data.tables||[]).length + ' tables', 'ok');
+  } catch(e) { alert('Invalid JSON: ' + e.message); }
+}
+function doIODictDownload() {
+  const blob = new Blob([JSON.stringify(loadDictionary(),null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='oracle_ddl_dict.json'; a.click();
+}
+function doIODdlImport() {
+  const val = document.getElementById('io-ddl-import-ta').value.trim();
+  if(!val){ alert('Nothing to import.'); return; }
+  if(cm && cm.getValue().trim() && !confirm('Replace editor content with pasted DDL?')) return;
+  if(cm){ cm.setValue(val); setDirty(true); }
+  closeModal('io-modal'); statusMsg('DDL loaded into editor','ok');
+}
+function doIODdlDownload() {
+  const val = cm ? cm.getValue() : '';
+  const blob = new Blob([val],{type:'text/plain'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download = (typeof currentFileName!=='undefined'&&currentFileName) ? currentFileName : 'export.sql';
+  a.click();
+}
+
+// ============================================================================
+// USER-DEFINED TEMPLATES
+// ============================================================================
+const USER_TMPL_KEY = 'oracle_ddl_user_templates_v1';
+function loadUserTemplates() {
+  try { return JSON.parse(localStorage.getItem(USER_TMPL_KEY)||'[]'); }
+  catch { return []; }
+}
+function saveUserTemplates(arr) {
+  try { localStorage.setItem(USER_TMPL_KEY, JSON.stringify(arr)); }
+  catch(e) { statusMsg('⚠ Could not save user templates','warn'); }
+}
+function saveEditorAsTemplate() {
+  if(!cm) return;
+  const sql = cm.getValue().trim();
+  if(!sql){ statusMsg('Editor is empty — nothing to save','warn'); return; }
+  const name = prompt('Template name:','My Template');
+  if(!name) return;
+  const desc = prompt('Short description (optional):','')||'';
+  const arr = loadUserTemplates();
+  arr.push({ name: name.trim(), desc: desc.trim(), sql: sql, created: new Date().toISOString() });
+  saveUserTemplates(arr);
+  renderTemplates();
+  statusMsg('Template "'+name.trim()+'" saved','ok');
+}
+function deleteUserTemplate(idx) {
+  if(!confirm('Delete this user template?')) return;
+  const arr = loadUserTemplates();
+  arr.splice(idx,1);
+  saveUserTemplates(arr);
+  renderTemplates();
+  statusMsg('User template deleted','ok');
+}
+function exportUserTemplates() {
+  const arr = loadUserTemplates();
+  if(!arr.length){ statusMsg('No user templates to export','warn'); return; }
+  const blob = new Blob([JSON.stringify(arr,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='oracle_ddl_user_templates.json'; a.click();
+}
+function importUserTemplatesFile(evt) {
+  const file = evt.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const arr = JSON.parse(e.target.result);
+      if(!Array.isArray(arr)) throw new Error('Expected a JSON array');
+      const existing = loadUserTemplates();
+      const merged = [...existing, ...arr.filter(t=>t&&t.name&&t.sql)];
+      saveUserTemplates(merged);
+      renderTemplates();
+      statusMsg('Imported '+arr.length+' template(s)','ok');
+    } catch(ex) { alert('Invalid template file: '+ex.message); }
+    evt.target.value='';
+  };
+  reader.readAsText(file);
+}
+
 </script>
 </body>
 </html>
