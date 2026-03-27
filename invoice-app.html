@@ -367,6 +367,57 @@
             background: white;
         }
 
+
+        /* Designation textarea - full width, auto-expand */
+        .item-designation {
+            width: 100%;
+            min-height: 34px;
+            resize: none;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 5px 6px;
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.4;
+            box-sizing: border-box;
+            background: transparent;
+            transition: border-color 0.2s;
+            display: block;
+        }
+        .item-designation:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+        }
+        /* Mirror div shown only during print */
+        .item-designation-print {
+            display: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+            padding: 5px 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .item-quantity, .item-price {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px 6px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .item-quantity:focus, .item-price:focus {
+            outline: none;
+            border-color: #667eea;
+        }
         .items-table .col-total {
             text-align: right;
             font-weight: 600;
@@ -505,7 +556,47 @@
             .app-layout { flex-direction: column; }
             .config-panel, .preview-panel { max-height: none; }
         }
+
+        /* Edition mode banner */
+        .mode-banner {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 7px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #856404;
+            font-size: 14px;
+        }
+        .mode-banner.active { display: flex; }
+        .mode-banner .mode-icon { font-size: 20px; }
+        .mode-banner .btn-new-doc {
+            margin-left: auto;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mode-banner .btn-new-doc:hover { background: #5568d3; }
         
+        /* Sortable headers */
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .sortable-header:hover { background: #8fa8c8; }
+        .sort-indicator { font-size: 11px; opacity: 0.7; margin-left: 4px; }
+        .sort-asc::after { content: ' ▲'; }
+        .sort-desc::after { content: ' ▼'; }
+
         /* Styles d'impression améliorés */
         @media print {
             .toast-container,
@@ -514,7 +605,8 @@
             .button-group, 
             .modal, 
             .preview-modal, 
-            .remove-row {
+            .remove-row,
+            .mode-banner {
                 display: none !important;
             }
             
@@ -553,6 +645,9 @@
                 font-size: inherit !important;
                 color: inherit !important;
                 width: auto !important;
+                resize: none !important;
+                overflow: visible !important;
+                height: auto !important;
             }
             
             input::placeholder, textarea::placeholder {
@@ -567,6 +662,35 @@
             .items-table {
                 width: 100% !important;
                 table-layout: fixed !important;
+                page-break-inside: auto !important;
+            }
+
+            .items-table tr {
+                page-break-inside: avoid !important;
+            }
+            
+            .item-designation {
+                display: none !important;
+            }
+            .item-designation-print {
+                display: block !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+                font-size: 13px !important;
+                line-height: 1.4 !important;
+                color: #333 !important;
+                padding: 5px 6px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .items-table td {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                overflow: visible !important;
+                white-space: normal !important;
             }
             
             .invoice-middle {
@@ -603,6 +727,13 @@
         <!-- LEFT: Configuration panel -->
         <div class="config-panel">
             <div class="controls">
+                <!-- Edition mode banner -->
+                <div class="mode-banner" id="modeBanner">
+                    <span class="mode-icon">✏️</span>
+                    <span id="modeBannerText">Mode édition — modifications non sauvegardées</span>
+                    <button class="btn-new-doc" onclick="newDocument()">➕ Nouveau document</button>
+                </div>
+
                 <h2 id="hh">Configuration Facture</h2>
                 <p>Choisir Facture ou Devis :</p>
                 <input type="radio" id="facture" name="FD" value="Facture" onChange="handleTypeChange()" checked>
@@ -667,6 +798,7 @@ Tel: 07-44-18-54-80
                 <div class="button-group">
                     <button class="btn-primary" onclick="addRow()" title="Ajouter une nouvelle ligne dans le tableau des travaux">➕ Ajouter</button>
                     <button class="btn-validate" onclick="validateAndSave()" title="Valider les entrées avant l'impression">✅ Valider</button>
+                    <button class="btn-success" id="btnSaveEdition" onclick="saveEdition()" title="Enregistrer les modifications dans l'historique" style="display:none;">💾 Enregistrer</button>
                     <button class="btn-info" onclick="exportToJSON()" title="Exporter la facture/ le Devis (*.Json)">💾 Exporter</button>
                     <button class="btn-warning" onclick="document.getElementById('importJSON').click()" title="Importer la facture/ le Devis (*.Json)">📂 Importer</button>
                     <input type="file" id="importJSON" accept=".json" style="display: none;" onchange="importFromJSON(event)">
@@ -710,10 +842,10 @@ Tel: 07-44-18-54-80
                     <table class="items-table" id="itemsTable">
                         <thead>
                             <tr>
-                                <th style="width: 40%;">Désignation</th>
-                                <th style="width: 15%;">Quantité</th>
-                                <th style="width: 20%;">Prix unitaire</th>
-                                <th style="width: 20%;">Total</th>
+                                <th style="width: 50%;">Désignation</th>
+                                <th style="width: 12%;">Quantité</th>
+                                <th style="width: 17%;">Prix unitaire</th>
+                                <th style="width: 16%;">Total</th>
                                 <th style="width: 5%;"></th>
                             </tr>
                         </thead>
@@ -755,18 +887,32 @@ Tel: 07-44-18-54-80
                     <button class="tab" id="tabDevis" onclick="switchHistoryTab('devis')">Devis</button>
                 </div>
                 <div class="search-filters" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:15px 0;">
-                    <input type="text" id="searchClient" placeholder="Rechercher par client" oninput="filterHistory()">
+                    <input type="text" id="searchClient" placeholder="Rechercher par client ou numéro" oninput="filterHistory()">
                     <input type="date" id="searchDate" onchange="filterHistory()">
                 </div>
                 <div id="facturesContent" style="display:block;">
-                    <table class="history-table">
-                        <thead><tr><th>Numéro</th><th>Client</th><th>Date</th><th>Montant</th><th>Désignation</th><th>Actions</th></tr></thead>
+                    <table class="history-table" id="facturesTable">
+                        <thead><tr>
+                            <th class="sortable-header" id="sh-number" onclick="sortHistory('number')">Numéro</th>
+                            <th class="sortable-header" id="sh-client" onclick="sortHistory('client')">Client</th>
+                            <th class="sortable-header" id="sh-date" onclick="sortHistory('date')">Date</th>
+                            <th class="sortable-header" id="sh-grandTotal" onclick="sortHistory('grandTotal')">Montant</th>
+                            <th class="sortable-header" id="sh-workDesignation" onclick="sortHistory('workDesignation')">Désignation</th>
+                            <th>Actions</th>
+                        </tr></thead>
                         <tbody id="facturesTableBody"><tr class="empty-message"><td colspan="6">Aucune facture</td></tr></tbody>
                     </table>
                 </div>
                 <div id="devisContent" style="display:none;">
-                    <table class="history-table">
-                        <thead><tr><th>Numéro</th><th>Client</th><th>Date</th><th>Montant</th><th>Désignation</th><th>Actions</th></tr></thead>
+                    <table class="history-table" id="devisTable">
+                        <thead><tr>
+                            <th class="sortable-header" id="sh-d-number" onclick="sortHistory('number')">Numéro</th>
+                            <th class="sortable-header" id="sh-d-client" onclick="sortHistory('client')">Client</th>
+                            <th class="sortable-header" id="sh-d-date" onclick="sortHistory('date')">Date</th>
+                            <th class="sortable-header" id="sh-d-grandTotal" onclick="sortHistory('grandTotal')">Montant</th>
+                            <th class="sortable-header" id="sh-d-workDesignation" onclick="sortHistory('workDesignation')">Désignation</th>
+                            <th>Actions</th>
+                        </tr></thead>
                         <tbody id="devisTableBody"><tr class="empty-message"><td colspan="6">Aucun devis</td></tr></tbody>
                     </table>
                 </div>
@@ -859,6 +1005,10 @@ Tel: 07-44-18-54-80
     const STORAGE_KEY_CURRENT_TYPE = 'currentDocumentType';
     const STORAGE_KEY_HISTORY = 'documentHistory';
     const STORAGE_KEY_LAST_MANUAL_NUMBER = 'lastManualNumber';
+
+    // ==================== MODE MANAGEMENT ====================
+    // null = création, number = édition (id du document en cours)
+    let currentEditingId = null;
 
     // ==================== INITIALIZATION ====================
     
@@ -1073,12 +1223,18 @@ Tel: 07-44-18-54-80
         const tbody = document.getElementById('itemsBody');
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td><input type="text" class="item-designation" placeholder="Description"></td>
+            <td><textarea class="item-designation" placeholder="Description" rows="1"></textarea><div class="item-designation-print"></div></td>
             <td><input type="text" class="item-quantity" placeholder="Qté"></td>
             <td><input type="text" class="item-price" placeholder="Prix"></td>
             <td><span class="col-total">0.00 €</span></td>
             <td><button class="remove-row" onclick="removeRow(this)">✕</button></td>
         `;
+        const desArea = row.querySelector('.item-designation');
+        desArea.addEventListener('input', function() {
+            this.style.height='auto';
+            this.style.height=this.scrollHeight+'px';
+            this.nextElementSibling.textContent = this.value;
+        });
         row.querySelector('.item-quantity').addEventListener('input', () => calculateRowTotal(row));
         row.querySelector('.item-price').addEventListener('input', () => calculateRowTotal(row));
         console.log('New row added to items table');
@@ -1125,46 +1281,47 @@ Tel: 07-44-18-54-80
     function validateAndSave() {
         const client = document.getElementById('clientInfo').value.trim();
         const work = document.getElementById('workDesignation').value.trim();
-        let state = true;
 
         if (!client) {
             showToast('Veuillez remplir les informations du client.', 'warning');
-            state = false;
             return;
         }
         if (!work) {
             showToast('Veuillez remplir la désignation des travaux.', 'warning');
-            state = false;
             return;
         }
 
         const currentNumber = document.getElementById('invoiceNumber').value.trim();
         if (!currentNumber) {
             showToast('Numéro de document manquant.', 'error');
-            state = false;
             return;
         }
 
-        // Vérifier les doublons
         const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
-        const duplicate = history.find(doc => doc.number === currentNumber);
-        
-        if (duplicate) {
-            showToast(`Le numéro ${currentNumber} existe déjà dans l'historique.`, 'error', 'Doublon détecté');
-            state = false;
-            return;
+
+        if (currentEditingId !== null) {
+            // MODE ÉDITION : vérifier doublon uniquement sur les AUTRES documents
+            const duplicate = history.find(doc => doc.number === currentNumber && doc.id !== currentEditingId);
+            if (duplicate) {
+                showToast(`Le numéro ${currentNumber} est déjà utilisé par un autre document.`, 'error', 'Doublon détecté');
+                return;
+            }
+            showToast('Modifications validées. Cliquez sur "Enregistrer" pour sauvegarder ou "Imprimer".', 'success');
+        } else {
+            // MODE CRÉATION : vérifier doublon absolu
+            const duplicate = history.find(doc => doc.number === currentNumber);
+            if (duplicate) {
+                showToast(`Le numéro ${currentNumber} existe déjà dans l'historique.`, 'error', 'Doublon détecté');
+                return;
+            }
+            showToast('Document validé avec succès !', 'success');
         }
 
-        if (state = true){
-            console.log('Document validé');
-            //saveCurrentDocumentToHistory();
-            showToast('Document validé avec succès !', 'success');
-            const print = document.getElementById('btnPrint').style.visibility = "visible";
-        }
+        document.getElementById('btnPrint').style.visibility = 'visible';
     }
 
     /**
-     * Sauvegarde le document actuel dans l'historique
+     * Sauvegarde ou met à jour le document actuel dans l'historique
      */
     function saveCurrentDocumentToHistory() {
         const selected = document.querySelector('input[name="FD"]:checked');
@@ -1184,7 +1341,7 @@ Tel: 07-44-18-54-80
         });
 
         const documentData = {
-            id: Date.now(),
+            id: currentEditingId !== null ? currentEditingId : Date.now(),
             type: selected.value,
             number: currentNumber,
             date: document.getElementById('invoiceDate').value,
@@ -1197,36 +1354,55 @@ Tel: 07-44-18-54-80
             logo: document.getElementById('logoPreview').src,
             grandTotal: document.getElementById('grandTotal').textContent,
             items: items,
-            createdAt: new Date().toISOString()
+            createdAt: currentEditingId !== null ? undefined : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
-        const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
-        console.log('Saving document to history:', documentData);
-        history.push(documentData);
+        let history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+
+        if (currentEditingId !== null) {
+            // UPDATE existing entry
+            const idx = history.findIndex(d => d.id === currentEditingId);
+            if (idx !== -1) {
+                documentData.createdAt = history[idx].createdAt;
+                history[idx] = documentData;
+            } else {
+                history.push(documentData);
+            }
+        } else {
+            history.push(documentData);
+        }
+
         history.sort((a, b) => new Date(b.date) - new Date(a.date));
         localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+        console.log('Document saved/updated in history:', documentData.number);
     }
 
     // ==================== PRINTING ====================
     
     /**
      * Imprime depuis le panneau d'aperçu
-     * Incrémente le numéro SEULEMENT après impression réussie
+     * Incrémente le numéro SEULEMENT après impression en mode création
      */
     function printPreviewFromPanel() {
             console.log('Initiating print from preview panel...');
-            // Sauvegarder puis imprimer
             saveCurrentDocumentToHistory();
             window.print();
-            console.log('Print command executed, waiting for completion...');
-            // IMPORTANT: Incrémenter UNIQUEMENT après impression réussie
-            setTimeout(() => {
-                incrementAndGenerateNextNumber();
-                updateDisplay();
-            }, 500);
-            
-            showToast('Document imprimé et sauvegardé. Numéro incrémenté.', 'success');
-            document.getElementById('btnPrint').style.visibility = "hidden";
+            console.log('Print command executed...');
+
+            if (currentEditingId === null) {
+                // MODE CRÉATION : incrémenter après impression
+                setTimeout(() => {
+                    incrementAndGenerateNextNumber();
+                    updateDisplay();
+                    showToast('Document imprimé et sauvegardé. Numéro incrémenté.', 'success');
+                }, 500);
+            } else {
+                showToast('Document modifié imprimé et sauvegardé.', 'success');
+                // Rester en mode édition, le doc est déjà à jour
+            }
+
+            document.getElementById('btnPrint').style.visibility = 'hidden';
     }
 
     // ==================== HISTORY FUNCTIONS ====================
@@ -1248,6 +1424,30 @@ Tel: 07-44-18-54-80
         filterHistory();
     }
     
+
+    // ==================== SORT STATE ====================
+    let _sortCol = null;
+    let _sortDir = 1; // 1=asc, -1=desc
+
+    function sortHistory(col) {
+        if (_sortCol === col) {
+            _sortDir *= -1;
+        } else {
+            _sortCol = col;
+            _sortDir = 1;
+        }
+        // Update header visual indicators
+        ['number','client','date','grandTotal','workDesignation'].forEach(c => {
+            ['sh-','sh-d-'].forEach(prefix => {
+                const el = document.getElementById(prefix + c);
+                if (!el) return;
+                el.classList.remove('sort-asc','sort-desc');
+                if (c === col) el.classList.add(_sortDir === 1 ? 'sort-asc' : 'sort-desc');
+            });
+        });
+        filterHistory();
+    }
+
     function filterHistory() {
         const searchClient = document.getElementById('searchClient').value.toLowerCase();
         const searchDate = document.getElementById('searchDate').value;
@@ -1255,17 +1455,30 @@ Tel: 07-44-18-54-80
         
         const factures = history.filter(d => 
             d.type === 'Facture' && 
-            (!searchClient || (d.client||'').toLowerCase().includes(searchClient)) && 
+            (!searchClient || (d.client||'').toLowerCase().includes(searchClient) || (d.number||'').toLowerCase().includes(searchClient)) && 
             (!searchDate || d.date === searchDate)
         );
         
         const devis = history.filter(d => 
             d.type === 'Devis' && 
-            (!searchClient || (d.client||'').toLowerCase().includes(searchClient)) && 
+            (!searchClient || (d.client||'').toLowerCase().includes(searchClient) || (d.number||'').toLowerCase().includes(searchClient)) && 
             (!searchDate || d.date === searchDate)
         );
         
-        displayFilteredHistory(factures, devis);
+        function doSort(arr) {
+            if (!_sortCol) return arr;
+            return [...arr].sort((a, b) => {
+                let va = (a[_sortCol] || '').toString().toLowerCase();
+                let vb = (b[_sortCol] || '').toString().toLowerCase();
+                if (_sortCol === 'grandTotal') {
+                    va = parseFloat(va.replace(/[^0-9.,]/g,'').replace(',','.')) || 0;
+                    vb = parseFloat(vb.replace(/[^0-9.,]/g,'').replace(',','.')) || 0;
+                    return (va - vb) * _sortDir;
+                }
+                return va < vb ? -_sortDir : va > vb ? _sortDir : 0;
+            });
+        }
+        displayFilteredHistory(doSort(factures), doSort(devis));
     }
     
     function displayFilteredHistory(factures, devis) {
@@ -1277,7 +1490,7 @@ Tel: 07-44-18-54-80
                 <td>${new Date(d.date).toLocaleDateString('fr-FR')}</td>
                 <td>${d.grandTotal}</td>
                 <td>${d.workDesignation||'-'}</td>
-                <td><button class="btn-info small-btn" onclick="previewDocument(${d.id})" title="Aperçu de facture">👁️</button></td>
+                <td style="white-space:nowrap;"><button class="btn-info small-btn" onclick="previewDocument(${d.id})" title="Aperçu de facture">👁️</button> <button class="btn-warning small-btn" onclick="loadDocumentForEdit(${d.id})" title="Modifier cette facture">✏️</button></td>
             </tr>
         `).join('') : '<tr><td colspan="6">Aucune facture</td></tr>';
         
@@ -1289,7 +1502,7 @@ Tel: 07-44-18-54-80
                 <td>${new Date(d.date).toLocaleDateString('fr-FR')}</td>
                 <td>${d.grandTotal}</td>
                 <td>${d.workDesignation||'-'}</td>
-                <td><button class="btn-info small-btn" onclick="previewDocument(${d.id})" title="Aperçu de Devis">👁️</button></td>
+                <td style="white-space:nowrap;"><button class="btn-info small-btn" onclick="previewDocument(${d.id})" title="Aperçu de Devis">👁️</button> <button class="btn-warning small-btn" onclick="loadDocumentForEdit(${d.id})" title="Modifier ce devis">✏️</button></td>
             </tr>
         `).join('') : '<tr><td colspan="6">Aucun devis</td></tr>';
     }
@@ -1317,7 +1530,7 @@ Tel: 07-44-18-54-80
             doc.items.forEach(item => {
                 itemsHtml += `
                     <tr>
-                        <td>${item.designation || ''}</td>
+                        <td style="white-space:pre-wrap; word-wrap:break-word; overflow-wrap:break-word;">${item.designation || ''}</td>
                         <td>${item.quantity || ''}</td>
                         <td>${item.price || ''} €</td>
                         <td class="col-total">${item.total || '0.00 €'}</td>
@@ -1349,13 +1562,13 @@ Tel: 07-44-18-54-80
                 <div style="margin-bottom:20px; padding:15px; background:#f8f9fa; border-left:4px solid #667eea;">
                     <strong>Désignation des travaux:</strong> ${doc.workDesignation || ''}
                 </div>
-                <table class="items-table">
+                <table class="items-table" style="table-layout:fixed;">
                     <thead>
                         <tr>
-                            <th>Désignation</th>
-                            <th>Quantité</th>
-                            <th>Prix unitaire</th>
-                            <th>Total</th>
+                            <th style="width:50%;">Désignation</th>
+                            <th style="width:12%;">Quantité</th>
+                            <th style="width:18%;">Prix unitaire</th>
+                            <th style="width:20%;">Total</th>
                         </tr>
                     </thead>
                     <tbody>${itemsHtml}</tbody>
@@ -1380,29 +1593,31 @@ Tel: 07-44-18-54-80
         // Styles essentiels pour reproduire l'apparence de la facture
         const styles = `
             <style>
+                * { box-sizing: border-box; margin: 0; padding: 0; }
                 body { margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                .invoice { max-width: 900px; margin: 0 auto; padding: 30px; background: white; border: 1px solid #ddd; border-radius: 8px; }
+                .invoice { max-width: 900px; margin: 0 auto; padding: 30px; background: white; }
                 .invoice-header { display: table; width: 100%; margin-bottom: 30px; }
                 .logo-section { display: table-cell; width: 50%; vertical-align: top; padding-right: 20px; }
                 .logo-section img { max-width: 200px; max-height: 100px; object-fit: contain; margin-bottom: 15px; }
                 .company-info, .client-info { font-size: 13px; line-height: 1.6; color: #333; white-space: pre-line; }
                 .client-section { display: table-cell; width: 50%; text-align: right; vertical-align: top; padding-left: 20px; }
-                .invoice-middle { text-align: center; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
+                .invoice-middle { text-align: center; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                 .invoice-middle h1 { color: #667eea; margin-bottom: 10px; font-size: 28px; }
                 .invoice-details { display: flex; justify-content: center; gap: 30px; font-size: 14px; }
-                .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                .items-table th { background: #667eea; color: white; padding: 12px; text-align: left; border: 1px solid #5568d3; }
-                .items-table td { padding: 10px 12px; border: 1px solid #ddd; background: white; }
-                .items-table .col-total { text-align: right; font-weight: 600; color: #667eea; }
+                .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; }
+                .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 50%; }
+                .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 12%; }
+                .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 18%; }
+                .items-table th:nth-child(4), .items-table td:nth-child(4) { width: 20%; }
+                .items-table th { background: #667eea; color: white; padding: 12px; text-align: left; border: 1px solid #5568d3; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .items-table td { padding: 10px 12px; border: 1px solid #ddd; background: white; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; overflow: visible; vertical-align: top; }
+                .items-table tr { page-break-inside: avoid; }
+                .col-total { text-align: right; font-weight: 600; color: #667eea; }
                 .invoice-footer { display: flex; flex-direction: column; align-items: flex-start; margin-top: 30px; }
                 .total-row { display: flex; justify-content: space-between; width: 300px; padding: 15px 20px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px; }
-                .total-row.grand-total { background: #667eea; color: white; font-size: 20px; font-weight: bold; }
-                .tva-notice { width: 300px; font-size: 12px; color: #666; font-style: italic; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 3px; margin-bottom: 10px; text-align: left; }
+                .total-row.grand-total { background: #667eea; color: white; font-size: 20px; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .tva-notice { width: 300px; font-size: 12px; color: #666; font-style: italic; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 3px; margin-bottom: 10px; text-align: left; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                 .signature-line { width: 300px; text-align: left; font-style: italic; color: #333; margin-top: 5px; }
-                @media print {
-                    body { background: white; }
-                    .invoice { border: none; box-shadow: none; }
-                }
             </style>
         `;
 
@@ -1425,6 +1640,123 @@ Tel: 07-44-18-54-80
 
     function closePreviewModal() {
         document.getElementById('previewModal').style.display = 'none';
+    }
+
+
+    // ==================== EDITION MODE MANAGEMENT ====================
+
+    /**
+     * Active le mode édition avec l'id du document chargé
+     */
+    function setEditionMode(id) {
+        currentEditingId = id;
+        document.getElementById('modeBanner').classList.add('active');
+        document.getElementById('btnSaveEdition').style.display = 'inline-block';
+        document.getElementById('btnPrint').style.visibility = 'hidden';
+        const num = document.getElementById('invoiceNumber').value;
+        document.getElementById('modeBannerText').textContent = `Mode édition — Document ${num}`;
+    }
+
+    /**
+     * Désactive le mode édition, revient en mode création
+     */
+    function newDocument() {
+        currentEditingId = null;
+        document.getElementById('modeBanner').classList.remove('active');
+        document.getElementById('btnSaveEdition').style.display = 'none';
+        document.getElementById('btnPrint').style.visibility = 'hidden';
+
+        // Réinitialiser le formulaire
+        document.getElementById('clientInfo').value = '';
+        document.getElementById('workDesignation').value = '';
+        document.getElementById('invoiceDate').valueAsDate = new Date();
+        document.getElementById('tvaNotice').value = 'TVA non applicable selon l\'article 293 B du CGI';
+        document.getElementById('showTvaNotice').checked = true;
+        document.getElementById('itemsBody').innerHTML = '';
+        addRow(); addRow(); addRow();
+        generateDocumentNumber();
+        updateDisplay();
+        showToast('Nouveau document initialisé.', 'info');
+    }
+
+    /**
+     * Enregistre les modifications en mode édition dans l'historique
+     */
+    function saveEdition() {
+        if (currentEditingId === null) { showToast('Pas en mode édition.', 'warning'); return; }
+
+        const client = document.getElementById('clientInfo').value.trim();
+        const work = document.getElementById('workDesignation').value.trim();
+        if (!client) { showToast('Veuillez remplir les informations du client.', 'warning'); return; }
+        if (!work)   { showToast('Veuillez remplir la désignation des travaux.', 'warning'); return; }
+
+        const currentNumber = document.getElementById('invoiceNumber').value.trim();
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+        const duplicate = history.find(doc => doc.number === currentNumber && doc.id !== currentEditingId);
+        if (duplicate) {
+            showToast(`Le numéro ${currentNumber} est déjà utilisé par un autre document.`, 'error', 'Doublon');
+            return;
+        }
+
+        saveCurrentDocumentToHistory();
+        const num = document.getElementById('invoiceNumber').value;
+        document.getElementById('modeBannerText').textContent = `Mode édition — Document ${num} (enregistré ✓)`;
+        showToast('Modifications enregistrées dans l\'historique.', 'success');
+        document.getElementById('btnPrint').style.visibility = 'visible';
+    }
+
+    // ==================== EDIT FROM HISTORY ====================
+
+    function loadDocumentForEdit(id) {
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY)) || [];
+        const doc = history.find(d => d.id === id);
+        if (!doc) { showToast('Document introuvable.', 'error'); return; }
+
+        // Type (Facture / Devis)
+        if (doc.type === 'Devis') {
+            document.getElementById('Devis').checked = true;
+        } else {
+            document.getElementById('facture').checked = true;
+        }
+        updateUIText();
+
+        // Champs principaux
+        if (doc.number)          document.getElementById('invoiceNumber').value  = doc.number;
+        if (doc.date)            document.getElementById('invoiceDate').value     = doc.date;
+        if (doc.clientFullInfo)  document.getElementById('clientInfo').value      = doc.clientFullInfo;
+        else if (doc.client)     document.getElementById('clientInfo').value      = doc.client;
+        if (doc.workDesignation) document.getElementById('workDesignation').value = doc.workDesignation;
+        if (doc.tvaNotice)       document.getElementById('tvaNotice').value       = doc.tvaNotice;
+        document.getElementById('showTvaNotice').checked = doc.showTvaNotice !== false;
+        if (doc.logo)            { document.getElementById('logoPreview').src = doc.logo; document.getElementById('logoPreviewDisplay').src = doc.logo; }
+
+        // Lignes d'articles
+        document.getElementById('itemsBody').innerHTML = '';
+        if (doc.items && doc.items.length) {
+            doc.items.forEach(item => {
+                addRow();
+                const lastRow = document.querySelector('#itemsBody tr:last-child');
+                if (lastRow) {
+                    const desArea = lastRow.querySelector('.item-designation');
+                    desArea.value = item.designation || '';
+                    desArea.style.height = 'auto';
+                    desArea.style.height = desArea.scrollHeight + 'px';
+                    const printDiv = desArea.nextElementSibling;
+                    if (printDiv) printDiv.textContent = desArea.value;
+                    lastRow.querySelector('.item-quantity').value = item.quantity || '';
+                    lastRow.querySelector('.item-price').value    = item.price    || '';
+                    calculateRowTotal(lastRow);
+                }
+            });
+        } else {
+            addRow(); addRow(); addRow();
+        }
+
+        updateDisplay();
+        setEditionMode(id);
+        closeHistoryModal();
+        showToast(`Document ${doc.number} chargé en mode édition.`, 'success', 'Édition');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ==================== EXPORT/IMPORT ====================
@@ -1513,7 +1845,10 @@ Tel: 07-44-18-54-80
                         addRow();
                         const lastRow = document.querySelector('#itemsBody tr:last-child');
                         if(lastRow) {
-                            lastRow.querySelector('.item-designation').value = item.designation || '';
+                            const _desEl = lastRow.querySelector('.item-designation');
+                            _desEl.value = item.designation || '';
+                            const _printEl = _desEl.nextElementSibling;
+                            if (_printEl) _printEl.textContent = _desEl.value;
                             lastRow.querySelector('.item-quantity').value = item.quantity || '';
                             lastRow.querySelector('.item-price').value = item.price || '';
                             calculateRowTotal(lastRow);
