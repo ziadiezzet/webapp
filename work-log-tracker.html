@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Log Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.5);
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .models-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            min-height: 50px;
+            align-items: center;
+            cursor: text;
+            transition: all 0.3s ease;
+        }
+
+        .models-input-container:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .model-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: tagPop 0.3s ease;
+        }
+
+        @keyframes tagPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .model-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .model-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .models-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            padding: 4px;
+            font-size: 0.95rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .nav-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .date-display {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card.remaining {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+
+        .stat-card.remaining.warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+
+        .stat-card.remaining.danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .task-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .task-code {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .task-duration {
+            color: #764ba2;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .task-desc {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .task-models {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .task-model-tag {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-time {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .task-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn.edit {
+            background: #ffd93d;
+            color: #333;
+        }
+
+        .icon-btn.delete {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-content.wide {
+            max-width: 900px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #4caf50;
+        }
+
+        .toast.error {
+            background: #f44336;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .quick-stat span {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Recapitulation Styles */
+        .recap-section {
+            margin-bottom: 25px;
+        }
+
+        .recap-title {
+            font-size: 1.1rem;
+            color: #667eea;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .recap-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-left: 4px solid #f5576c;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .recap-codes {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .recap-labels {
+            color: #555;
+        }
+
+        .recap-model-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .recap-empty {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .recap-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .recap-stat {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .recap-stat h4 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .recap-stat p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* Debug panel */
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #856404;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Work Log Tracker</h1>
+            <p>Track your daily tasks, durations, project codes, and affected models</p>
+
+            <div class="controls">
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                    📥 Import JSON
+                </button>
+                <button class="btn btn-secondary" onclick="exportLogs()">
+                    📤 Export JSON
+                </button>
+                <button class="btn btn-accent" onclick="openRecapitulate()">
+                    📋 Recapitulate
+                </button>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    🗑️ Clear All
+                </button>
+            </div>
+            <input type="file" id="importFile" class="hidden-input" accept=".json" onchange="importLogs(event)">
+        </div>
+
+        <div class="main-grid">
+            <div class="panel">
+                <h2 class="panel-title">➕ Add Task</h2>
+                <form id="taskForm" onsubmit="addTask(event)">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="taskDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Task Code / Project ID</label>
+                        <input type="text" id="taskCode" placeholder="e.g., 12345, PROJ-001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Time Duration</label>
+                        <div class="time-inputs">
+                            <div>
+                                <input type="number" id="hours" placeholder="Hours" min="0" max="23" required>
+                            </div>
+                            <div>
+                                <input type="number" id="minutes" placeholder="Minutes" min="0" max="59" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Affected Models (press Enter to add multiple)</label>
+                        <div class="models-input-container" id="addModelsContainer" onclick="document.getElementById('modelsInput').focus()">
+                            <div id="modelsTags"></div>
+                            <input type="text" id="modelsInput" class="models-input" placeholder="Type model name + Enter...">
+                        </div>
+                        <div class="debug-info" id="addDebug">Models: <span id="addModelCount">0</span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="taskDesc" placeholder="What did you work on?" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Add Task Log
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <div class="calendar-nav">
+                    <button class="nav-btn" onclick="changeDate(-1)">‹</button>
+                    <div>
+                        <h2 id="currentDateDisplay">Today</h2>
+                        <div class="date-display" id="fullDateDisplay"></div>
+                    </div>
+                    <button class="nav-btn" onclick="changeDate(1)">›</button>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <h3 id="totalTasks">0</h3>
+                        <p>Tasks</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalHours">0h 0m</h3>
+                        <p>Total Time</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalModels">0</h3>
+                        <p>Models</p>
+                    </div>
+                    <div class="stat-card remaining" id="remainingCard">
+                        <h3 id="remainingTime">7h 0m</h3>
+                        <p>Remaining</p>
+                    </div>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        📋 Unique Codes: <span id="uniqueCodes">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        ⏱️ Avg Duration: <span id="avgDuration">0m</span>
+                    </div>
+                    <div class="quick-stat">
+                        🏷️ Unique Models: <span id="uniqueModelsCount">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        🎯 Daily Target: <span>7h 0m</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 25px; margin-bottom: 15px; color: #333;">Task Logs</h3>
+                <div class="task-list" id="taskList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>No tasks logged for this day</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Task</h2>
+                <button class="close-btn" onclick="closeModal('editModal')">×</button>
+            </div>
+            <form id="editForm" onsubmit="updateTask(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="editDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Task Code</label>
+                    <input type="text" id="editCode" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <div class="time-inputs">
+                        <input type="number" id="editHours" placeholder="Hours" min="0" max="23" required>
+                        <input type="number" id="editMinutes" placeholder="Minutes" min="0" max="59" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Affected Models (press Enter to add multiple)</label>
+                    <div class="models-input-container" id="editModelsContainer" onclick="document.getElementById('editModelsInput').focus()">
+                        <div id="editModelsTags"></div>
+                        <input type="text" id="editModelsInput" class="models-input" placeholder="Type model name + Enter...">
+                    </div>
+                    <div class="debug-info" id="editDebug" style="display: block;">Models: <span id="editModelCount">0</span></div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editDesc" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Update Task
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recapitulate Modal -->
+    <div class="modal" id="recapModal">
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h2>📋 Recapitulation by Model</h2>
+                <button class="close-btn" onclick="closeModal('recapModal')">×</button>
+            </div>
+
+            <div class="recap-stats">
+                <div class="recap-stat">
+                    <h4 id="recapTotalTasks">0</h4>
+                    <p>Total Tasks</p>
+                </div>
+                <div class="recap-stat">
+                    <h4 id="recapTotalModels">0</h4>
+                    <p>Affected Models</p>
+                </div>
+                <div class="recap-stat">
+                    <h4 id="recapTotalGroups">0</h4>
+                    <p>Groupings</p>
+                </div>
+            </div>
+
+            <div id="recapContent">
+                <div class="recap-empty">No tasks to recapitulate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Data storage
+        let logs = JSON.parse(localStorage.getItem('workLogs')) || [];
+        let currentDate = new Date();
+        let editingId = null;
+        let currentModels = [];
+        let editCurrentModels = [];
+
+        // Daily target in minutes (7 hours)
+        const DAILY_TARGET_MINUTES = 7 * 60; // 420 minutes
+
+        // Initialize - migrate old data format if needed
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initializing... Logs count:', logs.length);
+
+            // Ensure all logs have models array (backward compatibility)
+            logs = logs.map((log, index) => {
+                if (!log.models || !Array.isArray(log.models)) {
+                    console.log(`Log ${index} has no models or invalid models:`, log);
+                    return { ...log, models: [] };
+                }
+                return log;
+            });
+            saveLogs();
+
+            document.getElementById('taskDate').valueAsDate = new Date();
+            setupModelsInput('modelsInput', 'modelsTags', 'currentModels', 'addModelCount');
+            setupModelsInput('editModelsInput', 'editModelsTags', 'editCurrentModels', 'editModelCount');
+            updateDisplay();
+        });
+
+        // Setup models input
+        function setupModelsInput(inputId, tagsId, storageVar, counterId) {
+            const input = document.getElementById(inputId);
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = input.value.trim();
+                    console.log(`Adding model to ${storageVar}:`, value);
+                    if (value) {
+                        if (storageVar === 'currentModels') {
+                            if (!currentModels.includes(value)) {
+                                currentModels.push(value);
+                                console.log('currentModels now:', currentModels);
+                                renderModelsTags(tagsId, currentModels, storageVar, counterId);
+                            }
+                        } else {
+                            if (!editCurrentModels.includes(value)) {
+                                editCurrentModels.push(value);
+                                console.log('editCurrentModels now:', editCurrentModels);
+                                renderModelsTags(tagsId, editCurrentModels, storageVar, counterId);
+                            }
+                        }
+                        input.value = '';
+                    }
+                } else if (e.key === 'Backspace' && !input.value) {
+                    if (storageVar === 'currentModels' && currentModels.length > 0) {
+                        currentModels.pop();
+                        renderModelsTags(tagsId, currentModels, storageVar, counterId);
+                    } else if (storageVar === 'editCurrentModels' && editCurrentModels.length > 0) {
+                        editCurrentModels.pop();
+                        renderModelsTags(tagsId, editCurrentModels, storageVar, counterId);
+                    }
+                }
+            });
+        }
+
+        // Render model tags
+        function renderModelsTags(containerId, models, storageVar, counterId) {
+            const container = document.getElementById(containerId);
+            const counter = document.getElementById(counterId);
+
+            console.log(`Rendering tags for ${containerId}:`, models);
+
+            container.innerHTML = models.map((model, index) => `
+                <span class="model-tag">
+                    ${escapeHtml(model)}
+                    <span class="remove" onclick="removeModel(${index}, '${storageVar}', '${containerId}', '${counterId}')">×</span>
+                </span>
+            `).join('');
+
+            if (counter) {
+                counter.textContent = models.length;
+            }
+        }
+
+        // Remove model tag
+        function removeModel(index, storageVar, containerId, counterId) {
+            console.log(`Removing model at index ${index} from ${storageVar}`);
+            if (storageVar === 'currentModels') {
+                currentModels.splice(index, 1);
+                renderModelsTags(containerId, currentModels, storageVar, counterId);
+            } else {
+                editCurrentModels.splice(index, 1);
+                renderModelsTags(containerId, editCurrentModels, storageVar, counterId);
+            }
+        }
+
+        // Format date for comparison
+        function formatDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Format date for display
+        function formatDateDisplay(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Get logs for specific date
+        function getLogsForDate(date) {
+            const dateKey = formatDateKey(date);
+            return logs.filter(log => log.date === dateKey);
+        }
+
+        // Calculate duration in minutes
+        function getDurationMinutes(hours, minutes) {
+            return (parseInt(hours) || 0) * 60 + (parseInt(minutes) || 0);
+        }
+
+        // Format duration display
+        function formatDuration(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            if (h > 0 && m > 0) return `${h}h ${m}m`;
+            if (h > 0) return `${h}h`;
+            return `${m}m`;
+        }
+
+        // Add new task
+        function addTask(e) {
+            e.preventDefault();
+
+            console.log('Adding task with models:', currentModels);
+
+            const date = document.getElementById('taskDate').value;
+            const code = document.getElementById('taskCode').value.trim();
+            const hours = document.getElementById('hours').value;
+            const minutes = document.getElementById('minutes').value;
+            const desc = document.getElementById('taskDesc').value.trim();
+
+            if (!date || !code || !desc) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                date: date,
+                code: code,
+                duration: getDurationMinutes(hours, minutes),
+                description: desc,
+                models: Array.isArray(currentModels) ? [...currentModels] : [],
+                createdAt: new Date().toISOString()
+            };
+
+            console.log('Task object created:', task);
+
+            logs.push(task);
+            saveLogs();
+
+            // Reset form
+            document.getElementById('taskCode').value = '';
+            document.getElementById('hours').value = '';
+            document.getElementById('minutes').value = '';
+            document.getElementById('taskDesc').value = '';
+            currentModels = [];
+            renderModelsTags('modelsTags', currentModels, 'currentModels', 'addModelCount');
+
+            if (date === formatDateKey(currentDate)) {
+                updateDisplay();
+            }
+
+            showToast(`Task added with ${task.models.length} model(s)!`, 'success');
+        }
+
+        // Update display
+        function updateDisplay() {
+            const dateKey = formatDateKey(currentDate);
+            const dayLogs = getLogsForDate(currentDate);
+
+            console.log('updateDisplay - dayLogs:', dayLogs);
+
+            // Update date display
+            const today = new Date();
+            const isToday = dateKey === formatDateKey(today);
+            document.getElementById('currentDateDisplay').textContent = isToday ? 'Today' : currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById('fullDateDisplay').textContent = formatDateDisplay(currentDate);
+
+            // Update stats
+            document.getElementById('totalTasks').textContent = dayLogs.length;
+            const totalMinutes = dayLogs.reduce((sum, log) => sum + log.duration, 0);
+            document.getElementById('totalHours').textContent = formatDuration(totalMinutes);
+
+            // Calculate remaining time
+            const remainingMinutes = Math.max(0, DAILY_TARGET_MINUTES - totalMinutes);
+            const remainingEl = document.getElementById('remainingTime');
+            const remainingCard = document.getElementById('remainingCard');
+
+            remainingEl.textContent = formatDuration(remainingMinutes);
+
+            // Update color based on remaining time
+            remainingCard.classList.remove('warning', 'danger');
+            if (remainingMinutes === 0) {
+                remainingCard.classList.add('danger');
+            } else if (remainingMinutes < 120) {
+                remainingCard.classList.add('warning');
+            }
+
+            // Count unique models for the day (with null check)
+            const dayModels = new Set();
+            dayLogs.forEach(log => {
+                console.log('Processing log for models:', log.id, log.models);
+                const models = Array.isArray(log.models) ? log.models : [];
+                models.forEach(m => dayModels.add(m));
+            });
+            document.getElementById('totalModels').textContent = dayModels.size;
+
+            // Unique codes
+            const uniqueCodes = new Set(dayLogs.map(log => log.code)).size;
+            document.getElementById('uniqueCodes').textContent = uniqueCodes;
+
+            // Average duration
+            const avgMinutes = dayLogs.length > 0 ? Math.round(totalMinutes / dayLogs.length) : 0;
+            document.getElementById('avgDuration').textContent = formatDuration(avgMinutes);
+
+            // Unique models count
+            document.getElementById('uniqueModelsCount').textContent = dayModels.size;
+
+            // Render task list
+            const taskList = document.getElementById('taskList');
+            if (dayLogs.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>No tasks logged for this day</p>
+                    </div>
+                `;
+            } else {
+                taskList.innerHTML = dayLogs
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map(log => {
+                        const models = Array.isArray(log.models) ? log.models : [];
+                        console.log('Rendering log:', log.id, 'models:', models);
+                        return `
+                        <div class="task-item">
+                            <div class="task-actions">
+                                <button class="icon-btn edit" onclick="editTask(${log.id})" title="Edit">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteTask(${log.id})" title="Delete">🗑️</button>
+                            </div>
+                            <div class="task-header">
+                                <span class="task-code">${escapeHtml(log.code)}</span>
+                                <span class="task-duration">${formatDuration(log.duration)}</span>
+                            </div>
+                            <div class="task-desc">${escapeHtml(log.description)}</div>
+                            ${models.length > 0 ? `
+                                <div class="task-models">
+                                    ${models.map(m => `<span class="task-model-tag">${escapeHtml(m)}</span>`).join('')}
+                                </div>
+                            ` : '<div class="task-models" style="color: #999; font-size: 0.8rem; font-style: italic;">No models assigned</div>'}
+                            <div class="task-time">${new Date(log.createdAt).toLocaleTimeString()}</div>
+                        </div>
+                    `;
+                    }).join('');
+            }
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Change date
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateDisplay();
+        }
+
+        // Edit task
+        function editTask(id) {
+            console.log('Editing task:', id);
+            const task = logs.find(l => l.id === id);
+            if (!task) {
+                console.error('Task not found:', id);
+                return;
+            }
+
+            console.log('Found task:', task);
+
+            editingId = id;
+            document.getElementById('editId').value = id;
+            document.getElementById('editDate').value = task.date;
+            document.getElementById('editCode').value = task.code;
+            document.getElementById('editHours').value = Math.floor(task.duration / 60);
+            document.getElementById('editMinutes').value = task.duration % 60;
+            document.getElementById('editDesc').value = task.description;
+
+            // FIXED: Properly set edit models and render them
+            editCurrentModels = Array.isArray(task.models) ? [...task.models] : [];
+            console.log('Setting editCurrentModels:', editCurrentModels);
+            renderModelsTags('editModelsTags', editCurrentModels, 'editCurrentModels', 'editModelCount');
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Update task
+        function updateTask(e) {
+            e.preventDefault();
+
+            console.log('Updating task with models:', editCurrentModels);
+
+            const id = parseInt(document.getElementById('editId').value);
+            const task = logs.find(l => l.id === id);
+            if (!task) {
+                console.error('Task not found for update:', id);
+                return;
+            }
+
+            task.date = document.getElementById('editDate').value;
+            task.code = document.getElementById('editCode').value.trim();
+            task.duration = getDurationMinutes(
+                document.getElementById('editHours').value,
+                document.getElementById('editMinutes').value
+            );
+            task.description = document.getElementById('editDesc').value.trim();
+            task.models = Array.isArray(editCurrentModels) ? [...editCurrentModels] : [];
+            task.updatedAt = new Date().toISOString();
+
+            console.log('Updated task:', task);
+
+            saveLogs();
+            closeModal('editModal');
+            updateDisplay();
+            showToast(`Task updated with ${task.models.length} model(s)!`, 'success');
+        }
+
+        // Delete task
+        function deleteTask(id) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+
+            logs = logs.filter(l => l.id !== id);
+            saveLogs();
+            updateDisplay();
+            showToast('Task deleted', 'success');
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'editModal') {
+                editingId = null;
+                editCurrentModels = [];
+            }
+        }
+
+        // Open recapitulate modal
+        function openRecapitulate() {
+            generateRecapitulation();
+            document.getElementById('recapModal').classList.add('active');
+        }
+
+        // Generate recapitulation
+        function generateRecapitulation() {
+            console.log('Generating recapitulation for', logs.length, 'logs');
+
+            // Group tasks by models
+            const modelGroups = {};
+            let tasksWithModels = 0;
+            let tasksWithoutModels = 0;
+
+            logs.forEach(log => {
+                const models = Array.isArray(log.models) ? log.models : [];
+                console.log('Processing log for recap:', log.id, 'models:', models);
+
+                if (models.length === 0) {
+                    tasksWithoutModels++;
+                    // Tasks with no models go to "No Model" group
+                    const key = 'No Model';
+                    if (!modelGroups[key]) {
+                        modelGroups[key] = { codes: [], labels: [] };
+                    }
+                    modelGroups[key].codes.push(log.code);
+                    modelGroups[key].labels.push(log.description);
+                } else {
+                    tasksWithModels++;
+                    // Group by each model
+                    models.forEach(model => {
+                        if (!modelGroups[model]) {
+                            modelGroups[model] = { codes: [], labels: [] };
+                        }
+                        modelGroups[model].codes.push(log.code);
+                        modelGroups[model].labels.push(log.description);
+                    });
+                }
+            });
+
+            console.log('Tasks with models:', tasksWithModels);
+            console.log('Tasks without models:', tasksWithoutModels);
+            console.log('Model groups:', Object.keys(modelGroups));
+
+            // Update stats
+            const totalModels = Object.keys(modelGroups).length;
+            const totalTasks = logs.length;
+
+            document.getElementById('recapTotalTasks').textContent = totalTasks;
+            document.getElementById('recapTotalModels').textContent = totalModels;
+            document.getElementById('recapTotalGroups').textContent = totalModels;
+
+            // Generate content
+            const content = document.getElementById('recapContent');
+
+            if (logs.length === 0) {
+                content.innerHTML = '<div class="recap-empty">No tasks to recapitulate</div>';
+                return;
+            }
+
+            let html = '';
+
+            // Sort models alphabetically, but put "No Model" at the end
+            const sortedModels = Object.keys(modelGroups).sort((a, b) => {
+                if (a === 'No Model') return 1;
+                if (b === 'No Model') return -1;
+                return a.localeCompare(b);
+            });
+
+            sortedModels.forEach(model => {
+                const group = modelGroups[model];
+                const uniqueCodes = [...new Set(group.codes)];
+                const uniqueLabels = [...new Set(group.labels)];
+
+                html += `
+                    <div class="recap-section">
+                        <div class="recap-model-header">🏷️ ${escapeHtml(model)} (${uniqueCodes.length} tasks)</div>
+                        <div class="recap-item">
+                            <span class="recap-codes">(${uniqueCodes.join(', ')})</span>
+                            <span class="recap-labels"> - ${uniqueLabels.join(' & ')}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html;
+        }
+
+        // Save to localStorage
+        function saveLogs() {
+            console.log('Saving', logs.length, 'logs to localStorage');
+            localStorage.setItem('workLogs', JSON.stringify(logs));
+        }
+
+        // Export logs
+        function exportLogs() {
+            if (logs.length === 0) {
+                showToast('No logs to export', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(logs, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `work-logs-${formatDateKey(new Date())}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('Logs exported successfully!', 'success');
+        }
+
+        // Import logs - with backward compatibility
+        function importLogs(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+
+                    if (!Array.isArray(imported)) {
+                        throw new Error('Invalid format: expected array');
+                    }
+
+                    console.log('Importing', imported.length, 'logs');
+
+                    // Validate and migrate structure (backward compatibility)
+                    const migrated = imported.map((item, idx) => {
+                        // Ensure required fields exist
+                        if (!item.id || !item.date || !item.code || 
+                            typeof item.duration !== 'number' || !item.description) {
+                            console.warn(`Skipping invalid log at index ${idx}:`, item);
+                            return null;
+                        }
+
+                        // Migrate old format to new format
+                        const migratedItem = {
+                            id: item.id,
+                            date: item.date,
+                            code: item.code,
+                            duration: item.duration,
+                            description: item.description,
+                            models: Array.isArray(item.models) ? item.models : [],
+                            createdAt: item.createdAt || new Date().toISOString(),
+                            updatedAt: item.updatedAt
+                        };
+
+                        if (migratedItem.models.length > 0) {
+                            console.log(`Log ${idx} has models:`, migratedItem.models);
+                        }
+
+                        return migratedItem;
+                    }).filter(item => item !== null);
+
+                    if (migrated.length === 0) {
+                        throw new Error('No valid logs found in file');
+                    }
+
+                    // Merge or replace
+                    const merge = confirm(`Import ${migrated.length} logs? Click OK to merge with existing, Cancel to replace.`);
+
+                    if (merge) {
+                        const existingIds = new Set(logs.map(l => l.id));
+                        const newLogs = migrated.filter(l => !existingIds.has(l.id));
+                        logs = [...logs, ...newLogs];
+                        showToast(`Imported ${newLogs.length} new logs`, 'success');
+                    } else {
+                        logs = migrated;
+                        showToast(`Replaced with ${migrated.length} logs`, 'success');
+                    }
+
+                    saveLogs();
+                    updateDisplay();
+
+                } catch (err) {
+                    showToast('Error importing: ' + err.message, 'error');
+                    console.error('Import error:', err);
+                }
+
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (!confirm('WARNING: This will delete ALL logs permanently. Are you sure?')) return;
+            if (!confirm('Really sure? This cannot be undone.')) return;
+
+            logs = [];
+            localStorage.removeItem('workLogs');
+            updateDisplay();
+            showToast('All data cleared', 'success');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal('editModal');
+                closeModal('recapModal');
+            }
+        });
+    </script>
+</body>
+</html>
