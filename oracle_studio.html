@@ -43,6 +43,10 @@
 }
 [data-theme="contrast"] {
   --bg0:#000; --bg1:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --bg4:#222;
+  --border:#333; --border2:#555;
+  --amber:#ffcc00; --cyan:#00ffff; --green:#00ff88;
+  --text:#ffffff; --text2:#dddddd; --text3:#888888; --text4:#444444;
+}
 /* ===== MIXED THEMES ===== */
 [data-theme="nord"] {
   --bg0:#1e2430; --bg1:#242c3b; --bg2:#2c3547; --bg3:#354057; --bg4:#3e4c66;
@@ -94,10 +98,7 @@
   --text:#a6accd; --text2:#8a91b4; --text3:#4a5280; --text4:#1f2848;
   --err:#f07178; --warn:#ffcb6b; --info:#89ddff; --ok:#c3e88d;
 }
-  --border:#333; --border2:#555;
-  --amber:#ffcc00; --cyan:#00ffff; --green:#00ff88;
-  --text:#ffffff; --text2:#dddddd; --text3:#888888; --text4:#444444;
-}
+ 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);font-family:var(--mono)}
 #app{display:flex;flex-direction:column;height:100vh}
@@ -281,10 +282,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 .pane-pin-btn{margin-left:auto;margin-right:6px;background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text3);font-size:.6rem;padding:2px 6px;cursor:pointer;font-family:var(--mono);flex-shrink:0;align-self:center;white-space:nowrap}
 .pane-pin-btn:hover{border-color:var(--amber);color:var(--amber)}
 .pane-pin-btn.pinned{color:var(--amber);border-color:var(--amber)}
-#right-body{flex:1;overflow-y:auto;padding:0}
-#right-body::-webkit-scrollbar{width:4px}
+#right-body{flex:1;overflow-y:scroll;padding:0;scrollbar-width:thin;scrollbar-color:var(--border2) var(--bg1)}
+#right-body::-webkit-scrollbar{width:6px;display:block}
 #right-body::-webkit-scrollbar-track{background:var(--bg1)}
-#right-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#right-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;min-height:40px}
+#right-body::-webkit-scrollbar-thumb:hover{background:var(--amber)}
 
 /* ===== VALIDATION ===== */
 .val-summary{display:flex;gap:6px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:.62rem;align-items:center;flex-wrap:wrap;}
@@ -393,7 +395,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
   --text:#0a1830; --text2:#203058; --text3:#506890; --text4:#9ab0d0;
   --err:#b82020; --warn:#8a6000; --info:#005890; --ok:#1a5c30;
 }
-
+/* ===== TABS BAR ===== */
+#tabs-bar{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0;min-height:30px;padding:0 4px;gap:1px}
+#tabs-bar::-webkit-scrollbar{display:none}
+.tab-item{display:flex;align-items:center;gap:5px;padding:0 10px;min-height:26px;border-radius:4px 4px 0 0;cursor:pointer;font-family:var(--mono);font-size:.58rem;color:var(--text3);background:transparent;border:1px solid transparent;border-bottom:none;white-space:nowrap;flex-shrink:0;transition:all .1s;user-select:none}
+.tab-item:hover{background:var(--bg3);color:var(--text2)}
+.tab-item.active{background:var(--bg0);color:var(--text);border-color:var(--border2);border-bottom-color:var(--bg0)}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:var(--text4);flex-shrink:0}
+.tab-dot.dirty{background:var(--orange)}
+.tab-name{max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.tab-x{opacity:.4;font-size:.55rem;width:13px;height:13px;display:flex;align-items:center;justify-content:center;border-radius:2px;margin-left:2px;flex-shrink:0;transition:all .1s}
+.tab-x:hover{opacity:1;background:rgba(248,113,113,.25);color:var(--err)}
+.tab-add{background:transparent;border:none;color:var(--text3);font-size:.85rem;cursor:pointer;padding:0 7px;height:20px;border-radius:3px;line-height:1;flex-shrink:0}
+.tab-add:hover{background:var(--bg3);color:var(--text)}
 /* ===== SCHEMA ===== */
 .obj-section{border-bottom:1px solid var(--border)}
 .obj-section-head{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg2);cursor:pointer;user-select:none;font-size:.6rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;}
@@ -449,7 +463,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 .tmpl-actions{display:flex;gap:4px;margin-top:5px}
 
 /* ===== STATUS BAR ===== */
-#statusbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:24px;background:var(--bg1);border-top:1px solid var(--border);font-size:.58rem;color:var(--text3);flex-shrink:0;}
+#statusbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:24px;background:var(--bg1);border-top:1px solid var(--border);font-size:.58rem;color:var(--text3);flex-shrink:0;z-index:20;position:relative;}
 .sb-item{display:flex;align-items:center;gap:4px}
 .sb-item.ok{color:var(--green)}
 .sb-item.err{color:var(--err)}
@@ -476,7 +490,16 @@ input.modal-input:focus{border-color:var(--amber)}
 *::-webkit-scrollbar{width:4px;height:4px}
 *::-webkit-scrollbar-track{background:transparent}
 *::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+#right-body::-webkit-scrollbar{width:6px}
 
+/* ===== COMMAND PALETTE ===== */
+#cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:flex-start;justify-content:center;padding-top:80px;backdrop-filter:blur(2px)}
+#cmd-box{background:var(--bg1);border:1px solid var(--border2);border-radius:10px;width:540px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+#cmd-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:12px 16px;font-family:var(--mono);font-size:.82rem;color:var(--text);outline:none}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:.66rem;color:var(--text2);transition:background .1s}
+.cmd-item:hover,.cmd-item.cmd-active{background:var(--bg3);color:var(--text)}
+.cmd-shortcut{margin-left:auto;font-size:.56rem;color:var(--text3);background:var(--bg4);padding:2px 6px;border-radius:3px}
+.cmd-group-label{font-size:.55rem;letter-spacing:1px;text-transform:uppercase;color:var(--text4);padding:5px 14px 2px;background:var(--bg2)}
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .val-item,.hist-item,.tmpl-item{animation:fadeIn .12s ease}
@@ -589,7 +612,7 @@ input.modal-input:focus{border-color:var(--amber)}
 
   /* Statusbar compact */
   #statusbar { gap: 6px; padding: 0 8px; font-size: .52rem; }
-  #sb-msg { display: none; }
+  
 
   /* Val items more compact */
   .val-item { padding: 6px 10px; }
@@ -673,6 +696,25 @@ input.modal-input:focus{border-color:var(--amber)}
   #mobile-resizer { display: none; }
 }
 
+#cm-wrap.drag-over::after {
+  content: '⬇ Drop SQL file here';
+  position: absolute; inset: 0; background: rgba(245,158,11,.08);
+  border: 2px dashed var(--amber); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; color: var(--amber); letter-spacing: 1px;
+  pointer-events: none; z-index: 20;
+}
+@media print {
+  #header, #resizer, #mobile-resizer, #right-pane, #statusbar { display: none !important; }
+  #main { display: block !important; }
+  #editor-pane { width: 100% !important; height: auto !important; overflow: visible !important; }
+  #cm-wrap, .CodeMirror { height: auto !important; overflow: visible !important; }
+  .CodeMirror-scroll { overflow: visible !important; height: auto !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .CodeMirror { font-size: 11px !important; line-height: 1.5 !important; background: #fff !important; color: #000 !important; }
+  .CodeMirror-gutters { background: #f5f5f5 !important; border-right: 1px solid #ddd !important; }
+  .CodeMirror-linenumber { color: #888 !important; }
+}
 </style>
 </head>
 <body>
@@ -694,9 +736,10 @@ input.modal-input:focus{border-color:var(--amber)}
     <button class="tb-btn dim" onclick="doUndo()" title="Undo (Ctrl+Z)">⟲ UNDO</button>
     <button class="tb-btn dim" onclick="doRedo()" title="Redo (Ctrl+Y)">⟳ REDO</button>
     <div class="tb-sep"></div>
-    <button class="tb-btn success" onclick="validateDDL()" title="Validate (F5)">✓ VALIDATE</button>
-    <button class="tb-btn primary" onclick="formatDDL()" title="Format (Ctrl+Shift+F)">⌸ FORMAT</button>
-    <button class="tb-btn cyan" onclick="fixDDL()" title="Auto-Fix (Ctrl+Shift+X)">🔧 FIX</button>
+    <button class="tb-btn success" onclick="validateDDL()" title="Validate (F5)" aria-label="Validate DDL">✓ VALIDATE</button>
+    <button class="tb-btn primary" onclick="formatDDL()" title="Format (Ctrl+Shift+F)" aria-label="Format DDL">⌸ FORMAT</button>
+    <button class="tb-btn dim" onclick="showFmtOptions()" title="Format options" aria-label="Format options">⚙</button>
+    <button class="tb-btn cyan" onclick="fixDDL()" title="Auto-Fix (Ctrl+Shift+X)" aria-label="Auto-fix DDL issues">🔧 FIX</button>
     <div class="tb-sep"></div>
     <button class="tb-btn dim" onclick="copyDDL()">📋 COPY</button>
     <button class="tb-btn danger" onclick="clearEditor()">🗑 CLEAR</button>
@@ -724,6 +767,12 @@ input.modal-input:focus{border-color:var(--amber)}
       </optgroup>
     </select>
     <div class="tb-sep"></div>
+    <button class="tb-btn dim" onclick="foldAll()" title="Fold all blocks (Ctrl+Shift+[)">⊟ FOLD</button>
+    <button class="tb-btn dim" onclick="unfoldAll()" title="Unfold all blocks (Ctrl+Shift+])">⊞ UNFOLD</button>
+    <button class="tb-btn dim" onclick="showFindReplace()" title="Find & Replace (Ctrl+F)">🔍 FIND</button>
+    <button class="tb-btn dim" onclick="showDiffMigrate()" title="DDL Diff & Migration">⟺ MIGRATE</button>
+    <button class="tb-btn dim" onclick="shareURL()" title="Copy shareable link">🔗 SHARE</button>
+    <button class="tb-btn dim" onclick="openPalette()" title="Command palette (Ctrl+K)">⌘ CMD</button>
     <button class="tb-btn dim" onclick="showHelp()">? HELP</button>
   </div>
   <input type="file" id="fileInput" style="display:none" accept=".sql,.ddl,.txt" onchange="handleFileOpen(event)">
@@ -761,8 +810,7 @@ input.modal-input:focus{border-color:var(--amber)}
   <div id="right-pane">
     <div class="right-pane-inner">
       <div id="right-tabs">
-        <button class="r-tab active" onclick="switchRTab('validation')">⚡ ISSUES</button>
-        <button class="r-tab" onclick="switchRTab('schema')">🏛 SCHEMA</button>
+        <button class="r-tab active" onclick="switchRTab('validation')">⚡ ISSUES <span id="issues-badge" style="display:none;background:var(--err);color:#000;font-size:.5rem;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle"></span></button>        <button class="r-tab" onclick="switchRTab('schema')">🏛 SCHEMA</button>
         <button class="r-tab" onclick="switchRTab('dictionary')">📚 DICT</button>
         <button class="r-tab" onclick="switchRTab('history')">🕐 HISTORY</button>
         <button class="r-tab" onclick="switchRTab('templates')">📋 TEMPLATES</button>
@@ -782,9 +830,14 @@ input.modal-input:focus{border-color:var(--amber)}
         <!-- Schema Tab -->
         <div id="tab-schema" style="display:none">
           <div id="ext-schema-badge" style="display:none;padding:3px 10px;font-size:.58rem;background:rgba(34,211,238,.08);border-bottom:1px solid var(--border);color:var(--cyan);letter-spacing:.5px">
-  🗂 <span id="ext-schema-count">0</span> external table(s) loaded — schema-aware validation active
-</div>
-<div id="schema-list"><div class="val-empty"><div style="font-size:2rem;opacity:.25">🏛</div><div>Validate to build schema tree</div></div></div>
+            🗂 <span id="ext-schema-count">0</span> external table(s) loaded — schema-aware validation active
+          </div>
+          <div style="display:flex;gap:4px;padding:5px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
+            <button class="tb-btn dim active-btn" id="schema-tree-btn" style="padding:2px 8px;font-size:.57rem" onclick="switchSchemaView('tree')">🏛 TREE</button>
+            <button class="tb-btn dim" id="schema-erd-btn" style="padding:2px 8px;font-size:.57rem" onclick="switchSchemaView('erd')">◈ ERD</button>
+          </div>
+          <div id="schema-list"><div class="val-empty"><div style="font-size:2rem;opacity:.25">🏛</div><div>Validate to build schema tree</div></div></div>
+          <div id="schema-erd" style="display:none;overflow:auto;padding:10px;background:var(--bg0)"></div>
         </div>
         <!-- Dictionary Tab -->
         <div id="tab-dictionary" style="display:none">
@@ -831,11 +884,12 @@ input.modal-input:focus{border-color:var(--amber)}
 </div>
 
 <!-- Status bar -->
-<div id="statusbar">
+<div id="statusbar" role="status" aria-live="polite">
   <div class="sb-item" id="sb-status">◉ Ready</div>
   <div class="sb-item" id="sb-err" style="display:none"></div>
   <div class="sb-item" id="sb-warn" style="display:none"></div>
   <div class="sb-item" id="sb-tables" style="display:none"></div>
+  <div class="sb-item" id="sb-lines" style="color:var(--text3)"></div>
   <div id="sb-msg" class="sb-item"></div>
 </div>
 
@@ -849,6 +903,9 @@ input.modal-input:focus{border-color:var(--amber)}
       <button class="io-tab io-tab-active" id="iotab-dict" onclick="switchIOTab('dict')">📚 Dictionary</button>
       <button class="io-tab" id="iotab-schema" onclick="switchIOTab('schema')">🗂 Schema JS</button>
       <button class="io-tab" id="iotab-ddl" onclick="switchIOTab('ddl')">📄 DDL File</button>
+      <button class="io-tab" id="iotab-export" onclick="switchIOTab('export')">⬇ Export</button>
+      <button class="io-tab" id="iotab-csv" onclick="switchIOTab('csv')">📊 CSV→DDL</button>
+      <button class="io-tab" id="iotab-pg" onclick="switchIOTab('pg')">🐘 →PG Hints</button>
     </div>
     <!-- Dict section -->
     <div id="io-sect-dict">
@@ -906,6 +963,62 @@ input.modal-input:focus{border-color:var(--amber)}
         </div>
       </div>
     </div>
+<!-- Export section -->
+    <div id="io-sect-export" style="display:none">
+      <div class="modal-hint" style="margin-bottom:10px">Export your DDL or schema in different formats.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="tb-btn cyan" style="justify-content:flex-start;padding:8px 12px;font-size:.65rem" onclick="exportHTML()">📄 HTML Report — styled page with schema + issues (shareable)</button>
+        <button class="tb-btn dim" style="justify-content:flex-start;padding:8px 12px;font-size:.65rem" onclick="exportMarkdown()">📝 Markdown — column table for documentation</button>
+        <button class="tb-btn dim" style="justify-content:flex-start;padding:8px 12px;font-size:.65rem" onclick="exportJSON()">🔷 JSON Schema — machine-readable schema object</button>
+        <button class="tb-btn dim" style="justify-content:flex-start;padding:8px 12px;font-size:.65rem" onclick="doIODdlDownload();closeModal('io-modal')">💾 .sql file — raw DDL download</button>
+      </div>
+    </div>
+    <!-- CSV→DDL section -->
+    <div id="io-sect-csv" style="display:none">
+      <div class="modal-hint">Paste a CSV header row or comma-separated column names. Types are inferred from column names.</div>
+      <textarea class="modal-ta" id="csv-input" style="height:90px;margin-top:8px" placeholder="id,name,email,hire_date,salary,is_active"></textarea>
+      <input class="modal-input" id="csv-table" placeholder="Table name (e.g. EMPLOYEES)" style="margin-top:6px" oninput="this.value=this.value.toUpperCase()">
+      <div class="modal-actions" style="margin-top:10px">
+        <button class="tb-btn primary" onclick="doCSVtoDDL()">⊕ GENERATE CREATE TABLE</button>
+        <button class="tb-btn" onclick="closeModal('io-modal')">CANCEL</button>
+      </div>
+    </div>
+    <!-- Oracle → PostgreSQL hints section -->
+    <div id="io-sect-pg" style="display:none">
+      <div class="modal-hint" style="margin-bottom:10px">Common Oracle → PostgreSQL type mappings and syntax changes.</div>
+      <div style="font-size:.62rem;line-height:2;color:var(--text2);background:var(--bg0);border:1px solid var(--border);border-radius:4px;padding:10px 12px;font-family:var(--mono)">
+        <span style="color:var(--amber)">NUMBER(p,s)</span> → <span style="color:var(--cyan)">NUMERIC(p,s)</span><br>
+        <span style="color:var(--amber)">NUMBER(p) / INTEGER</span> → <span style="color:var(--cyan)">INTEGER / BIGINT</span><br>
+        <span style="color:var(--amber)">VARCHAR2(n)</span> → <span style="color:var(--cyan)">VARCHAR(n)</span><br>
+        <span style="color:var(--amber)">NVARCHAR2 / NCHAR</span> → <span style="color:var(--cyan)">VARCHAR / CHAR (UTF-8 default)</span><br>
+        <span style="color:var(--amber)">DATE</span> → <span style="color:var(--cyan)">TIMESTAMP (Oracle DATE includes time)</span><br>
+        <span style="color:var(--amber)">CLOB / NCLOB</span> → <span style="color:var(--cyan)">TEXT</span><br>
+        <span style="color:var(--amber)">BLOB</span> → <span style="color:var(--cyan)">BYTEA</span><br>
+        <span style="color:var(--amber)">RAW(n)</span> → <span style="color:var(--cyan)">BYTEA</span><br>
+        <span style="color:var(--amber)">XMLTYPE</span> → <span style="color:var(--cyan)">XML</span><br>
+        <span style="color:var(--amber)">BINARY_FLOAT/DOUBLE</span> → <span style="color:var(--cyan)">REAL / DOUBLE PRECISION</span><br>
+        <span style="color:var(--amber)">SYSDATE</span> → <span style="color:var(--cyan)">CURRENT_TIMESTAMP</span><br>
+        <span style="color:var(--amber)">NVL(a,b)</span> → <span style="color:var(--cyan)">COALESCE(a,b)</span><br>
+        <span style="color:var(--amber)">DECODE(col,v,r,...)</span> → <span style="color:var(--cyan)">CASE WHEN ... END</span><br>
+        <span style="color:var(--amber)">ROWNUM</span> → <span style="color:var(--cyan)">LIMIT / ROW_NUMBER() OVER()</span><br>
+        <span style="color:var(--amber)">CONNECT BY</span> → <span style="color:var(--cyan)">WITH RECURSIVE CTE</span><br>
+        <span style="color:var(--amber)">SEQUENCE.NEXTVAL</span> → <span style="color:var(--cyan)">NEXTVAL('sequence')</span><br>
+        <span style="color:var(--amber)">ON DELETE CASCADE</span> → <span style="color:var(--cyan)">ON DELETE CASCADE (same)</span><br>
+        <span style="color:var(--amber)">VARCHAR2 || VARCHAR2</span> → <span style="color:var(--cyan)">same, or CONCAT()</span>
+      </div>
+      <div class="modal-actions" style="margin-top:10px">
+        <button class="tb-btn cyan" onclick="convertToPG()">⟳ CONVERT EDITOR DDL</button>
+        <button class="tb-btn" onclick="closeModal('io-modal')">CLOSE</button>
+      </div>
+      <div id="pg-output" style="display:none;margin-top:10px">
+        <div class="modal-hint" style="margin-bottom:4px">Result — review carefully, automatic conversion is approximate:</div>
+        <textarea class="modal-ta" id="pg-result" readonly style="height:160px"></textarea>
+        <div class="modal-actions">
+          <button class="tb-btn primary" onclick="cm.setValue(document.getElementById('pg-result').value);setDirty(true);closeModal('io-modal');statusMsg('PG DDL loaded into editor','ok')">⊕ LOAD INTO EDITOR</button>
+          <button class="tb-btn cyan" onclick="navigator.clipboard.writeText(document.getElementById('pg-result').value).then(()=>statusMsg('Copied!','ok'))">📋 COPY</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -954,13 +1067,22 @@ input.modal-input:focus{border-color:var(--amber)}
     <button class="modal-close" onclick="closeModal('help-modal')">✕ CLOSE</button>
     <div class="modal-title">⌨ SHORTCUTS & FEATURES</div>
     <table style="font-size:.65rem;border-collapse:collapse;width:100%">
-      <tr><td style="padding:4px 0;color:var(--amber);width:200px">F5</td><td style="color:var(--text2)">Validate DDL (smart syntax + semantic)</td></tr>
+      <tr><td style="padding:4px 0;color:var(--amber);width:200px">F5</td><td style="color:var(--text2)">Validate DDL</td></tr>
       <tr><td>Ctrl+Shift+F</td><td>Format / Beautify DDL</td></tr>
       <tr><td>Ctrl+Shift+X</td><td>Auto-Fix issues</td></tr>
+      <tr><td>Ctrl+F</td><td>Find & Replace</td></tr>
+      <tr><td>Ctrl+H</td><td>Find & Replace (alternative)</td></tr>
+      <tr><td>Ctrl+D</td><td>Select next occurrence (multi-cursor)</td></tr>
+      <tr><td>F2</td><td>Rename identifier (all occurrences)</td></tr>
+      <tr><td>Ctrl+K</td><td>Command palette</td></tr>
+      <tr><td>Ctrl+Shift+[</td><td>Fold all blocks</td></tr>
+      <tr><td>Ctrl+Shift+]</td><td>Unfold all blocks</td></tr>
       <tr><td>Ctrl+Z / Ctrl+Y</td><td>Undo / Redo</td></tr>
       <tr><td>Ctrl+Space</td><td>Autocomplete</td></tr>
       <tr><td>Ctrl+/</td><td>Toggle comment</td></tr>
+      <tr><td>Ctrl+N</td><td>New file</td></tr>
       <tr><td>Ctrl+S</td><td>Save file</td></tr>
+      <tr><td>Ctrl+Shift+I</td><td>Import / Export panel</td></tr>
     </table>
     <div style="margin-top:12px;font-size:.65rem;color:var(--text3);line-height:1.9">
       <strong style="color:var(--amber)">Smart Validator v3</strong> — new checks:<br>
@@ -982,6 +1104,110 @@ input.modal-input:focus{border-color:var(--amber)}
 </div>
 </div>
 
+<!-- Formatter Options Modal -->
+<div class="modal-overlay" id="fmt-modal" style="display:none" onclick="if(event.target===this)closeModal('fmt-modal')">
+  <div class="modal-box" style="max-width:340px">
+    <button class="modal-close" onclick="closeModal('fmt-modal')">✕ CLOSE</button>
+    <div class="modal-title">⌸ FORMAT OPTIONS</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <label style="font-size:.65rem;color:var(--text2)">Indent size</label>
+        <select id="fmt-indent" class="modal-sel">
+          <option value="2">2 spaces</option>
+          <option value="4" selected>4 spaces</option>
+          <option value="8">8 spaces</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <label style="font-size:.65rem;color:var(--text2)">Keyword case</label>
+        <select id="fmt-keywords" class="modal-sel">
+          <option value="upper">UPPERCASE</option>
+          <option value="lower">lowercase</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <label style="font-size:.65rem;color:var(--text2)">Align column types</label>
+        <input type="checkbox" id="fmt-align" checked style="width:16px;height:16px;cursor:pointer">
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="tb-btn primary" onclick="applyFmtOptions()">⌸ FORMAT NOW</button>
+      <button class="tb-btn" onclick="closeModal('fmt-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+<!-- Diff Modal -->
+<div class="modal-overlay" id="diff-modal" style="display:none" onclick="if(event.target===this)closeModal('diff-modal')">
+  <div class="modal-box" style="max-width:680px;max-height:82vh;display:flex;flex-direction:column">
+    <button class="modal-close" onclick="closeModal('diff-modal')">✕ CLOSE</button>
+    <div class="modal-title">⟺ DIFF — HISTORY vs EDITOR</div>
+    <div id="diff-modal-stats" style="font-size:.6rem;color:var(--text3);margin-bottom:8px"></div>
+    <div id="diff-modal-body" style="overflow-y:auto;flex:1;border:1px solid var(--border);border-radius:4px;background:var(--bg0)"></div>
+  </div>
+</div>
+<!-- ===== FIND & REPLACE ===== -->
+<div class="modal-overlay" id="fr-modal" style="display:none" onclick="if(event.target===this)closeModal('fr-modal')">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('fr-modal')">✕ CLOSE</button>
+    <div class="modal-title">🔍 FIND & REPLACE</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="fr-find" class="modal-input" placeholder="Find…" style="flex:1" oninput="frHighlight()" onkeydown="if(event.key==='Enter')frNext()">
+        <button class="tb-btn dim" onclick="frPrev()" title="Previous (Shift+Enter)">↑</button>
+        <button class="tb-btn dim" onclick="frNext()" title="Next (Enter)">↓</button>
+      </div>
+      <input id="fr-replace" class="modal-input" placeholder="Replace with…" onkeydown="if(event.key==='Enter')frReplace()">
+      <div style="display:flex;gap:12px;align-items:center;font-size:.62rem;color:var(--text3)">
+        <label style="display:flex;gap:4px;align-items:center"><input type="checkbox" id="fr-case"> Case sensitive</label>
+        <label style="display:flex;gap:4px;align-items:center"><input type="checkbox" id="fr-regex"> Regex</label>
+        <span id="fr-count" style="margin-left:auto;color:var(--cyan)"></span>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="tb-btn primary" onclick="frReplace()">REPLACE</button>
+      <button class="tb-btn cyan" onclick="frReplaceAll()">REPLACE ALL</button>
+      <button class="tb-btn" onclick="closeModal('fr-modal')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMMAND PALETTE ===== -->
+<div id="cmd-overlay" style="display:none" onclick="if(event.target===this)closePalette()">
+  <div id="cmd-box">
+    <input id="cmd-input" placeholder="Type a command or search…" oninput="renderPalette()" onkeydown="palKey(event)" autocomplete="off" spellcheck="false">
+    <div id="cmd-list" style="max-height:360px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ===== DDL DIFF & MIGRATE ===== -->
+<div class="modal-overlay" id="migrate-modal" style="display:none" onclick="if(event.target===this)closeModal('migrate-modal')">
+  <div class="modal-box" style="max-width:700px">
+    <button class="modal-close" onclick="closeModal('migrate-modal')">✕ CLOSE</button>
+    <div class="modal-title">⟺ DDL DIFF & MIGRATION</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="flex:1">
+        <div style="font-size:.58rem;color:var(--text3);margin-bottom:4px">ORIGINAL TABLE (v1)</div>
+        <textarea class="modal-ta" id="mg-old" placeholder="CREATE TABLE employees (&#10;    id NUMBER(10) NOT NULL,&#10;    ...&#10;);"></textarea>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:.58rem;color:var(--text3);margin-bottom:4px">TARGET TABLE (v2)</div>
+        <textarea class="modal-ta" id="mg-new" placeholder="CREATE TABLE employees (&#10;    id NUMBER(10) NOT NULL,&#10;    email VARCHAR2(150),&#10;    ...&#10;);"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:10px">
+      <button class="tb-btn primary" onclick="runMigrate()">⟺ GENERATE ALTER SCRIPT</button>
+      <button class="tb-btn" onclick="closeModal('migrate-modal')">CANCEL</button>
+    </div>
+    <div id="mg-output" style="display:none;margin-top:10px">
+      <div style="font-size:.58rem;color:var(--text3);margin-bottom:4px">GENERATED MIGRATION SCRIPT</div>
+      <textarea class="modal-ta" id="mg-result" readonly style="height:140px;background:var(--bg0)"></textarea>
+      <div class="modal-actions">
+        <button class="tb-btn primary" onclick="insertMigration()">⊕ INSERT INTO EDITOR</button>
+        <button class="tb-btn cyan" onclick="navigator.clipboard.writeText(document.getElementById('mg-result').value).then(()=>statusMsg('Copied!','ok'))">📋 COPY</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ===== FIX PREVIEW POPUP ===== -->
 <div id="fix-popup-overlay" style="display:none" onclick="if(event.target===this)closeFix()">
@@ -997,6 +1223,7 @@ input.modal-input:focus{border-color:var(--amber)}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
@@ -1254,6 +1481,16 @@ function parseDDL(sql) {
     let fullType=baseType;
     if(baseType==='DOUBLE'&&cur()?.upper==='PRECISION'){fullType='DOUBLE PRECISION';pos++;}
     else if(baseType==='LONG'&&cur()?.upper==='RAW'){fullType='LONG RAW';pos++;}
+    else if(baseType==='INTERVAL'){
+      if(cur()?.upper==='YEAR'||cur()?.upper==='DAY'){
+        const _iUnit=consume().upper;
+        if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')')pos++;if(cur()?.value===')')pos++;}
+        if(cur()?.upper==='TO'){pos++;const _iTo=consume()?.upper||'';
+          fullType='INTERVAL '+_iUnit+' TO '+_iTo;
+          if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')')pos++;if(cur()?.value===')')pos++;}
+        } else { fullType='INTERVAL '+_iUnit; }
+      }
+    }
     let precision=null, scale=null;
     if(cur()?.value==='('){
       pos++;
@@ -1309,6 +1546,10 @@ function parseDDL(sql) {
         const cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
         if(cols.length===0) schema.errors.push({msg:`PRIMARY KEY constraint "${cname||'<unnamed>'}" has empty column list — template: CONSTRAINT pk_name PRIMARY KEY (col1, col2)`,line:cLine});
         if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}
+        if(tableObj.constraints.some(c=>c.type==='PK'))
+          schema.errors.push({msg:`Table already has a PRIMARY KEY — only one PRIMARY KEY constraint is allowed per table`,line:cLine});
+        if(tableObj.constraints.some(c=>c.type==='PK'))
+          schema.errors.push({msg:`Table already has a PRIMARY KEY — only one PRIMARY KEY constraint is allowed per table`,line:cLine});
         tableObj.constraints.push({type:'PK',name:cname,cols,line:cLine});
         cols.forEach(c=>{if(tableObj.columns[c])tableObj.columns[c].notNull=true;});
       }else schema.errors.push({msg:'Expected KEY after PRIMARY — template: CONSTRAINT name PRIMARY KEY (column)',line:cur()?.line});
@@ -1333,7 +1574,14 @@ function parseDDL(sql) {
             }
           }
           let onDelete=null;
-          if(cur()?.upper==='ON'){pos++;if(cur()?.upper==='DELETE'){pos++;onDelete=consume()?.upper;}}
+          if(cur()?.upper==='ON'){
+            pos++;
+            if(cur()?.upper==='DELETE'){pos++;onDelete=consume()?.upper;}
+            else if(cur()?.upper==='UPDATE'){
+              schema.errors.push({msg:`Oracle does not support ON UPDATE — only ON DELETE CASCADE / SET NULL is valid`,line:cLine});
+              pos++;consume();
+            }
+          }
           if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}
           tableObj.constraints.push({type:'FK',name:cname,cols:fkCols,refTable,refCols,onDelete,line:cLine});
         }else schema.errors.push({msg:'Expected REFERENCES after FOREIGN KEY — template: FOREIGN KEY (col) REFERENCES target_table (target_col)',line:cur()?.line});
@@ -1345,9 +1593,20 @@ function parseDDL(sql) {
       if(cname)schema.constraintNames.add(cname);
       tableObj.constraints.push({type:'CHECK',name:cname,line:cLine});
     }
-    while(pos<toks.length&&cur()?.value!==','&&cur()?.value!==')'&&cur()?.value!==';'){
-      if(['ENABLE','DISABLE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','NOVALIDATE','VALIDATE','USING','INDEX'].includes(cur()?.upper))pos++;
-      else break; pos++;
+    {
+      let _cStatus = 'ENABLED';
+      while(pos<toks.length&&cur()?.value!==','&&cur()?.value!==')'&&cur()?.value!==';'){
+        const _cu = cur()?.upper;
+        if(['ENABLE','DISABLE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','NOVALIDATE','VALIDATE','USING','INDEX'].includes(_cu)){
+          if(_cu==='DISABLE')   _cStatus = 'DISABLED';
+          else if(_cu==='NOVALIDATE') _cStatus = 'NOVALIDATE';
+          else if(_cu==='ENABLE')     _cStatus = 'ENABLED';
+          pos++;
+        } else break;
+        pos++;
+      }
+      const _lc = tableObj.constraints[tableObj.constraints.length-1];
+      if(_lc) _lc.status = _cStatus;
     }
   }
   function parseCreateTable() {
@@ -1653,6 +1912,42 @@ function parseDDL(sql) {
 // ============================================================================
 // PARENTHESIS BALANCE CHECKER
 // ============================================================================
+function checkPlsqlBalance(sql) {
+  const issues = [];
+  const stripped = sql
+    .replace(/--[^\n]*/g, m => ' '.repeat(m.length))
+    .replace(/'(?:[^']|'')*'/g, m => "'" + ' '.repeat(m.length - 2) + "'");
+  function lineOf(idx) { let n=1; for(let i=0;i<idx;i++){if(sql[i]==='\n')n++;} return n; }
+  const re = /\b(BEGIN|END|IF|LOOP|CASE|DECLARE)\b|\(|\)/gi;
+  const toks2 = [];
+  let rm;
+  while((rm=re.exec(stripped))!==null) toks2.push({t:rm[0].toUpperCase(),idx:rm.index});
+  let depth=0, parenD=0, lastOpen=null;
+  for(let i=0; i<toks2.length; i++){
+    const {t,idx}=toks2[i];
+    if(t==='('){parenD++;continue;}
+    if(t===')'){if(parenD>0)parenD--;continue;}
+    if(parenD>0)continue;
+    if(['BEGIN','IF','LOOP','CASE','DECLARE'].includes(t)){
+      if(depth===0)lastOpen=lineOf(idx);
+      depth++;
+    } else if(t==='END'){
+      if(depth===0){
+        issues.push({sev:'error',msg:'Unexpected END without a matching BEGIN / IF / LOOP / CASE',line:lineOf(idx)});
+      } else {
+        depth--;
+        // END IF / END LOOP / END CASE — consume the suffix so it doesn't re-open depth
+        if(i+1<toks2.length&&['IF','LOOP','CASE'].includes(toks2[i+1].t)) i++;
+      }
+    }
+  }
+  if(depth>0)
+    issues.push({sev:'error',
+      msg:`Unclosed PL/SQL block — ${depth} opener${depth>1?'s':''} (BEGIN/IF/LOOP/CASE) without matching END`,
+      line:lastOpen||1});
+  return issues;
+}
+
 function checkParenBalance(sql) {
   const issues = [];
   let depth = 0;
@@ -1704,6 +1999,7 @@ function validateSchema(schema, sql) {
   // Paren balance check
   if (sql) {
     checkParenBalance(sql).forEach(i => issues.push(i));
+    checkPlsqlBalance(sql).forEach(i => issues.push(i));
   }
 
   // Missing semicolons between DDL statements + missing trailing semicolon
@@ -1791,6 +2087,11 @@ function validateSchema(schema, sql) {
       const baseUp = dt.base?.toUpperCase();
       if (baseUp && !VALID_TYPES.has(baseUp) && !baseUp.startsWith('INTERVAL'))
         err(`Invalid Oracle datatype "${dt.base}" on column "${colName}"`, tblName, colName, col.line);
+      if (baseUp === 'INTERVAL') {
+        const _fUp = (dt.full||'').toUpperCase();
+        if (!/^INTERVAL\s+(YEAR\s+TO\s+MONTH|DAY\s+TO\s+SECOND)/.test(_fUp))
+          err(`INTERVAL column "${colName}" needs qualifier — use INTERVAL YEAR TO MONTH or INTERVAL DAY TO SECOND`, tblName, colName, col.line);
+      }
       if (baseUp === 'VARCHAR2' && dt.precision == null)
         err(`VARCHAR2 requires a size — "${colName}" missing size e.g. VARCHAR2(100)`, tblName, colName, col.line);
       if (baseUp === 'NVARCHAR2' && dt.precision == null)
@@ -1801,6 +2102,16 @@ function validateSchema(schema, sql) {
         warn(`VARCHAR2(${dt.precision}) exceeds 4000 bytes — EXTENDED STRINGS must be enabled`, tblName, colName, col.line);
       if (baseUp === 'CHAR' && dt.precision != null && dt.precision > 2000)
         err(`CHAR(${dt.precision}) exceeds max size of 2000`, tblName, colName, col.line);
+      if (baseUp === 'NCHAR' && dt.precision != null && dt.precision > 2000)
+        err(`NCHAR(${dt.precision}) exceeds max size of 2000 chars`, tblName, colName, col.line);
+      if (baseUp === 'NVARCHAR2' && dt.precision == null)
+        err(`NVARCHAR2 requires a size — "${colName}" missing size e.g. NVARCHAR2(100)`, tblName, colName, col.line);
+      if (baseUp === 'NVARCHAR2' && dt.precision != null && dt.precision > 4000)
+        err(`NVARCHAR2(${dt.precision}) exceeds max size of 4000 chars`, tblName, colName, col.line);
+      if ((baseUp === 'CLOB' || baseUp === 'BLOB' || baseUp === 'NCLOB') && dt.precision != null)
+        err(`${baseUp} columns do not accept a size parameter — remove (${dt.precision})`, tblName, colName, col.line);
+      if (baseUp === 'TIMESTAMP' && dt.precision != null && (dt.precision < 0 || dt.precision > 9))
+        err(`TIMESTAMP precision must be between 0 and 9 — found TIMESTAMP(${dt.precision})`, tblName, colName, col.line);
       if (baseUp === 'NUMBER' && dt.precision != null && (dt.precision < 1 || dt.precision > 38))
         err(`NUMBER precision must be between 1 and 38`, tblName, colName, col.line);
       if (colName.length > 128) err(`Column name "${colName}" exceeds 128 chars`, tblName, colName, col.line);
@@ -1909,7 +2220,21 @@ function validateSchema(schema, sql) {
       warn(`Table name "${tblName}" is an Oracle unreserved keyword — allowed but risky; consider renaming`, tblName, null, tbl.line);
   }
 
+  // ── GRANT / REVOKE privilege linter ─────────────────────────────────────
+  if (sql) {
+    const _grantRe = /\bGRANT\s+([\w\s,*]+?)\s+ON\s+(\w+)\s+TO\s+(\w+)/gi;
+    let _gm;
+    while ((_gm = _grantRe.exec(sql)) !== null) {
+      const _obj = _gm[2].toUpperCase(), _to = _gm[3].toUpperCase();
+      const _ln  = sql.slice(0, _gm.index).split('\n').length;
+      if (!schema.tables[_obj] && !schema.sequences[_obj] && !(schema.views||{})[_obj])
+        warn(`GRANT references "${_obj}" which is not defined in this DDL`, null, null, _ln);
+      if (/\bALL\b/i.test(_gm[1]))
+        warn(`GRANT ALL on "${_obj}" to "${_to}" is overly broad — grant only required privileges`, null, null, _ln);
+    }
+  }
   // Index checks
+  const _idxSigs = new Map();
   schema.indexes.forEach(idx => {
     const tblObj = schema.tables[idx.table];
     if (!tblObj) { warn(`Index "${idx.name||'?'}" references unknown table "${idx.table}"`, null, null, idx.line); return; }
@@ -1917,7 +2242,35 @@ function validateSchema(schema, sql) {
       if (!tblObj.columns[col.toUpperCase()])
         err(`Index "${idx.name||'?'}" column "${col}" does not exist in table "${idx.table}"`, idx.table, null, idx.line);
     });
+    // Duplicate index detection
+    const sig = idx.table + '|' + [...idx.cols].sort().join(',') + '|' + (idx.unique?'U':'');
+    if (_idxSigs.has(sig)) {
+      warn(`Index "${idx.name||'?'}" duplicates existing index "${_idxSigs.get(sig)}" — same table, columns and uniqueness`, idx.table, null, idx.line);
+    } else {
+      _idxSigs.set(sig, idx.name||'?');
+    }
   });
+  
+  // Constraint naming convention lint
+  const _conPrefixRules = [
+    { type:'PK',     prefix:'PK_',  label:'Primary Key' },
+    { type:'FK',     prefix:'FK_',  label:'Foreign Key' },
+    { type:'UNIQUE', prefix:'AK_',  label:'Unique'      },
+    { type:'CHECK',  prefix:'CK_',  label:'Check'       },
+  ];
+  for (const [tblName, tbl] of Object.entries(schema.tables)) {
+    for (const con of tbl.constraints) {
+      if (!con.name) continue;
+      const rule = _conPrefixRules.find(r => r.type === con.type);
+      if (!rule) continue;
+      if (!con.name.toUpperCase().startsWith(rule.prefix)) {
+        info(
+          `Constraint "${con.name}" (${rule.label} on "${tblName}") does not follow the "${rule.prefix}" naming convention`,
+          tblName, null, con.line
+        );
+      }
+    }
+  }
 
   // Propagate syntax errors/warnings from parser
   schema.errors?.forEach(e  => err(e.msg,  e.table, e.col, e.line));
@@ -1928,7 +2281,8 @@ function validateSchema(schema, sql) {
 // ============================================================================
 // FORMATTER (real implementation)
 // ============================================================================
-function formatDDLText(sql) {
+function formatDDLText(sql, opts) {
+  opts = opts || loadFmtOpts();
   let toks;
   try { toks = tokenize(sql); } catch(e) { return sql; }
   const stmts = [];
@@ -1945,7 +2299,9 @@ function formatDDLText(sql) {
 
 function fmtToken(tok) {
   if (!tok) return '';
-  if (tok.type === 'KEYWORD' || KW_SET.has(tok.upper) || DTYPE_SET.has(tok.upper)) return tok.upper;
+  const _fo = (typeof opts !== 'undefined' && opts) ? opts : loadFmtOpts();
+  if (tok.type === 'KEYWORD' || KW_SET.has(tok.upper) || DTYPE_SET.has(tok.upper))
+    return _fo.keywords === 'lower' ? tok.upper.toLowerCase() : tok.upper;
   return tok.value;
 }
 
@@ -2033,14 +2389,16 @@ function fmtCreateTable(toks) {
     }
   });
 
+  const _fo2 = (typeof opts !== 'undefined' && opts) ? opts : loadFmtOpts();
+  const _ind = ' '.repeat(_fo2.indent || 4);
   const maxNameLen = Math.max(0, ...colItems.map(c => c.name.length));
   const maxTypeLen = Math.max(0, ...colItems.map(c => c.type.length));
 
   const lines = [
     ...colItems.map(c => {
-      const namePad = c.name.padEnd(maxNameLen + 3);
-      const typePad = c.type.padEnd(maxTypeLen + 3);
-      return '    ' + namePad + typePad + c.rest.trim();
+      const namePad = _fo2.align ? c.name.padEnd(maxNameLen + 3) : c.name + '   ';
+      const typePad = _fo2.align ? c.type.padEnd(maxTypeLen + 3) : c.type + '   ';
+      return _ind + namePad + typePad + c.rest.trim();
     }),
     ...conItems.map(c => '    ' + c)
   ];
@@ -2335,6 +2693,17 @@ function autoFixDDL(sql) {
     }
   }
 
+  // ── PASS 6: missing semicolon at end of last statement ────────
+  {
+    const trimmed = fixed.replace(/\s+$/, '');
+    if (trimmed.length > 0 && trimmed[trimmed.length - 1] !== ';') {
+      const hasStmt = /\b(CREATE|ALTER|DROP|TRUNCATE|INSERT|UPDATE|DELETE|SELECT|MERGE|GRANT|REVOKE)\b/i.test(trimmed);
+      if (hasStmt) {
+        fixed = trimmed + ';\n';
+        fixes.push({ msg: 'Added missing semicolon at end of last statement', lineNum: null });
+      }
+    }
+  }
   return { fixed, fixes };
 }
 
@@ -2455,10 +2824,12 @@ function loadDictionary() {
   try { return JSON.parse(localStorage.getItem(DICT_KEY)||'null')||{tables:[],columns:[],objects:[],custom_kw:[],custom_types:[]}; }
   catch { return {tables:[],columns:[],objects:[],custom_kw:[],custom_types:[]}; }
 }
+
 function saveDictionary(d) {
-  try { localStorage.setItem(DICT_KEY,JSON.stringify(d)); }
+  try { localStorage.setItem(DICT_KEY,JSON.stringify(d)); _hintCache = null; }
   catch(e) { statusMsg('⚠ Could not save dictionary','warn'); }
 }
+
 function learnFromSchemaExternal() {
   if (!externalSchema || !externalSchema.tables) return [];
   const names = [];
@@ -2671,7 +3042,6 @@ const DDL_COMPLETIONS = [
 // EXTERNAL SCHEMA (imported from pdmData JS file)
 // ============================================================================
 let externalSchema = null;
-let schemaWorker   = null;
 
 function importJsSchema() {
   document.getElementById('schemaJsInput').click();
@@ -2733,8 +3103,11 @@ function handleSchemaJsFile(evt) {
           externalSchema = schema;
           const tCount = Object.keys(schema.tables).length;
           statusMsg('✅ Schema loaded — ' + tCount + ' table(s)', 'ok');
+          // Merge external schema names into autocomplete
+          const _extNames = learnFromSchemaExternal();
           try {
             const _ed = loadDictionary();
+            _extNames.forEach(n => { if(n && !_ed.tables.includes(n) && !_ed.columns.includes(n) && !_ed.objects.includes(n)) _ed.tables.push(n); });
             for (const [code, _tbl] of Object.entries(schema.tables)) {
               if (!_ed.tables.includes(code)) _ed.tables.push(code);
               for (const col of Object.keys(_tbl.columns)) { if (!_ed.columns.includes(col)) _ed.columns.push(col); }
@@ -2746,7 +3119,7 @@ function handleSchemaJsFile(evt) {
           const countEl = document.getElementById('ext-schema-count');
           if (badge) badge.style.display = 'block';
           if (countEl) countEl.textContent = tCount;
-          if (currentSchema) renderSchemaPanel(currentSchema);
+          renderSchemaPanel(currentSchema);
         }
       }
       processBatch();
@@ -2852,13 +3225,17 @@ const FUNCTION_ARG_HINTS = {
 // ============================================================================
 // AUTOCOMPLETE ENGINE
 // ============================================================================
+let _hintCache = null;
+function invalidateCompletionCache() { _hintCache = null; }
 function getHintWords() {
+  if (_hintCache) return _hintCache;
   const d = loadDictionary();
-  return {
+  _hintCache = {
     keywords: [...ORACLE_KEYWORDS, ...(d.custom_kw||[])],
     datatypes: [...ORACLE_DATATYPES, ...(d.custom_types||[])],
     tables: d.tables, columns: d.columns, objects: d.objects, functions: ORACLE_FUNCTIONS,
   };
+  return _hintCache;
 }
 
 // Get columns of a specific table from currentSchema or externalSchema
@@ -3085,12 +3462,23 @@ function oracleHint(editor) {
 // ============================================================================
 // HISTORY
 // ============================================================================
-const historyItems = [];
+const HIST_KEY = 'oracle_ddl_history_v1';
+function _loadHistory() {
+  try {
+    return (JSON.parse(sessionStorage.getItem(HIST_KEY)||'[]')).map(h=>({...h,time:new Date(h.time)}));
+  } catch { return []; }
+}
+function _saveHistory() {
+  try { sessionStorage.setItem(HIST_KEY, JSON.stringify(historyItems)); } catch {}
+}
+const historyItems = _loadHistory();
 function addHistoryEntry(text, type) {
   historyItems.unshift({ text, type: type||'copy', time: new Date(), chars: text.length });
   if (historyItems.length > 20) historyItems.pop();
+  _saveHistory();
   if (document.getElementById('tab-history').style.display !== 'none') renderHistory();
 }
+
 function renderHistory() {
   const el = document.getElementById('hist-list');
   if (!historyItems.length) {
@@ -3118,6 +3506,7 @@ function renderHistory() {
       <div class="hist-actions">
         <button class="hist-small-btn restore" onclick="restoreHistory(${idx})">⟲ Restore</button>
         <button class="hist-small-btn" onclick="copyHistoryItem(${idx})">📋 Copy</button>
+        <button class="hist-small-btn" style="color:var(--cyan);border-color:rgba(34,211,238,.3)" onclick="showHistoryDiff(${idx})">⟺ Diff</button>
         <button class="hist-small-btn" style="color:var(--red)" onclick="deleteHistoryItem(${idx})">✕</button>
       </div>
     </div>`;
@@ -3136,11 +3525,45 @@ function copyHistoryItem(idx) {
 }
 function deleteHistoryItem(idx) {
   historyItems.splice(idx, 1);
+  _saveHistory();
   renderHistory();
 }
+function computeDiff(oldText, newText) {
+  const A = oldText.split('\n'), B = newText.split('\n');
+  const m = A.length, n = B.length;
+  const dp = Array.from({length:m+1}, () => new Array(n+1).fill(0));
+  for(let i=m-1;i>=0;i--) for(let j=n-1;j>=0;j--)
+    dp[i][j] = A[i]===B[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const result = [];
+  let i=0, j=0;
+  while(i<m||j<n){
+    if(i<m&&j<n&&A[i]===B[j]){result.push({t:' ',v:A[i]});i++;j++;}
+    else if(j<n&&(i>=m||(dp[i+1]?.[j]||0)<=(dp[i]?.[j+1]||0))){result.push({t:'+',v:B[j]});j++;}
+    else{result.push({t:'-',v:A[i]});i++;}
+  }
+  return result;
+}
+function showHistoryDiff(idx) {
+  const item = historyItems[idx];
+  if (!item || !cm) return;
+  const diff = computeDiff(item.text, cm.getValue());
+  const adds = diff.filter(d=>d.t==='+').length;
+  const dels = diff.filter(d=>d.t==='-').length;
+  document.getElementById('diff-modal-stats').textContent = `+${adds} added  −${dels} removed`;
+  document.getElementById('diff-modal-body').innerHTML = diff.map(d => {
+    const e = d.v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const bg = d.t==='+'?'rgba(52,211,153,.07)':d.t==='-'?'rgba(248,113,113,.07)':'';
+    const col = d.t==='+'?'var(--green)':d.t==='-'?'var(--red)':'var(--text4)';
+    const tc  = d.t==='+'?'var(--green)':d.t==='-'?'var(--red)':'var(--text3)';
+    return `<div style="display:flex;gap:8px;background:${bg};padding:1px 8px;font-family:var(--mono);font-size:.61rem;line-height:1.65;white-space:pre-wrap;word-break:break-all"><span style="color:${col};width:10px;flex-shrink:0">${d.t}</span><span style="color:${tc}">${e}</span></div>`;
+  }).join('');
+  document.getElementById('diff-modal').style.display = 'flex';
+}
+
 function clearHistory() {
   if (!confirm('Clear all history?')) return;
   historyItems.length = 0;
+  _saveHistory();
   renderHistory();
   statusMsg('History cleared', 'ok');
 }
@@ -3474,19 +3897,21 @@ CREATE TABLE user_accounts (
 
 function renderTemplates() {
   const el = document.getElementById('templates-list');
+  _tmplSqlStore.length = 0;
   // Built-in template groups
   let html = TEMPLATES.map(group => {
     const items = group.items.map(item => {
-      const sqlJson = JSON.stringify(item.sql);
+      _tmplSqlStore.push(item.sql);
+      const idx = _tmplSqlStore.length - 1;
       return `
       <div class="tmpl-item" style="border-left:2px solid ${group.color}20">
         <div class="tmpl-name" style="color:${group.color}">${item.name}</div>
         <div class="tmpl-desc">${item.desc}</div>
         <div class="tmpl-actions">
           <button class="hist-small-btn restore" style="color:${group.color};border-color:${group.color}40"
-            onclick='insertTemplate(${sqlJson})'>⊕ Insert</button>
+            onclick="insertTemplate(_tmplSqlStore[${idx}])">⊕ Insert</button>
           <button class="hist-small-btn"
-            onclick='replaceTemplate(${sqlJson})'>⟲ Replace</button>
+            onclick="replaceTemplate(_tmplSqlStore[${idx}])">⟲ Replace</button>
         </div>
       </div>`;
     }).join('');
@@ -3504,17 +3929,18 @@ function renderTemplates() {
   const uItems = uList.length === 0
     ? `<div class="val-empty" style="padding:12px;font-size:.62rem;line-height:1.6">No user templates yet.<br>Click <strong style="color:var(--green)">＋ SAVE</strong> to add the current editor content.</div>`
     : uList.map((t, i) => {
-        const sqlJson = JSON.stringify(t.sql);
+        _tmplSqlStore.push(t.sql);
+        const idx = _tmplSqlStore.length - 1;
         return `<div class="tmpl-item" style="border-left:2px solid rgba(167,139,250,.25)">
-          <div class="tmpl-name" style="color:${uColor}">${t.name}</div>
-          <div class="tmpl-desc">${t.desc||''}</div>
+          <div class="tmpl-name" style="color:${uColor}">${escHtml(t.name)}</div>
+          <div class="tmpl-desc">${escHtml(t.desc||'')}</div>
           <div class="tmpl-actions">
             <button class="hist-small-btn restore" style="color:${uColor};border-color:rgba(167,139,250,.3)"
-              onclick='insertTemplate(${sqlJson})'>⊕ Insert</button>
+              onclick="insertTemplate(_tmplSqlStore[${idx}])">⊕ Insert</button>
             <button class="hist-small-btn"
-              onclick='replaceTemplate(${sqlJson})'>⟲ Replace</button>
+              onclick="replaceTemplate(_tmplSqlStore[${idx}])">⟲ Replace</button>
             <button class="hist-small-btn" style="color:var(--red);border-color:rgba(248,113,113,.3)"
-              onclick='deleteUserTemplate(${i})'>🗑</button>
+              onclick="deleteUserTemplate(${i})">🗑</button>
           </div>
         </div>`;
       }).join('');
@@ -3528,25 +3954,41 @@ function renderTemplates() {
   el.innerHTML = html;
 }
 
+function _jumpToFirstPlaceholder() {
+  if (!cm) return;
+  const txt = cm.getValue();
+  const idx = txt.indexOf('%');
+  if (idx < 0) return;
+  const end = txt.indexOf('%', idx + 1);
+  if (end < 0) return;
+  const from = cm.posFromIndex(idx);
+  const to   = cm.posFromIndex(end + 1);
+  cm.setSelection(from, to);
+  cm.scrollIntoView(from, 80);
+  cm.focus();
+}
 function insertTemplate(sql) {
   if (!cm) return;
   const cursor = cm.getCursor();
   cm.replaceRange('\n' + sql + '\n', cursor);
   setDirty(true);
-  statusMsg('Template inserted', 'ok');
+  _jumpToFirstPlaceholder();
+  statusMsg('Template inserted — Tab through %placeholders%', 'ok');
 }
 function replaceTemplate(sql) {
   if (!cm) return;
   if (cm.getValue().trim() && !confirm('Replace editor content with template?')) return;
   cm.setValue(sql);
   setDirty(true);
-  statusMsg('Template loaded', 'ok');
+  _jumpToFirstPlaceholder();
+  statusMsg('Template loaded — Tab through %placeholders%', 'ok');
 }
 
 // ============================================================================
 // GLOBAL STATE & EDITOR INIT
 // ============================================================================
 let cm, currentSchema = null, isDirty = false, currentFileName = 'untitled.sql', lineMarks = [];
+const _tmplSqlStore = [];
 
 function initEditor() {
   const textarea = document.getElementById('editor');
@@ -3566,8 +4008,14 @@ function initEditor() {
       'F5': () => validateDDL(),
       'Ctrl-S': () => saveFile(),
       'Ctrl-/': cm => cm.execCommand('toggleComment'),
+      'Ctrl-H': cm => cm.execCommand('replace'),
+      'Ctrl-F': () => showFindReplace(),
+      'Ctrl-D': cm => selectNextOccurrence(cm),
+      'Ctrl-Shift-[': () => foldAll(),
+      'Ctrl-Shift-]': () => unfoldAll(),
       'Ctrl-Z': cm => cm.undo(),
       'Ctrl-Y': cm => cm.redo(),
+      'F2': () => renameIdentifier(),
       'Tab': cm => {
         // If hint widget is open, pick the active item
         if (cm.state.completionActive) {
@@ -3590,7 +4038,11 @@ function initEditor() {
     }
   });
   cm.on('cursorActivity', updateCursorInfo);
-  cm.on('change', () => setDirty(true));
+  cm.on('change', () => {
+    setDirty(true);
+    clearTimeout(window._autoValTimer);
+    window._autoValTimer = setTimeout(() => { if (cm.lineCount() < 600) validateDDL(); }, 1200);
+  });
   cm.setValue(`-- Oracle DDL Studio v3 — Validation Demo
 -- Hit F5 to validate. All errors below are intentional demos.
 
@@ -3629,14 +4081,85 @@ ALTER TABLE test ADD ts NUMBER()))));
   updateCursorInfo();
 }
 
+function selectNextOccurrence(cm) {
+  const sel = cm.getSelection();
+  if (!sel) {
+    // No selection — select the word under cursor first
+    const cur = cm.getCursor();
+    const word = cm.findWordAt(cur);
+    cm.setSelection(word.anchor, word.head);
+    return;
+  }
+  // Search forward from end of last selection
+  const lastSel = cm.listSelections().at(-1);
+  const searchFrom = lastSel.head;
+  const cursor = cm.getSearchCursor(sel, searchFrom, { caseFold: false });
+  if (cursor.findNext()) {
+    cm.addSelection(cursor.from(), cursor.to());
+    cm.scrollIntoView(cursor.from(), 80);
+  } else {
+    // Wrap around from top
+    const cursor2 = cm.getSearchCursor(sel, CodeMirror.Pos(0, 0), { caseFold: false });
+    if (cursor2.findNext()) {
+      cm.addSelection(cursor2.from(), cursor2.to());
+      cm.scrollIntoView(cursor2.from(), 80);
+    }
+  }
+  statusMsg(`"${sel}" — ${cm.listSelections().length} selection(s)`, 'ok', 2000);
+}
+
+const _sqlFoldFn = function(cm, start) {
+  const line = cm.getLine(start.line);
+  for (let ch = start.ch; ch < line.length; ch++) {
+    if (line[ch] === '(') {
+      let count = 1, curLine = start.line;
+      while (curLine < cm.lineCount()) {
+        const txt = cm.getLine(curLine);
+        const startI = (curLine === start.line) ? ch + 1 : 0;
+        for (let i = startI; i < txt.length; i++) {
+          if (txt[i] === "'") { while (++i < txt.length && txt[i] !== "'") {} continue; }
+          if (txt[i] === '-' && txt[i+1] === '-') break;
+          if (txt[i] === '(') count++;
+          else if (txt[i] === ')') {
+            if (--count === 0)
+              return { from: CodeMirror.Pos(start.line, ch + 1), to: CodeMirror.Pos(curLine, i) };
+          }
+        }
+        curLine++;
+      }
+    }
+  }
+};
+
+function foldAll() {
+  if (!cm) return;
+  cm.operation(() => {
+    for (let i = cm.lineCount() - 1; i >= 0; i--)
+      cm.foldCode(CodeMirror.Pos(i, 0), _sqlFoldFn, 'fold');
+  });
+  statusMsg('All blocks folded', 'ok');
+}
+function unfoldAll() {
+  if (!cm) return;
+  cm.operation(() => {
+    cm.getAllMarks().forEach(m => { if (m.__isFold) m.clear(); });
+  });
+  statusMsg('All blocks unfolded', 'ok');
+}
+
 function updateCursorInfo() {
   if (!cm) return;
   const cur = cm.getCursor();
   document.getElementById('cursor-info').textContent = `Ln ${cur.line+1}, Col ${cur.ch+1}`;
   const sel = cm.getSelection();
   document.getElementById('sel-info').textContent = sel ? `${sel.length} sel` : '';
-  const words = (cm.getValue().match(/\b\w+\b/g)||[]).length;
+  const val = cm.getValue();
+  const words = (val.match(/\b\w+\b/g)||[]).length;
   document.getElementById('stat-words').textContent = `${words} words`;
+  const lines = cm.lineCount();
+  const stmts = (val.match(/;/g)||[]).length;
+  const linesEl = document.getElementById('sb-lines');
+  if (linesEl) linesEl.textContent = `${lines} ln · ${stmts} stmt${stmts!==1?'s':''}`;
 }
 
 function setDirty(d) {
@@ -3720,13 +4243,19 @@ function validateDDL() {
   tblEl.style.display = '';
   tblEl.textContent = `🏛 ${tblCount} table${tblCount!==1?'s':''}`;
 
+  const badge = document.getElementById('issues-badge');
+  if (badge) {
+    if (errCount > 0) { badge.textContent = errCount; badge.style.display = ''; badge.style.background = 'var(--err)'; }
+    else if (warnCount > 0) { badge.textContent = warnCount; badge.style.display = ''; badge.style.background = 'var(--amber)'; }
+    else { badge.style.display = 'none'; }
+  }
   if (errCount === 0 && warnCount === 0)
     statusMsg(`✓ Valid — ${tblCount} table(s), no issues`, 'ok');
   else
     statusMsg(`${errCount} error(s), ${warnCount} warning(s)`, errCount > 0 ? 'err' : 'warn');
 
   switchRTab('validation');
-  renderSchemaPanel(schema);
+ renderSchemaPanel(schema, _schemaShowAll);
 }
 
 function showValidationResults(issues, schema) {
@@ -3768,11 +4297,19 @@ function goToLine(line) {
   cm.focus();
 }
 
+const FMT_KEY = 'oracle_ddl_fmt_opts_v1';
+function loadFmtOpts() {
+  try { return JSON.parse(localStorage.getItem(FMT_KEY)||'null') || { indent:4, keywords:'upper', align:true }; }
+  catch { return { indent:4, keywords:'upper', align:true }; }
+}
+function saveFmtOpts(o) { try { localStorage.setItem(FMT_KEY, JSON.stringify(o)); } catch {} }
+
 function formatDDL() {
   if (!cm) return;
   const sql = cm.getValue();
   try {
-    const formatted = formatDDLText(sql);
+    const opts = loadFmtOpts();
+    const formatted = formatDDLText(sql, opts);
     addHistoryEntry(sql, 'format');
     cm.setValue(formatted);
     setDirty(true);
@@ -3780,6 +4317,24 @@ function formatDDL() {
   } catch(e) {
     statusMsg('Format error: ' + e.message, 'err');
   }
+}
+
+function showFmtOptions() {
+  const o = loadFmtOpts();
+  document.getElementById('fmt-indent').value   = o.indent;
+  document.getElementById('fmt-keywords').value = o.keywords;
+  document.getElementById('fmt-align').checked  = o.align;
+  document.getElementById('fmt-modal').style.display = 'flex';
+}
+function applyFmtOptions() {
+  const o = {
+    indent:   parseInt(document.getElementById('fmt-indent').value, 10) || 4,
+    keywords: document.getElementById('fmt-keywords').value,
+    align:    document.getElementById('fmt-align').checked,
+  };
+  saveFmtOpts(o);
+  closeModal('fmt-modal');
+  formatDDL();
 }
 
 // Holds the pending fix result for the popup
@@ -3791,24 +4346,31 @@ function fixDDL() {
   const { fixed, fixes } = autoFixDDL(sql);
 
   if (fixes.length === 0) {
+    // reuse currentSchema if already parsed from same content, else parse once
     let issues = [];
-    try { const s = parseDDL(sql); issues = validateSchema(s, sql).filter(i => i.sev === 'error'); } catch(e){}
+    try {
+      const s = currentSchema || parseDDL(sql);
+      issues = validateSchema(s, sql).filter(i => i.sev === 'error');
+    } catch(e){}
     if (issues.length > 0) {
       statusMsg(`⚠ ${issues.length} error(s) found that require manual correction — see Validation tab`, 'warn', 6000);
       switchRTab('validation');
-      validateDDL();
+      if (!currentSchema) validateDDL();
     } else {
       statusMsg('✓ No fixable issues found — DDL looks clean!', 'ok');
     }
     return;
   }
 
-  // Show preview popup instead of applying immediately
   _pendingFix = { sql, fixed, fixes };
-  showFixPopup(fixes, sql, fixed);
+  // parse once here, pass result to showFixPopup to avoid re-parsing inside it
+  let _previewSchema = null, remaining = 0;
+  try { _previewSchema = parseDDL(fixed); remaining = validateSchema(_previewSchema, fixed).filter(i=>i.sev==='error').length; } catch(e){}
+  _pendingFix._remaining = remaining;
+  showFixPopup(fixes, sql, fixed, remaining);
 }
 
-function showFixPopup(fixes, originalSql, fixedSql) {
+function showFixPopup(fixes, originalSql, fixedSql, preRemaining) {
   const overlay = document.getElementById('fix-popup-overlay');
   const list    = document.getElementById('fix-popup-list');
   const subtitle = document.getElementById('fix-popup-subtitle');
@@ -3837,9 +4399,10 @@ function showFixPopup(fixes, originalSql, fixedSql) {
     </div>`;
   }).join('');
 
-  // Count remaining errors after fix
-  let remaining = 0;
-  try { const s2 = parseDDL(fixedSql); remaining = validateSchema(s2, fixedSql).filter(i=>i.sev==='error').length; } catch(e){}
+  // Use pre-computed count passed in (avoids a 3rd parseDDL call)
+  const remaining = (typeof preRemaining === 'number') ? preRemaining : (() => {
+    try { const s2 = parseDDL(fixedSql); return validateSchema(s2, fixedSql).filter(i=>i.sev==='error').length; } catch(e){ return 0; }
+  })();
   summary.innerHTML = remaining === 0
     ? '<span style="color:var(--green)">✓ After applying these fixes, the DDL will be error-free</span>'
     : `<span style="color:var(--warn)">⚠ After fixes, ${remaining} error(s) will still need manual correction</span>`;
@@ -3889,6 +4452,7 @@ function clearEditor() {
   if (!cm) return;
   if (isDirty && !confirm('Discard unsaved changes?')) return;
   addHistoryEntry(cm.getValue(), 'copy');
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
   cm.setValue('');
   currentSchema = null; externalSchema = null;
   setDirty(false);
@@ -3900,10 +4464,25 @@ function clearEditor() {
 function newFile() {
   if (!cm) return;
   if (isDirty && !confirm('Discard unsaved changes?')) return;
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
   cm.setValue('-- New Oracle DDL Script\n\n');
   currentFileName = 'untitled.sql';
   document.getElementById('fileName').textContent = currentFileName;
+  currentSchema = null;
+  for (let i = 0; i < cm.lineCount(); i++) {
+    cm.removeLineClass(i, 'background', 'cm-err-line');
+    cm.removeLineClass(i, 'background', 'cm-warn-line');
+    cm.setGutterMarker(i, 'issue-gutter', null);
+  }
+  document.getElementById('val-list').innerHTML = '<div class="val-empty"><div style="font-size:2rem;opacity:.3">✓</div><div>Press F5 to validate</div></div>';
+  document.getElementById('val-summary').innerHTML = '';
+  document.getElementById('sb-err').style.display = 'none';
+  document.getElementById('sb-warn').style.display = 'none';
+  document.getElementById('sb-tables').style.display = 'none';
+  const badge = document.getElementById('issues-badge');
+  if (badge) badge.style.display = 'none';
   setDirty(false);
+  statusMsg('New file', 'ok');
 }
 
 function openFile() { document.getElementById('fileInput').click(); }
@@ -3912,7 +4491,7 @@ function handleFileOpen(e) {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    if (cm) cm.setValue(ev.target.result);
+   if (cm) { cm.setValue(ev.target.result); saveSession(); }
     currentFileName = file.name;
     document.getElementById('fileName').textContent = file.name;
     setDirty(false);
@@ -3950,7 +4529,7 @@ function switchRTab(tab) {
   if (tab === 'dictionary') renderDictionary();
   if (tab === 'history') renderHistory();
   if (tab === 'templates') renderTemplates();
-  if (tab === 'schema' && currentSchema) renderSchemaPanel(currentSchema);
+  if (tab === 'schema') renderSchemaPanel(currentSchema);
 }
 
 let panelPinned = true;
@@ -3972,43 +4551,74 @@ function togglePanelPin() {
   if (cm) setTimeout(() => cm.refresh(), 300);
 }
 
-function renderSchemaPanel(schema) {
-  if (!schema) { document.getElementById('schema-list').innerHTML = '<div class="val-empty"><div>No schema</div></div>'; return; }
+let _schemaShowAll = false;
+function renderSchemaPanel(schema, showAll) {
+  if (showAll !== undefined) _schemaShowAll = showAll;
+  if (!schema && !externalSchema) { document.getElementById('schema-list').innerHTML = '<div class="val-empty"><div>No schema</div></div>'; return; }
+  if (!schema) schema = { tables: {}, sequences: {}, indexes: [] };
   const el = document.getElementById('schema-list');
-  const tables = Object.entries(schema.tables);
+  const ddlTableEntries = Object.entries(schema.tables);
+  const extTableEntries = [];
+  if (externalSchema && externalSchema.tables) {
+    const ddlKeys = new Set(ddlTableEntries.map(([k]) => k));
+    Object.entries(externalSchema.tables).forEach(([code, tbl]) => {
+      if (!ddlKeys.has(code)) extTableEntries.push([code, Object.assign({ _ext: true }, tbl)]);
+    });
+  }
+  const allTables = [...ddlTableEntries, ...extTableEntries];
+  const tables = (!_schemaShowAll && allTables.length > 40) ? allTables.slice(0, 40) : allTables;
   const seqEntries = Object.entries(schema.sequences||{});
   const idxEntries = schema.indexes||[];
   if (!tables.length && !seqEntries.length && !idxEntries.length) {
     el.innerHTML = '<div class="val-empty"><div style="font-size:1.5rem;opacity:.3">🏛</div><div>No objects found</div></div>'; return;
   }
-  let html = '';
+  let html = `<div style="padding:6px 10px;border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:5">
+    <input id="schema-search" class="dict-search" placeholder="Filter tables…" style="width:100%" oninput="filterSchemaPanel(this.value)">
+  </div>`;
   if (tables.length) {
     html += `<div class="obj-section"><div class="obj-section-head" onclick="toggleSection(this)"><span style="color:var(--amber)">📋 TABLES (${tables.length})</span><span>▾</span></div><div>`;
     tables.forEach(([tblName, tbl]) => {
       const colCount = Object.keys(tbl.columns).length;
       const conCount = tbl.constraints.length;
-      html += `<div class="obj-table-item" onclick="toggleTableCols('cols_${tblName}',${tbl.line})">
-        <div class="obj-table-name">${tblName}</div>
-        <div class="obj-table-meta">${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+( conCount!==1?'s':''):''}</div>
+      const isExt = !!tbl._ext;
+      html += `<div class="obj-table-item" onclick="toggleTableCols('cols_${tblName}',${tbl.line||0})">
+        <div class="obj-table-name" style="${isExt?'color:var(--cyan)':''}">${tblName}${isExt?` <span style="font-size:.5rem;opacity:.5;color:var(--cyan)">PDM</span>`:''}</div>
+        <div class="obj-table-meta">${isExt&&tbl.name&&tbl.name!==tblName?tbl.name+' · ':''}${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+(conCount!==1?'s':''):''}</div>
       </div>
       <div id="cols_${tblName}" class="obj-col-list" style="display:none">`;
-      tbl.colOrder.forEach(colName => {
-        const col = tbl.columns[colName];
-        const flags = [col.notNull?'NOT NULL':'', col.pk?'PK':'', col.unique?'UQ':''].filter(Boolean).join(' ');
-        html += `<div class="obj-col">
-          <span class="obj-col-name">${colName}</span>
-          <span class="obj-col-type">${col.type?.full||col.type?.base||'?'}</span>
-          ${flags?`<span class="obj-col-flags">${flags}</span>`:''}
-        </div>`;
-      });
+      if (isExt) {
+        Object.values(tbl.columns||{}).forEach(col => {
+          const flags = [col.mandatory?'NOT NULL':'',col.pk?'PK':'',col.ak?'UQ':'',col.fk?'FK':''].filter(Boolean).join(' ');
+          html += `<div class="obj-col">
+            <span class="obj-col-name">${col.code}</span>
+            <span class="obj-col-type">${col.datatype||''}</span>
+            ${flags?`<span class="obj-col-flags">${flags}</span>`:''}
+          </div>`;
+        });
+      } else {
+        (tbl.colOrder||[]).forEach(colName => {
+          const col = tbl.columns[colName];
+          const flags = [col.notNull?'NOT NULL':'',col.pk?'PK':'',col.unique?'UQ':''].filter(Boolean).join(' ');
+          html += `<div class="obj-col">
+            <span class="obj-col-name">${colName}</span>
+            <span class="obj-col-type">${col.type?.full||col.type?.base||'?'}</span>
+            ${flags?`<span class="obj-col-flags">${flags}</span>`:''}
+          </div>`;
+        });
+      }
       tbl.constraints.forEach(con => {
         const ctype = {PK:'🔑',FK:'🔗',UNIQUE:'◈',CHECK:'✓'}[con.type]||'•';
         const detail = con.cols?.join(', ')||'';
         const ref = con.refTable ? ` → ${con.refTable}(${con.refCols?.join(',')||''})` : '';
-        html += `<div class="obj-con">${ctype} ${con.name||'<unnamed>'} ${detail}${ref}</div>`;
+        const _sb = con.status && con.status!=='ENABLED'
+          ? ` <span style="font-size:.5rem;padding:1px 5px;border-radius:3px;background:${con.status==='DISABLED'?'var(--red2)':'var(--amber3)'};color:${con.status==='DISABLED'?'var(--red)':'var(--amber)'}">${con.status}</span>`
+          : '';
+        html += `<div class="obj-con">${ctype} ${con.name||'<unnamed>'} ${detail}${ref}${_sb}</div>`;
       });
       html += '</div>';
     });
+    if (!_schemaShowAll && allTables.length > 40)
+      html += `<div class="obj-table-item" style="color:var(--cyan);cursor:pointer;font-size:.62rem" onclick="renderSchemaPanel(currentSchema,true)">▼ Show ${allTables.length - 40} more tables…</div>`;
     html += '</div></div>';
   }
   if (seqEntries.length) {
@@ -4026,6 +4636,94 @@ function renderSchemaPanel(schema) {
     html += '</div></div>';
   }
   el.innerHTML = html;
+}
+
+function switchSchemaView(view) {
+  document.getElementById('schema-list').style.display = view==='tree' ? '' : 'none';
+  document.getElementById('schema-erd').style.display  = view==='erd'  ? '' : 'none';
+  document.getElementById('schema-tree-btn').classList.toggle('active-btn', view==='tree');
+  document.getElementById('schema-erd-btn').classList.toggle('active-btn', view==='erd');
+  if (view==='erd') renderERD(currentSchema);
+}
+
+function renderERD(schema) {
+  const el = document.getElementById('schema-erd');
+  if (!schema || !Object.keys(schema.tables).length) {
+    el.innerHTML = '<div class="val-empty"><div style="font-size:1.5rem;opacity:.3">◈</div><div>Validate DDL first to generate ERD</div></div>';
+    return;
+  }
+  const tables = Object.entries(schema.tables);
+  const COLS = Math.min(4, Math.ceil(Math.sqrt(tables.length)));
+  const TW=210, TH_HDR=24, ROW_H=16, PAD=48;
+  const positions = {};
+  tables.forEach(([name], i) => {
+    positions[name] = {
+      x: PAD + (i % COLS) * (TW + PAD),
+      y: PAD + Math.floor(i / COLS) * (TH_HDR + 5*ROW_H + 24 + PAD)
+    };
+  });
+  const svgW = COLS*(TW+PAD)+PAD;
+  const svgH = Math.ceil(tables.length/COLS)*(TH_HDR+5*ROW_H+24+PAD)+PAD;
+
+  // FK edges
+  const edges = tables.flatMap(([tblName, tbl]) =>
+    tbl.constraints
+      .filter(c => c.type==='FK' && c.refTable && positions[c.refTable.toUpperCase()])
+      .map(c => ({from:tblName, to:c.refTable.toUpperCase(), name:c.name||''}))
+  );
+  const edgeSvg = edges.map(e => {
+    const fp=positions[e.from], tp=positions[e.to]; if(!fp||!tp) return '';
+    const x1=fp.x+TW, y1=fp.y+TH_HDR/2, x2=tp.x, y2=tp.y+TH_HDR/2, cx=(x1+x2)/2;
+    return `<path d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}" fill="none" stroke="var(--cyan)" stroke-width="1.2" stroke-dasharray="4,3" opacity=".55" marker-end="url(#erd-arr)"/>`;
+  }).join('');
+
+  // Table boxes
+  const boxSvg = tables.map(([name, tbl]) => {
+    const p = positions[name];
+    const colList = (tbl.colOrder || Object.keys(tbl.columns)).slice(0,5);
+    const boxH = TH_HDR + colList.length*ROW_H + 12;
+    const colRows = colList.map((c,i) => {
+      const col = tbl.columns[c] || {};
+      const isPK = col.pk || tbl.constraints.some(cn=>cn.type==='PK'&&cn.cols?.includes(c));
+      const isFK = tbl.constraints.some(cn=>cn.type==='FK'&&cn.cols?.includes(c));
+      const icon = isPK?'⬡':isFK?'→':'·';
+      const icol = isPK?'var(--amber)':isFK?'var(--cyan)':'var(--text3)';
+      return `<text x="${p.x+10}" y="${p.y+TH_HDR+8+i*ROW_H}" font-size="9.5" fill="var(--text2)" font-family="monospace"><tspan fill="${icol}">${icon} </tspan>${c}<tspan fill="var(--blue)" opacity=".7">  ${col.type?.base||''}</tspan></text>`;
+    }).join('');
+    const more = tbl.colOrder?.length>5
+      ? `<text x="${p.x+10}" y="${p.y+TH_HDR+8+5*ROW_H}" font-size="9" fill="var(--text3)" font-family="monospace">+${tbl.colOrder.length-5} more…</text>` : '';
+    return `<g onclick="goToLine(${tbl.line});switchSchemaView('tree')" style="cursor:pointer" title="${name}">
+      <rect x="${p.x}" y="${p.y}" width="${TW}" height="${boxH}" rx="5" fill="var(--bg2)" stroke="var(--border2)" stroke-width="1"/>
+      <rect x="${p.x}" y="${p.y}" width="${TW}" height="${TH_HDR}" rx="5" fill="var(--bg4)"/>
+      <rect x="${p.x}" y="${p.y+TH_HDR-5}" width="${TW}" height="5" fill="var(--bg4)"/>
+      <text x="${p.x+TW/2}" y="${p.y+16}" font-size="11" font-weight="bold" fill="var(--amber)" font-family="monospace" text-anchor="middle">${name}</text>
+      <line x1="${p.x}" y1="${p.y+TH_HDR}" x2="${p.x+TW}" y2="${p.y+TH_HDR}" stroke="var(--border2)" stroke-width="1"/>
+      ${colRows}${more}
+    </g>`;
+  }).join('');
+
+  el.innerHTML = `<svg width="${svgW}" height="${svgH}" style="min-width:${svgW}px;display:block">
+    <defs><marker id="erd-arr" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--cyan)" opacity=".7"/></marker></defs>
+    ${edgeSvg}${boxSvg}
+  </svg>`;
+}
+
+function filterSchemaPanel(q) {
+  const val = q.trim().toUpperCase();
+  document.querySelectorAll('#schema-list .obj-table-item').forEach(el => {
+    const name = el.querySelector('.obj-table-name')?.textContent?.toUpperCase() || '';
+    el.style.display = (!val || name.includes(val)) ? '' : 'none';
+    const colBlock = el.nextElementSibling;
+    if (colBlock && colBlock.classList.contains('obj-col-list')) {
+      colBlock.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('#schema-list .obj-section-head').forEach(head => {
+    const section = head.closest('.obj-section');
+    if (!section) return;
+    const visible = [...section.querySelectorAll('.obj-table-item')].some(el => el.style.display !== 'none');
+    section.style.display = visible ? '' : 'none';
+  });
 }
 
 function toggleTableCols(id, line) {
@@ -4091,31 +4789,9 @@ function confirmAddWord() {
 // ============================================================================
 // IMPORT / EXPORT
 // ============================================================================
-function showImportExport(mode) {
-  document.getElementById('ie-modal').style.display = 'flex';
-  const isImport = mode === 'import';
-  document.getElementById('ie-title').textContent = isImport ? 'IMPORT DICTIONARY' : 'EXPORT DICTIONARY';
-  document.getElementById('ie-import-section').style.display = isImport ? '' : 'none';
-  document.getElementById('ie-export-section').style.display = isImport ? 'none' : '';
-  const btn = document.getElementById('ie-action-btn');
-  if (isImport) { btn.textContent = '⬇ IMPORT'; btn.onclick = doImport; }
-  else {
-    document.getElementById('ie-export-ta').value = JSON.stringify(loadDictionary(), null, 2);
-    btn.textContent = '📋 COPY JSON';
-    btn.onclick = () => { navigator.clipboard.writeText(document.getElementById('ie-export-ta').value).then(() => statusMsg('Copied!','ok')); };
-  }
-}
-function doImport() {
-  try {
-    const data = JSON.parse(document.getElementById('ie-import-ta').value);
-    const d = loadDictionary();
-    ['tables','columns','objects','custom_kw','custom_types'].forEach(k => {
-      if (Array.isArray(data[k])) data[k].forEach(w => { if (!d[k].includes(w)) d[k].push(w); });
-    });
-    saveDictionary(d); renderDictionary(); closeModal('ie-modal');
-    statusMsg('Dictionary imported', 'ok');
-  } catch(e) { alert('Invalid JSON: ' + e.message); }
-}
+// Legacy ie-modal functions kept as stubs to avoid reference errors
+function showImportExport(mode) { showIOPanel(mode === 'import' ? 'dict' : 'dict'); }
+function doImport() { doIODictImport(); }
 
 // ============================================================================
 // THEME
@@ -4151,6 +4827,7 @@ window.onload = function() {
   renderTemplates();
   switchRTab('validation');
   loadSavedTheme();
+  loadFromURL();
 
   // Sync editor size
   const wrap = document.getElementById('cm-wrap');
@@ -4179,11 +4856,62 @@ window.onload = function() {
     if (cm) cm.refresh();
   });
 
+  // Session restore (skip if URL hash carries DDL)
+  if (!location.hash.startsWith('#ddl=')) {
+    try {
+      const _saved = localStorage.getItem(SESSION_KEY);
+      if (_saved && _saved.trim()) { cm.setValue(_saved); setDirty(false); statusMsg('Session restored','ok'); }
+    } catch(e) {}
+  }
+  // Auto-save on change
+  cm.on('change', () => { clearTimeout(window._saveTimer); window._saveTimer = setTimeout(saveSession, 1500); });
+
   // Keyboard shortcuts not in CodeMirror
   document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newFile(); }
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') { e.preventDefault(); showIOPanel(); }
+    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openPalette(); }
+    if (e.ctrlKey && e.key === 'g') { e.preventDefault(); promptGoToLine(); }
+    if (e.key === 'Escape') { closePalette(); }
+  });
+
+  // Drag-and-drop file open
+  const cmWrap = document.getElementById('cm-wrap');
+  cmWrap.addEventListener('dragover', e => { e.preventDefault(); cmWrap.classList.add('drag-over'); });
+  cmWrap.addEventListener('dragleave', () => cmWrap.classList.remove('drag-over'));
+  cmWrap.addEventListener('drop', e => {
+    e.preventDefault(); cmWrap.classList.remove('drag-over');
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    if (!/\.(sql|ddl|txt)$/i.test(file.name)) { statusMsg('⚠ Drop a .sql / .ddl / .txt file', 'warn'); return; }
+    if (isDirty && !confirm('Discard unsaved changes and open dropped file?')) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      cm.setValue(ev.target.result);
+      currentFileName = file.name;
+      document.getElementById('fileName').textContent = file.name;
+      setDirty(false);
+      statusMsg(`Opened: ${file.name}`, 'ok');
+      validateDDL();
+    };
+    reader.readAsText(file);
   });
 };
+
+function promptGoToLine() {
+  if (!cm) return;
+  const total = cm.lineCount();
+  const input = prompt(`Go to line (1–${total}):`, '');
+  if (!input) return;
+  const n = parseInt(input, 10);
+  if (!isNaN(n) && n >= 1 && n <= total) {
+    goToLine(n);
+    statusMsg(`Line ${n}`, 'ok', 1500);
+  } else {
+    statusMsg(`Invalid line number — enter 1–${total}`, 'warn');
+  }
+}
+
 // ============================================================================
 // I/O PANEL (unified modal — new, keeps showImportExport intact)
 // ============================================================================
@@ -4192,14 +4920,16 @@ function showIOPanel(defaultTab) {
   document.getElementById('io-modal').style.display = 'flex';
 }
 function switchIOTab(tab) {
-  ['dict','schema','ddl'].forEach(t => {
-    document.getElementById('io-sect-'+t).style.display = t===tab?'':'none';
+  ['dict','schema','ddl','export','csv','pg'].forEach(t => {
+    const s = document.getElementById('io-sect-'+t);
+    if (s) s.style.display = t===tab?'':'none';
     const b = document.getElementById('iotab-'+t);
-    if(b){ b.classList.toggle('io-tab-active', t===tab); }
+    if (b) b.classList.toggle('io-tab-active', t===tab);
   });
-  if(tab==='dict')    switchIODictTab('import');
-  if(tab==='ddl')     switchIODdlTab('import');
+  if (tab==='dict') switchIODictTab('import');
+  if (tab==='ddl')  switchIODdlTab('import');
 }
+
 function switchIODictTab(sub) {
   document.getElementById('io-dict-import-body').style.display = sub==='import'?'':'none';
   document.getElementById('io-dict-export-body').style.display = sub==='export'?'':'none';
@@ -4309,6 +5039,348 @@ function importUserTemplatesFile(evt) {
   reader.readAsText(file);
 }
 
+// ============================================================================
+// PERSISTENT SESSIONS
+// ============================================================================
+const SESSION_KEY = 'oracle_ddl_session_v1';
+function saveSession() { try { if (cm) localStorage.setItem(SESSION_KEY, cm.getValue()); } catch(e){} }
+
+// ============================================================================
+// SHAREABLE URL
+// ============================================================================
+function shareURL() {
+  if (!cm) return;
+  const sql = cm.getValue().trim();
+  if (!sql) { statusMsg('Editor is empty','warn'); return; }
+  try {
+    const compressed = LZString.compressToEncodedURIComponent(sql);
+    const url = location.href.split('#')[0] + '#ddl=' + compressed;
+    navigator.clipboard.writeText(url).then(() => statusMsg('🔗 Link copied to clipboard!','ok'));
+  } catch(e) { statusMsg('Share failed: '+e.message,'err'); }
+}
+function loadFromURL() {
+  if (!location.hash.startsWith('#ddl=')) return;
+  try {
+    const sql = LZString.decompressFromEncodedURIComponent(location.hash.slice(5));
+    if (sql && cm) { cm.setValue(sql); setDirty(false); statusMsg('Loaded from shared link','ok'); validateDDL(); }
+  } catch(e) {}
+}
+
+// ============================================================================
+// FIND & REPLACE
+// ============================================================================
+let _frCursor = null;
+function showFindReplace() {
+  document.getElementById('fr-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('fr-find').focus(), 80);
+}
+function _frQuery() {
+  const q = document.getElementById('fr-find').value;
+  const caseFold = !document.getElementById('fr-case').checked;
+  const isRegex  = document.getElementById('fr-regex').checked;
+  return isRegex ? new RegExp(q, caseFold?'i':'') : q;
+}
+function frHighlight() {
+  const q = document.getElementById('fr-find').value;
+  if (!q || !cm) { document.getElementById('fr-count').textContent=''; return; }
+  let n=0; const c=cm.getSearchCursor(_frQuery(),CodeMirror.Pos(0,0),{caseFold:!document.getElementById('fr-case').checked});
+  while(c.findNext()) n++;
+  document.getElementById('fr-count').textContent = n+' match'+(n!==1?'es':'');
+}
+function frNext() {
+  if (!cm) return;
+  const q = document.getElementById('fr-find').value; if (!q) return;
+  const cf = {caseFold:!document.getElementById('fr-case').checked};
+  const from = _frCursor ? _frCursor.to() : cm.getCursor();
+  _frCursor = cm.getSearchCursor(_frQuery(), from, cf);
+  if (!_frCursor.findNext()) { _frCursor = cm.getSearchCursor(_frQuery(),CodeMirror.Pos(0,0),cf); _frCursor.findNext(); }
+  if (_frCursor.from()) { cm.setSelection(_frCursor.from(),_frCursor.to()); cm.scrollIntoView(_frCursor.from(),80); }
+}
+function frPrev() {
+  if (!cm) return;
+  const q = document.getElementById('fr-find').value; if (!q) return;
+  const cf = {caseFold:!document.getElementById('fr-case').checked};
+  const from = _frCursor ? _frCursor.from() : cm.getCursor();
+  _frCursor = cm.getSearchCursor(_frQuery(), from, cf);
+  if (!_frCursor.findPrevious()) {
+    _frCursor = cm.getSearchCursor(_frQuery(),CodeMirror.Pos(cm.lastLine()),cf);
+    _frCursor.findPrevious();
+  }
+  if (_frCursor.from()) { cm.setSelection(_frCursor.from(),_frCursor.to()); cm.scrollIntoView(_frCursor.from(),80); }
+}
+function frReplace() {
+  if (!cm || !_frCursor) { frNext(); return; }
+  _frCursor.replace(document.getElementById('fr-replace').value);
+  frNext(); frHighlight();
+}
+function frReplaceAll() {
+  if (!cm) return;
+  const q = document.getElementById('fr-find').value; if (!q) return;
+  const rep = document.getElementById('fr-replace').value;
+  const cf  = {caseFold:!document.getElementById('fr-case').checked};
+  let n=0;
+  cm.operation(() => { const c=cm.getSearchCursor(_frQuery(),CodeMirror.Pos(0,0),cf); while(c.findNext()){c.replace(rep);n++;} });
+  frHighlight(); statusMsg(`Replaced ${n} occurrence${n!==1?'s':''}`, 'ok');
+}
+
+// ============================================================================
+// COMMAND PALETTE
+// ============================================================================
+const COMMANDS = [
+  { g:'Editor',  label:'Validate DDL',           kb:'F5',           fn:()=>validateDDL() },
+  { g:'Editor',  label:'Format DDL',             kb:'Ctrl+Shift+F', fn:()=>formatDDL() },
+  { g:'Editor',  label:'Auto-Fix issues',        kb:'Ctrl+Shift+X', fn:()=>fixDDL() },
+  { g:'Editor',  label:'Find & Replace',         kb:'Ctrl+F',       fn:()=>showFindReplace() },
+  { g:'Editor',  label:'Rename identifier',      kb:'F2',           fn:()=>renameIdentifier() },
+  { g:'Editor',  label:'Fold all blocks',        kb:'Ctrl+Shift+[', fn:()=>foldAll() },
+  { g:'Editor',  label:'Unfold all blocks',      kb:'Ctrl+Shift+]', fn:()=>unfoldAll() },
+  { g:'Editor',  label:'Undo',                   kb:'Ctrl+Z',       fn:()=>doUndo() },
+  { g:'Editor',  label:'Redo',                   kb:'Ctrl+Y',       fn:()=>doRedo() },
+  { g:'File',    label:'New file',               kb:'Ctrl+N',       fn:()=>newFile() },
+  { g:'File',    label:'Open file',              kb:'',             fn:()=>openFile() },
+  { g:'File',    label:'Save file',              kb:'Ctrl+S',       fn:()=>saveFile() },
+  { g:'File',    label:'Copy DDL',               kb:'',             fn:()=>copyDDL() },
+  { g:'File',    label:'Share URL',              kb:'',             fn:()=>shareURL() },
+  { g:'File',    label:'Clear editor',           kb:'',             fn:()=>clearEditor() },
+  { g:'Tools',   label:'DDL Diff & Migration',   kb:'',             fn:()=>showDiffMigrate() },
+  { g:'Tools',   label:'Import / Export panel',  kb:'Ctrl+Shift+I', fn:()=>showIOPanel() },
+  { g:'Tools',   label:'Format options',         kb:'',             fn:()=>showFmtOptions() },
+  { g:'Tools',   label:'Import schema JS',       kb:'',             fn:()=>importJsSchema() },
+  { g:'View',    label:'Validation tab',         kb:'',             fn:()=>switchRTab('validation') },
+  { g:'View',    label:'Schema tab',             kb:'',             fn:()=>switchRTab('schema') },
+  { g:'View',    label:'Dictionary tab',         kb:'',             fn:()=>switchRTab('dictionary') },
+  { g:'View',    label:'History tab',            kb:'',             fn:()=>switchRTab('history') },
+  { g:'View',    label:'Templates tab',          kb:'',             fn:()=>switchRTab('templates') },
+  { g:'View',    label:'Toggle panel pin/auto',  kb:'',             fn:()=>togglePanelPin() },
+  { g:'Help',    label:'Keyboard shortcuts',     kb:'',             fn:()=>showHelp() },
+];
+let _palIdx = 0;
+function openPalette() {
+  document.getElementById('cmd-overlay').style.display='flex';
+  document.getElementById('cmd-input').value='';
+  _palIdx=0; renderPalette();
+  setTimeout(()=>document.getElementById('cmd-input').focus(),50);
+}
+function closePalette() { document.getElementById('cmd-overlay').style.display='none'; }
+function renderPalette() {
+  const q = document.getElementById('cmd-input').value.toLowerCase();
+  const filtered = COMMANDS.filter(c=>c.label.toLowerCase().includes(q));
+  let html='',lastG='';
+  filtered.forEach((c,i) => {
+    if(c.g!==lastG){ html+=`<div class="cmd-group-label">${c.g}</div>`; lastG=c.g; }
+    html+=`<div class="cmd-item${i===_palIdx?' cmd-active':''}" onclick="runCmd(${i},${JSON.stringify(filtered.map(x=>COMMANDS.indexOf(x)))[i]})">
+      <span>${c.label}</span>${c.kb?`<span class="cmd-shortcut">${c.kb}</span>`:''}
+    </div>`;
+  });
+  document.getElementById('cmd-list').innerHTML=html||'<div class="cmd-item" style="color:var(--text3);cursor:default">No commands match</div>';
+  _palFilteredIndices = filtered.map(f=>COMMANDS.indexOf(f));
+}
+let _palFilteredIndices = [];
+function runCmd(filteredIdx) {
+  const realIdx = _palFilteredIndices[filteredIdx];
+  closePalette();
+  setTimeout(()=>COMMANDS[realIdx]?.fn(), 60);
+}
+function palKey(e) {
+  const items = [...document.querySelectorAll('#cmd-list .cmd-item')];
+  const max = items.length-1;
+  if(e.key==='ArrowDown'){e.preventDefault();_palIdx=Math.min(_palIdx+1,max);}
+  else if(e.key==='ArrowUp'){e.preventDefault();_palIdx=Math.max(_palIdx-1,0);}
+  else if(e.key==='Enter'){e.preventDefault();items[_palIdx]?.click();return;}
+  else if(e.key==='Escape'){closePalette();return;}
+  items.forEach((el,i)=>el.classList.toggle('cmd-active',i===_palIdx));
+  items[_palIdx]?.scrollIntoView({block:'nearest'});
+}
+
+// ============================================================================
+// RENAME REFACTORING
+// ============================================================================
+function renameIdentifier() {
+  if (!cm) return;
+  const cur  = cm.getCursor();
+  const word = cm.findWordAt(cur);
+  const name = cm.getRange(word.anchor, word.head);
+  if (!name || !/^[\w$#_]+$/.test(name)) { statusMsg('Place cursor on an identifier to rename','warn'); return; }
+  const newName = prompt(`Rename "${name}" to:`, name);
+  if (!newName || newName === name || !/^[\w$#_]+$/.test(newName)) return;
+  let count = 0;
+  cm.operation(() => {
+    const c = cm.getSearchCursor(name, CodeMirror.Pos(0,0), {caseFold:false});
+    while (c.findNext()) {
+      const f=c.from(), t=c.to();
+      const before = f.ch>0 ? cm.getLine(f.line)[f.ch-1] : ' ';
+      const after  = cm.getLine(t.line)[t.ch]||' ';
+      if (/[\w$#_]/.test(before)||/[\w$#_]/.test(after)) continue;
+      c.replace(newName); count++;
+    }
+  });
+  statusMsg(`Renamed "${name}" → "${newName}" (${count} occurrence${count!==1?'s':''})`, 'ok');
+}
+
+// ============================================================================
+// MULTI-FORMAT EXPORT
+// ============================================================================
+function exportHTML() {
+  const schema=currentSchema, sql=cm?cm.getValue():'';
+  const issues=schema?validateSchema(schema,sql):[];
+  const errs=issues.filter(i=>i.sev==='error').length, warns=issues.filter(i=>i.sev==='warning').length;
+  const tables=schema?Object.entries(schema.tables):[];
+  const schemaRows=tables.map(([n,t])=>{
+    const cols=(t.colOrder||[]).map(c=>{
+      const col=t.columns[c]||{};
+      return `<tr><td style="padding:3px 8px">${c}</td><td style="padding:3px 8px;color:#0066cc">${col.type?.full||''}</td><td style="padding:3px 8px;color:#666">${col.notNull?'NOT NULL':''}${col.pk?' PK':''}</td></tr>`;
+    }).join('');
+    return `<h3 style="margin:1.5rem 0 .4rem;font-family:monospace;color:#b8720a">${n}</h3><table border="0" style="border-collapse:collapse;border:1px solid #ddd;width:100%;font-size:13px"><thead><tr style="background:#f5f5f5"><th align="left" style="padding:4px 8px">Column</th><th align="left" style="padding:4px 8px">Type</th><th align="left" style="padding:4px 8px">Constraints</th></tr></thead><tbody>${cols}</tbody></table>`;
+  }).join('');
+  const issueList=issues.slice(0,60).map(i=>`<li style="color:${i.sev==='error'?'#c0281e':i.sev==='warning'?'#7a4a00':'#2a5870'}">[${i.sev.toUpperCase()}] Line ${i.line||'?'}: ${escHtml(i.msg)}</li>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Oracle DDL Report</title></head><body style="font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px"><h1 style="font-size:1.4rem;border-bottom:2px solid #f59e0b;padding-bottom:8px">Oracle DDL Report</h1><p style="color:#666;font-size:.85rem">Generated: ${new Date().toLocaleString()} · ${tables.length} table(s) · ${errs} error(s) · ${warns} warning(s)</p><h2>Schema</h2>${schemaRows}<h2 style="margin-top:2rem">Validation Issues</h2><ul style="font-size:.85rem;line-height:2">${issueList||'<li style="color:green">No issues found</li>'}</ul></body></html>`;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='ddl_report.html'; a.click();
+  statusMsg('HTML report exported','ok'); closeModal('io-modal');
+}
+function exportMarkdown() {
+  if (!currentSchema) { statusMsg('Validate first to build schema','warn'); return; }
+  let md=`# Oracle DDL Schema\n\nGenerated: ${new Date().toLocaleString()}\n\n`;
+  Object.entries(currentSchema.tables).forEach(([n,t])=>{
+    md+=`## ${n}\n\n| Column | Type | Nullable | Notes |\n|--------|------|----------|-------|\n`;
+    (t.colOrder||[]).forEach(c=>{
+      const col=t.columns[c]||{};
+      const notes=[col.pk?'PK':'',col.unique?'UQ':'',col.default?'DEFAULT '+col.default:''].filter(Boolean).join(', ');
+      md+=`| \`${c}\` | \`${col.type?.full||''}\` | ${col.notNull?'NOT NULL':'NULL'} | ${notes} |\n`;
+    });
+    md+='\n';
+  });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'})); a.download='schema.md'; a.click();
+  statusMsg('Markdown exported','ok'); closeModal('io-modal');
+}
+function exportJSON() {
+  if (!currentSchema) { statusMsg('Validate first to build schema','warn'); return; }
+  const out={generated:new Date().toISOString(),tables:{}};
+  Object.entries(currentSchema.tables).forEach(([n,t])=>{
+    out.tables[n]={columns:{},constraints:t.constraints||[]};
+    (t.colOrder||[]).forEach(c=>{
+      const col=t.columns[c]||{};
+      out.tables[n].columns[c]={type:col.type?.full||'',notNull:!!col.notNull,pk:!!col.pk,unique:!!col.unique,default:col.default||null};
+    });
+  });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'})); a.download='schema.json'; a.click();
+  statusMsg('JSON schema exported','ok'); closeModal('io-modal');
+}
+
+// ============================================================================
+// CSV → DDL IMPORTER
+// ============================================================================
+function doCSVtoDDL() {
+  const raw=document.getElementById('csv-input').value.trim();
+  const tbl=(document.getElementById('csv-table').value.trim()||'MY_TABLE').toUpperCase();
+  if (!raw) { statusMsg('Paste column headers first','warn'); return; }
+  const cols=raw.split('\n')[0].split(',').map(c=>c.replace(/["\s\r]/g,'').toUpperCase()).filter(Boolean);
+  if (!cols.length) { statusMsg('No columns detected','warn'); return; }
+  function inferType(n) {
+    if (/_?ID$|_KEY$|_NUM$|_SEQ$|^(NUM|COUNT|QTY|AGE|RANK|SORT)$/i.test(n)) return 'NUMBER(10)';
+    if (/(DATE|TIME|_AT|CREATED|UPDATED|MODIFIED|BORN|SINCE|EXPIRES)$/i.test(n)) return 'DATE';
+    if (/^(IS_|HAS_|FLAG)|(_FLAG|_BOOL|ACTIVE|ENABLED|DELETED|VALID)$/i.test(n)) return 'NUMBER(1)';
+    if (/(SALARY|AMOUNT|PRICE|COST|BALANCE|TOTAL|TAX|FEE|RATE)$/i.test(n)) return 'NUMBER(12,2)';
+    if (/(DESC|DESCRIPTION|NOTE|COMMENT|TEXT|BODY|MESSAGE)$/i.test(n)) return 'VARCHAR2(500)';
+    if (/(EMAIL|MAIL)$/i.test(n)) return 'VARCHAR2(150)';
+    if (/(PHONE|TEL|FAX|MOBILE)$/i.test(n)) return 'VARCHAR2(20)';
+    if (/(URL|LINK|PATH|URI)$/i.test(n)) return 'VARCHAR2(2000)';
+    if (/(CODE|TYPE|STATUS|CATEGORY|GENDER|LANG|CURRENCY|COUNTRY)$/i.test(n)) return 'VARCHAR2(20)';
+    return 'VARCHAR2(100)';
+  }
+  const maxL=Math.max(...cols.map(c=>c.length));
+  const lines=cols.map((c,i)=>`    ${c.padEnd(maxL+2)} ${inferType(c)}${i===0?' NOT NULL':''}`);
+  const ddl=`CREATE TABLE ${tbl} (\n${lines.join(',\n')},\n    CONSTRAINT pk_${tbl.toLowerCase()} PRIMARY KEY (${cols[0]})\n);`;
+  if (cm) { cm.replaceRange('\n'+ddl+'\n',cm.getCursor()); setDirty(true); }
+  closeModal('io-modal');
+  statusMsg(`Generated CREATE TABLE ${tbl} (${cols.length} columns)`,'ok');
+}
+
+function convertToPG() {
+  if (!cm) return;
+  let sql = cm.getValue();
+  const rules = [
+    [/\bVARCHAR2\s*\(/gi,           'VARCHAR('],
+    [/\bNVARCHAR2\s*\(/gi,          'VARCHAR('],
+    [/\bNVARCHAR2\b/gi,             'VARCHAR'],
+    [/\bNCHAR\b/gi,                 'CHAR'],
+    [/\bNUMBER\s*\(\s*(\d+)\s*,\s*0\s*\)/gi, (_,p) => `INTEGER`],
+    [/\bNUMBER\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)/gi, (_,p,s) => `NUMERIC(${p},${s})`],
+    [/\bNUMBER\s*\(\s*(\d+)\s*\)/gi, (_,p) => parseInt(p)>9?'BIGINT':'INTEGER'],
+    [/\bNUMBER\b/gi,                'NUMERIC'],
+    [/\bINTEGER\b/gi,               'INTEGER'],
+    [/\bCLOB\b/gi,                  'TEXT'],
+    [/\bNCLOB\b/gi,                 'TEXT'],
+    [/\bBLOB\b/gi,                  'BYTEA'],
+    [/\bRAW\s*\(\d+\)/gi,           'BYTEA'],
+    [/\bXMLTYPE\b/gi,               'XML'],
+    [/\bBINARY_FLOAT\b/gi,          'REAL'],
+    [/\bBINARY_DOUBLE\b/gi,         'DOUBLE PRECISION'],
+    [/\bDATE\b/gi,                  'TIMESTAMP'],
+    [/\bSYSDATE\b/gi,               'CURRENT_TIMESTAMP'],
+    [/\bNVL\s*\(/gi,                'COALESCE('],
+    [/\bROWNUM\b/gi,                '/* ROWNUM→LIMIT */ ROWNUM'],
+    [/\bNOCACHE\b/gi,               ''],
+    [/\bNOCYCLE\b/gi,               ''],
+    [/\bNOORDER\b/gi,               ''],
+  ];
+  rules.forEach(([re, rep]) => { sql = sql.replace(re, rep); });
+  document.getElementById('pg-result').value = '-- Auto-converted from Oracle DDL (review required)\n' + sql;
+  document.getElementById('pg-output').style.display = '';
+  statusMsg('Approximate PG conversion done — review carefully', 'warn', 6000);
+}
+
+// ============================================================================
+// DDL DIFF & MIGRATION GENERATOR
+// ============================================================================
+function showDiffMigrate() {
+  document.getElementById('mg-output').style.display='none';
+  document.getElementById('migrate-modal').style.display='flex';
+}
+function runMigrate() {
+  const oldSQL=document.getElementById('mg-old').value.trim();
+  const newSQL=document.getElementById('mg-new').value.trim();
+  if (!oldSQL||!newSQL) { statusMsg('Paste both DDL versions','warn'); return; }
+  let s1,s2;
+  try { s1=parseDDL(oldSQL); s2=parseDDL(newSQL); } catch(e) { statusMsg('Parse error: '+e.message,'err'); return; }
+  const t1n=Object.keys(s1.tables)[0], t2n=Object.keys(s2.tables)[0];
+  if (!t1n||!t2n) { statusMsg('No table found in one or both inputs','warn'); return; }
+  const t1=s1.tables[t1n], t2=s2.tables[t2n], tbl=t2n, lines=[];
+  // Added columns
+  Object.entries(t2.columns).forEach(([col,info])=>{
+    if (!t1.columns[col]) {
+      const nn=info.notNull?' NOT NULL':'', def=info.default?` DEFAULT ${info.default}`:'';
+      lines.push(`ALTER TABLE ${tbl} ADD ${col} ${info.type?.full||'VARCHAR2(100)'}${def}${nn};`);
+    }
+  });
+  // Dropped columns
+  Object.keys(t1.columns).forEach(col=>{ if (!t2.columns[col]) lines.push(`ALTER TABLE ${tbl} DROP COLUMN ${col};`); });
+  // Modified columns
+  Object.entries(t2.columns).forEach(([col,info])=>{
+    if (t1.columns[col]) {
+      const old=t1.columns[col];
+      if ((info.type?.full||'')!==(old.type?.full||'')||info.notNull!==old.notNull)
+        lines.push(`ALTER TABLE ${tbl} MODIFY (${col} ${info.type?.full||'VARCHAR2(100)'} ${info.notNull?'NOT NULL':'NULL'});`);
+    }
+  });
+  // Dropped constraints
+  (t1.constraints||[]).forEach(con=>{ if (con.name&&!(t2.constraints||[]).find(c=>c.name===con.name)) lines.push(`ALTER TABLE ${tbl} DROP CONSTRAINT ${con.name};`); });
+  // Added constraints
+  (t2.constraints||[]).forEach(con=>{
+    if (!con.name||( t1.constraints||[]).find(c=>c.name===con.name)) return;
+    if (con.type==='PK')     lines.push(`ALTER TABLE ${tbl} ADD CONSTRAINT ${con.name} PRIMARY KEY (${(con.cols||[]).join(', ')});`);
+    else if (con.type==='UNIQUE') lines.push(`ALTER TABLE ${tbl} ADD CONSTRAINT ${con.name} UNIQUE (${(con.cols||[]).join(', ')});`);
+    else if (con.type==='FK')    lines.push(`ALTER TABLE ${tbl} ADD CONSTRAINT ${con.name} FOREIGN KEY (${(con.cols||[]).join(', ')}) REFERENCES ${con.refTable} (${(con.refCols||[]).join(', ')});`);
+  });
+  document.getElementById('mg-result').value = lines.length
+    ? `-- Migration: ${t1n} → ${t2n}\n-- Generated: ${new Date().toLocaleString()}\n\n${lines.join('\n')}`
+    : '-- No differences detected.';
+  document.getElementById('mg-output').style.display='';
+}
+function insertMigration() {
+  if (!cm) return;
+  cm.replaceRange('\n'+document.getElementById('mg-result').value+'\n', cm.getCursor());
+  setDirty(true); closeModal('migrate-modal'); statusMsg('Migration script inserted','ok');
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOBILE VERTICAL RESIZER (touch drag between editor and bottom panel)
