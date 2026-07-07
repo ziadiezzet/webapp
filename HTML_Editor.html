@@ -51,7 +51,16 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
 .tb:hover{background:var(--btn-h);color:var(--accent);}
 .tb.active{background:var(--btn-act);color:var(--accent2);}
 .tb:disabled{opacity:.3;pointer-events:none;}
-.tb[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#000;color:#fff;font-family:var(--font-ui);font-size:.68rem;font-weight:400;padding:4px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:9999;border:1px solid var(--border2);}
+.tb[data-tip]:hover::after,
+.color-wrap[data-tip]:hover::after,
+.modal-close[data-tip]:hover::after,
+.tip-wrap[data-tip]:hover::after,
+#app-header input[title]:hover::after,
+#status-bar [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#000;color:#fff;font-family:var(--font-ui);font-size:.68rem;font-weight:400;padding:4px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:9999;border:1px solid var(--border2);}
+#app-header input[title]{position:relative;}
+#app-header input[title]:hover::after{content:attr(title);}
+.tip-wrap{position:relative;display:inline-flex;align-items:center;}
+.modal-close{position:relative;}
 .tb.icon-btn{font-size:.95rem;}
 .tb.lbl{font-size:.7rem;padding:3px 6px;}
 .tb-sel{font-family:var(--font-ui);font-size:.75rem;height:26px;padding:0 6px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);outline:none;cursor:pointer;}
@@ -76,10 +85,20 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
 #editor{flex:1;overflow-y:auto;padding:40px 60px;background:#fff;color:#222;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.7;outline:none;min-height:100%;}
 #editor.dark-canvas{background:#1a1b26;color:#c0caf5;}
 #editor.focus-mode{padding:40px 15%;}
-#editor img{max-width:100%;cursor:pointer;}
+#editor img{max-width:100%;cursor:pointer;display:inline-block;}
 #editor img.selected{outline:2px solid var(--accent);outline-offset:2px;}
-#editor table{border-collapse:collapse;width:100%;}
-#editor td,#editor th{border:1px solid #ccc;padding:6px 10px;min-width:40px;}
+.img-resize-wrap{display:inline-block;position:relative;line-height:0;vertical-align:bottom;}
+.img-resize-wrap.selected-wrap{outline:2px solid var(--accent);}
+.img-resize-handle{position:absolute;width:10px;height:10px;background:var(--accent);border:1px solid #fff;border-radius:2px;z-index:100;}
+.img-resize-handle.se{bottom:-5px;right:-5px;cursor:se-resize;}
+.img-resize-handle.sw{bottom:-5px;left:-5px;cursor:sw-resize;}
+.img-resize-handle.ne{top:-5px;right:-5px;cursor:ne-resize;}
+.img-resize-handle.nw{top:-5px;left:-5px;cursor:nw-resize;}
+.img-size-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;font-size:.62rem;padding:1px 5px;border-radius:3px;pointer-events:none;white-space:nowrap;font-family:var(--font-mono);}
+#editor table{border-collapse:collapse;width:100%;table-layout:fixed;}
+#editor td,#editor th{border:1px solid #ccc;padding:6px 10px;min-width:40px;position:relative;overflow:hidden;}
+#editor td .col-resizer,#editor th .col-resizer{position:absolute;right:0;top:0;width:5px;height:100%;cursor:col-resize;background:transparent;user-select:none;z-index:10;}
+#editor td .col-resizer:hover,#editor th .col-resizer:hover{background:rgba(79,195,247,.45);}
 #editor th{background:#f5f5f5;font-weight:600;}
 #editor .he-find{background:#ffd700;color:#000;}
 #editor .he-find.he-curr{background:#ff6b00;color:#fff;}
@@ -130,7 +149,7 @@ body.split #src-wrap{flex:1;display:flex;}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
 .btn-danger{background:#7a1c1c;color:var(--red);}
 .btn-danger:hover{background:#a02020;}
-.char-grid{display:flex;flex-wrap:wrap;gap:3px;max-height:300px;overflow-y:auto;padding:8px;background:var(--bg3);border-radius:var(--r);}
+.char-grid{display:flex;flex-wrap:wrap;gap:3px;max-height:300px;overflow-y:auto;padding:8px;background:white;border-radius:var(--r);}
 .char-item{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border-radius:4px;cursor:pointer;background:transparent;border:none;transition:background .1s;}
 .char-item:hover{background:var(--btn-h);}
 .char-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
@@ -198,6 +217,12 @@ body.awm-active #awm-wrap{display:flex!important;}
 @media (max-width:640px) {#app-header { padding: 4px 8px; } #editor { padding: 16px 12px; } #status-bar { flex-wrap: wrap; height: auto; min-height: var(--status-h); padding: 2px 8px; } .st-group { flex-wrap: wrap; gap: 6px; } .modal { margin: 8px; min-width: unset; } .modal.row { grid-template-columns: 1fr; } .tpl-grid { grid-template-columns: 1fr; } .kbds { grid-template-columns: 1fr; }}
 @media (max-width:480px) {#editor { padding: 12px 8px; } .hdr-right .tb.lbl { display: none; } #hdr-shortcuts, #hdr-css { display: none; }}
 @media print{#toolbar-wrap,#app-header,#status-bar,#find-bar,#modal-overlay,#src-wrap{display:none!important;}#editor{padding:0;min-height:auto;background:#fff!important;color:#000!important;}}
+#split-resizer{width:5px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;display:none;}
+#split-resizer:hover,#split-resizer.dragging{background:var(--accent);}
+#st-goal-bar{height:4px;border-radius:2px;background:var(--border2);width:60px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:4px;}
+#st-goal-bar-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+#st-goal-bar-fill.near{background:var(--yellow);}
+#st-goal-bar-fill.done{background:var(--accent);}
 </style>
 </head>
 <body>
@@ -208,11 +233,16 @@ body.awm-active #awm-wrap{display:flex!important;}
     <span class="logo-name">HyperEdit Pro</span>
     <span class="logo-ver">v3.0</span>
   </div>
+  <input id="doc-title" type="text" value="Untitled Document"
+    style="font-family:var(--font-ui);font-size:.82rem;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--text2);outline:none;padding:2px 6px;width:200px;text-align:center;position:relative;"
+    title="Document title — shown in the browser tab and used as the filename when exporting"
+    oninput="document.title = this.value + ' — HyperEdit Pro'"
+    onblur="if(!this.value.trim()) this.value='Untitled Document'">
   <div class="hdr-right">
-    <button class="tb lbl" onclick="showModal('tpl')" data-tip="Templates">📑 Templates</button>
+    <button class="tb lbl" onclick="showModal('tpl')" data-tip="Document templates — load a built-in or custom starter layout">📑 Templates</button>
     <button class="tb lbl" onclick="addToTemplate()" data-tip="Save current document as a new template">📌 Add Tpl</button>
     <button class="tb lbl" id="awm-toggle-btn" onclick="toggleAWMMode()" data-tip="Atlassian Wiki Markup mode">🔣 AWM</button>
-    <button class="tb lbl" onclick="showModal('css')" data-tip="Custom CSS">🎨 CSS</button>
+    <button class="tb lbl" onclick="showModal('css')" data-tip="Inject custom CSS — style the editor content with your own rules">🎨 CSS</button>
     <button class="tb lbl" onclick="showModal('kbd')" data-tip="Keyboard Shortcuts">⌨ Shortcuts</button>
     <button class="tb icon-btn" id="theme-toggle" onclick="toggleTheme()" data-tip="Toggle Dark/Light editor">🌓</button>
     <button class="tb icon-btn" id="fullscreen-btn" onclick="toggleFullscreen()" data-tip="Fullscreen [F11]">⛶</button>
@@ -222,11 +252,11 @@ body.awm-active #awm-wrap{display:flex!important;}
 <div id="toolbar-wrap">
   <div class="tb-row">
     <div class="tbg">
-      <button class="tb lbl" onclick="newDoc()" data-tip="New [Ctrl+N]">📄</button>
+      <button class="tb lbl" onclick="newDoc()" data-tip="New [Ctrl+N]">📄 New</button>
       <button class="tb lbl" onclick="openHTMLFile()" data-tip="Open HTML File [Ctrl+O]">📂</button>
       <button class="tb lbl" id="save-btn" onclick="saveDoc()" data-tip="Save to Browser [Ctrl+S]">💾</button>
       <div class="tb-sel-wrap" style="position:relative;display:inline-flex;">
-        <select class="tb-sel" onchange="handleExport(this.value);this.value=''" style="width:90px;">
+        <select class="tb-sel" onchange="handleExport(this.value);this.value=''" style="width:90px;" title="Export document — save as HTML file, plain text, Markdown, Atlassian Wiki Markup, or send to printer">
           <option value="">⬇ Export…</option>
           <option value="html">As HTML file</option>
           <option value="txt">As Plain Text</option>
@@ -255,7 +285,7 @@ body.awm-active #awm-wrap{display:flex!important;}
       <button class="tb" id="btn-strike" onclick="cmd('strikeThrough')" data-tip="Strikethrough"><s>S</s></button>
       <button class="tb" id="btn-sub" onclick="cmd('subscript')" data-tip="Subscript">x<sub>₂</sub></button>
       <button class="tb" id="btn-sup" onclick="cmd('superscript')" data-tip="Superscript">x<sup>²</sup></button>
-      <button class="tb" onclick="cmd('removeFormat')" data-tip="Clear Formatting">🧹</button>
+      <button class="tb" onclick="cmd('removeFormat')" data-tip="Clear formatting — strips bold, italic, color and all inline styles from selected text">🧹</button>
       <button class="tb" id="fmt-painter-btn" onclick="toggleFormatPainter()" data-tip="Format Painter — click to copy format, then select text to apply">🖌</button>
     </div>
     <div class="tbs"></div>
@@ -292,7 +322,7 @@ body.awm-active #awm-wrap{display:flex!important;}
 
   <div class="tb-row">
     <div class="tbg">
-      <select class="tb-sel" onchange="cmdArg('formatBlock',this.value);this.value=''" style="width:105px;">
+      <select class="tb-sel" onchange="cmdArg('formatBlock',this.value);this.value=''" style="width:105px;" title="Block format — apply heading (H1–H6), paragraph, blockquote or preformatted style to the current block">
         <option value="">¶ Block…</option>
         <optgroup label="Headings">
           <option value="h1">H1 — Heading 1</option>
@@ -314,8 +344,7 @@ body.awm-active #awm-wrap{display:flex!important;}
     </div>
     <div class="tbs"></div>
     <div class="tbg">
-      <select class="tb-sel" onchange="cmdArg('fontName',this.value)" style="width:145px;" id="font-sel">
-        <option value="">Font Family</option>
+      <select class="tb-sel" onchange="cmdArg('fontName',this.value);this.value=''" style="width:145px;" id="font-sel" title="Font family — change the typeface of the selected text">        <option value="">Font Family</option>
         <option value="Arial">Arial</option>
         <option value="Arial Black">Arial Black</option>
         <option value="Andale Mono">Andale Mono</option>
@@ -352,7 +381,7 @@ body.awm-active #awm-wrap{display:flex!important;}
         <option value="Trebuchet MS">Trebuchet MS</option>
         <option value="Verdana">Verdana</option>
       </select>
-      <select class="tb-sel" onchange="cmdArg('fontSize',this.value);this.value=''" style="width:90px;">
+      <select class="tb-sel" onchange="cmdArg('fontSize',this.value);this.value=''" style="width:90px;" title="Font size — 1 (8pt) to 7 (36pt). Select text first, then pick a size">
         <option value="">Size (pt)</option>
         <option value="1">1 — 8pt</option>
         <option value="2">2 — 10pt</option>
@@ -362,8 +391,8 @@ body.awm-active #awm-wrap{display:flex!important;}
         <option value="6">6 — 24pt</option>
         <option value="7">7 — 36pt</option>
       </select>
-      <span style="font-size:.68rem;color:var(--text3);padding:0 2px;">LH:</span>
-      <select class="tb-sel" onchange="applyLineHeight(this.value);this.value=''" style="width:56px;">
+      <span class="tip-wrap" data-tip="Line Height — vertical spacing between lines" style="font-size:.68rem;color:var(--text3);padding:0 2px;">LH:</span>
+      <select class="tb-sel" onchange="applyLineHeight(this.value);this.value=''" style="width:56px;" title="Line height — controls vertical spacing between lines in the selected text">
         <option value="">─</option>
         <option value="1">1</option>
         <option value="1.2">1.2</option>
@@ -373,8 +402,8 @@ body.awm-active #awm-wrap{display:flex!important;}
         <option value="2">2</option>
         <option value="2.5">2.5</option>
       </select>
-      <span style="font-size:.68rem;color:var(--text3);padding:0 2px;">LS:</span>
-      <select class="tb-sel" onchange="applyLetterSpacing(this.value);this.value=''" style="width:62px;">
+      <span class="tip-wrap" data-tip="Letter Spacing — horizontal space between characters" style="font-size:.68rem;color:var(--text3);padding:0 2px;">LS:</span>
+      <select class="tb-sel" onchange="applyLetterSpacing(this.value);this.value=''" style="width:62px;" title="Letter spacing — adjusts horizontal space between individual characters">
         <option value="">─</option>
         <option value="normal">normal</option>
         <option value=".5px">.5px</option>
@@ -397,12 +426,12 @@ body.awm-active #awm-wrap{display:flex!important;}
       <button class="tb" id="btn-center" onclick="cmd('justifyCenter')" data-tip="Center">≡</button>
       <button class="tb" id="btn-right" onclick="cmd('justifyRight')" data-tip="Align Right">⬲</button>
       <button class="tb" id="btn-justify" onclick="cmd('justifyFull')" data-tip="Justify">≣</button>
-      <button class="tb lbl" onclick="toggleDirection()" data-tip="Toggle LTR/RTL">↔RTL</button>
+      <button class="tb lbl" onclick="toggleDirection()" data-tip="Toggle text direction — switches the entire editor between Left-to-Right and Right-to-Left (for Arabic, Hebrew, etc.)">↔RTL</button>
     </div>
     <div class="tbs"></div>
     <div class="tbg">
-      <span style="font-size:.68rem;color:var(--text3);padding:0 2px;">WS:</span>
-      <select class="tb-sel" onchange="applyWordSpacing(this.value);this.value=''" style="width:60px;" title="Word Spacing">
+      <span class="tip-wrap" data-tip="Word Spacing — horizontal space between words" style="font-size:.68rem;color:var(--text3);padding:0 2px;">WS:</span>
+      <select class="tb-sel" onchange="applyWordSpacing(this.value);this.value=''" style="width:60px;" title="Word spacing — adjusts horizontal space between words in the selected text">
         <option value="">─</option>
         <option value="normal">norm</option>
         <option value="2px">+2px</option>
@@ -410,8 +439,8 @@ body.awm-active #awm-wrap{display:flex!important;}
         <option value="6px">+6px</option>
         <option value="-1px">-1px</option>
       </select>
-      <span style="font-size:.68rem;color:var(--text3);padding:0 2px;">Shadow:</span>
-      <select class="tb-sel" onchange="applyTextShadow(this.value);this.value=''" style="width:72px;" title="Text Shadow">
+      <span class="tip-wrap" data-tip="Text Shadow — adds a shadow effect behind selected text" style="font-size:.68rem;color:var(--text3);padding:0 2px;">Shadow:</span>
+      <select class="tb-sel" onchange="applyTextShadow(this.value);this.value=''" style="width:72px;" title="Text shadow — applies a shadow effect: Soft (subtle), Strong (dark), Glow (color), Neon (cyan)">
         <option value="">─</option>
         <option value="none">None</option>
         <option value="soft">Soft</option>
@@ -435,7 +464,7 @@ body.awm-active #awm-wrap{display:flex!important;}
     <div class="tbg">
       <button class="tb lbl" onclick="showModal('link')" data-tip="Insert Link [Ctrl+K]">🔗 Link</button>
       <button class="tb" onclick="removeLink()" data-tip="Remove Link">🔗̶</button>
-      <button class="tb lbl" onclick="generateTOC()" data-tip="Insert Table of Contents from headings">📑 TOC</button>
+      <button class="tb lbl" onclick="generateTOC()" data-tip="Auto-generate a Table of Contents from all H1–H4 headings in the document, with anchor links">📑 TOC</button>
       <button class="tb lbl" onclick="showModal('image')" data-tip="Insert Image">🖼 Image</button>
       <button class="tb lbl" onclick="showModal('video')" data-tip="Embed YouTube">▶ Video</button>
       <button class="tb lbl" onclick="showModal('table')" data-tip="Insert Table">▦ Table</button>
@@ -446,7 +475,7 @@ body.awm-active #awm-wrap{display:flex!important;}
     </div>
     <div class="tbs"></div>
     <div class="tbg">
-      <select class="tb-sel" onchange="insertPanel(this.value);this.value=''" style="width:100px;">
+      <select class="tb-sel" onchange="insertPanel(this.value);this.value=''" style="width:100px;" title="Insert a styled panel block — Info, Warning, Success, Error, Note or Code (Confluence-compatible)">
         <option value="">📦 Panel…</option>
         <option value="info">ℹ Info</option>
         <option value="warn">⚠ Warning</option>
@@ -458,7 +487,7 @@ body.awm-active #awm-wrap{display:flex!important;}
     </div>
     <div class="tbs"></div>
     <div class="tbg">
-      <select class="tb-sel" onchange="insertColumns(this.value);this.value=''" style="width:96px;">
+      <select class="tb-sel" onchange="insertColumns(this.value);this.value=''" style="width:96px;" title="Insert a multi-column layout — 2 equal columns, 3 equal columns, or asymmetric 1/3+2/3 splits">
         <option value="">⊞ Layout…</option>
         <option value="2">2 Columns</option>
         <option value="3">3 Columns</option>
@@ -477,8 +506,8 @@ body.awm-active #awm-wrap{display:flex!important;}
     <div class="tbs"></div>
     <div class="tbg">
       <button class="tb lbl" id="focus-btn" onclick="toggleFocusMode()" data-tip="Focus / Distraction-free Mode">🎯 Focus</button>
-      <button class="tb lbl" id="src-btn" onclick="setView('source')" data-tip="HTML Source [Ctrl+Shift-H]">&lt;/&gt; Source</button>
-      <button class="tb lbl" id="split-btn" onclick="setView('split')" data-tip="Split View">⊟ Split</button>
+      <button class="tb lbl" id="src-btn" onclick="setView('source')" data-tip="Source view — edit the raw HTML directly [Ctrl+Shift+H]">&lt;/&gt; Source</button>
+      <button class="tb lbl" id="split-btn" onclick="setView('split')" data-tip="Split view — visual editor on the left, live HTML source on the right [Ctrl+Shift+S]">⊟ Split</button>
       <button class="tb lbl active" id="wysiwyg-btn" onclick="setView('wysiwyg')" data-tip="WYSIWYG Editor">✎ WYSIWYG</button>
     </div>
   </div>
@@ -490,11 +519,11 @@ body.awm-active #awm-wrap{display:flex!important;}
   <button class="tb" onclick="findNext()" data-tip="Next match">▼</button>
   <span id="find-count"></span>
   <input id="rep-input" type="text" placeholder="Replace…">
-  <button class="tb lbl" onclick="replaceCurrent()">Replace</button>
-  <button class="tb lbl" onclick="replaceAll()">Replace All</button>
+  <button class="tb lbl" onclick="replaceCurrent()" data-tip="Replace current highlighted match [Enter after typing]">Replace</button>
+      <button class="tb lbl" onclick="replaceAll()" data-tip="Replace every match in the document at once">Replace All</button>
   <div class="find-opts">
-    <label class="find-check"><input type="checkbox" id="find-case"> Aa</label>
-    <label class="find-check"><input type="checkbox" id="find-word"> \b</label>
+    <label class="find-check tip-wrap" data-tip="Case-sensitive search — distinguishes uppercase from lowercase"><input type="checkbox" id="find-case"> Aa</label>
+    <label class="find-check tip-wrap" data-tip="Whole-word search — matches complete words only, ignores partial matches"><input type="checkbox" id="find-word"> \b</label>
   </div>
   <button class="tb" onclick="closeFindBar()" style="margin-left:auto;" data-tip="Close [Esc]">✕</button>
 </div>
@@ -527,34 +556,36 @@ body.awm-active #awm-wrap{display:flex!important;}
         placeholder="Atlassian Wiki Markup mode&#10;&#10;Toolbar buttons insert AWM syntax:&#10;  *bold*   _italic_   +underline+   -strikethrough-&#10;  ^superscript^   ~subscript~   {{monospace}}&#10;  h1. Heading   bq. Quote   ---- Horizontal rule&#10;  * Bullet   # Numbered   [text|url]   !image.png!&#10;  {code}...{code}   {info}...{info}   {warning}...{warning}&#10;&#10;Click ⇄ From WYSIWYG to convert existing document."></textarea>
     </div>
 
+   <div id="split-resizer"></div>
     <div id="src-wrap">
       <div id="src-lines">1</div>
       <textarea id="src-editor"
         oninput="onSourceChange()"
         onkeydown="sourceKeyDown(event)"
         onscroll="syncSrcScroll()"
-        spellcheck="false"></textarea>
+        spellcheck="false"
+        title="HTML Source Editor — edits here update the WYSIWYG view live in Split mode. Tab inserts 2 spaces."></textarea>
     </div>
   </div>
-
+  </div>
   <div id="status-bar">
     <div class="st-group">
       <div class="st-item"><div class="st-dot" id="saved-dot"></div> <span id="save-status">Saved</span></div>
       <div class="st-item">Words: <strong id="st-words">0</strong></div>
       <div class="st-item">Chars: <strong id="st-chars">0</strong></div>
       <div class="st-item">~<strong id="st-read">0</strong> min read</div>
-      <div class="st-item" id="st-goal-wrap" style="display:none">Goal: <strong id="st-goal-pct">0%</strong></div>
-      <button class="tb lbl" style="height:18px;font-size:.62rem;padding:0 5px;" onclick="setWordGoal()" data-tip="Set word count goal">🎯</button>
+      <div class="st-item" id="st-goal-wrap" style="display:none">Goal: <strong id="st-goal-pct">0%</strong><span id="st-goal-bar"><span id="st-goal-bar-fill"></span></span></div>
+      <button class="tb lbl" style="height:18px;font-size:.62rem;padding:0 5px;" onclick="setWordGoal()" data-tip="Set a word count goal — tracks progress as a percentage in the status bar">🎯</button>
       <div class="st-item">Lines: <strong id="st-lines">1</strong></div>
     </div>
     <div class="st-group">
       <div class="st-item" id="st-selection" style="display:none">Sel: <strong id="sel-count">—</strong></div>
-      <div class="st-item" id="st-mode" onclick="cycleView()">WYSIWYG</div>
-      <div class="st-item" id="st-time"></div>
+      <div class="st-item" id="st-mode" onclick="cycleView()" data-tip="Current editing mode — click to cycle: WYSIWYG → Split → Source → WYSIWYG" style="position:relative;cursor:pointer;">WYSIWYG</div>
+      <div class="st-item" id="st-time" data-tip="Current time" style="position:relative;"></div>
     </div>
   </div>
 </div>
-
+</div>
 <div id="zoom-ind"></div>
 <div id="toast-container"></div>
 
@@ -563,7 +594,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-link" style="display:none">
     <div class="modal-hdr">
       <span class="modal-title">🔗 Insert / Edit Link</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>URL</label>
     <input type="url" id="link-url" placeholder="https://example.com">
@@ -581,7 +612,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-image" style="display:none">
     <div class="modal-hdr">
       <span class="modal-title">🖼 Insert Image</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>From URL</label>
     <input type="url" id="img-url" placeholder="https://example.com/image.jpg">
@@ -613,7 +644,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-video" style="display:none">
     <div class="modal-hdr">
       <span class="modal-title">▶ Embed YouTube Video</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>YouTube URL or Video ID</label>
     <input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=... or video ID">
@@ -637,7 +668,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-table" style="display:none">
     <div class="modal-hdr">
       <span class="modal-title">▦ Insert Table</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <div class="row">
       <div><label>Rows</label><input type="number" id="tbl-rows" value="3" min="1" max="50"></div>
@@ -660,7 +691,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-emoji" style="display:none;max-width:420px;">
     <div class="modal-hdr">
       <span class="modal-title">😊 Emoji Picker</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <div class="char-tabs" id="emoji-tabs"></div>
     <div class="char-grid" id="emoji-grid"></div>
@@ -669,7 +700,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-char" style="display:none;max-width:420px;">
     <div class="modal-hdr">
       <span class="modal-title">Ω Special Characters</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <div class="char-tabs" id="char-tabs"></div>
     <div class="char-grid" id="char-grid"></div>
@@ -682,7 +713,7 @@ body.awm-active #awm-wrap{display:flex!important;}
         <button class="btn btn-ghost" style="padding:4px 10px;font-size:.72rem;" onclick="exportTemplates()">⬇ Export JSON</button>
         <button class="btn btn-ghost" style="padding:4px 10px;font-size:.72rem;" onclick="importTemplatesFile()">⬆ Import JSON</button>
         <input type="file" id="tpl-import-file" accept=".json" style="display:none" onchange="doImportTemplates(this)">
-        <button class="modal-close" onclick="hideModal()">✕</button>
+        <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
       </div>
     </div>
     <p style="font-size:.75rem;color:var(--text2);margin-bottom:8px;">⚠ Loading a template replaces current content.</p>
@@ -700,7 +731,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-css" style="display:none;">
     <div class="modal-hdr">
       <span class="modal-title">🎨 Inject Custom CSS</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>CSS rules applied to the editor content</label>
     <textarea id="custom-css-input" rows="8" style="font-family:var(--font-mono);font-size:.78rem;" placeholder="body { font-family: 'Arial'; }\nh1 { color: #c00; }"></textarea>
@@ -714,7 +745,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-kbd" style="display:none;max-width:560px;">
     <div class="modal-hdr">
       <span class="modal-title">⌨ Keyboard Shortcuts</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <div class="kbds" id="kbd-list"></div>
   </div>
@@ -722,7 +753,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-wrap" style="display:none;max-width:420px;">
     <div class="modal-hdr">
       <span class="modal-title">⟨⟩ Wrap Selection in Tag</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>HTML Tag</label>
     <select id="wrap-tag" oninput="updateWrapPreview()">
@@ -771,7 +802,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <div class="modal" id="modal-addtpl" style="display:none;max-width:480px;">
     <div class="modal-hdr">
       <span class="modal-title">📌 Save as Template</span>
-      <button class="modal-close" onclick="hideModal()">✕</button>
+      <button class="modal-close" onclick="hideModal()" data-tip="Close this dialog [Esc]">✕</button>
     </div>
     <label>Template Name</label>
     <input type="text" id="addtpl-name" placeholder="e.g. 🚀 My Confluence Page">
@@ -804,6 +835,7 @@ body.awm-active #awm-wrap{display:flex!important;}
   <button class="tb" onmousedown="selShowModal('link')" data-tip="Wrap in Link">🔗</button>
   <button class="tb" onmousedown="selShowModal('wrap')" data-tip="Wrap in Tag">⟨⟩</button>
   <div class="tbs"></div>
+  <button class="tb" id="sel-painter-btn" onmousedown="toggleFormatPainter()" data-tip="Copy/Paste Format">🖌</button>
   <button class="tb" onmousedown="selCmd('removeFormat')" data-tip="Clear Format">🧹</button>
 </div>
 
@@ -841,6 +873,7 @@ function saveState() {
     darkCanvas: darkCanvas,
     zoomLevel: zoomLevel,
     awmContent: awmEd.value,
+    awmMode: awmMode,
     customCSS: document.getElementById('custom-style-tag').textContent || ''
   };
   try { localStorage.setItem('hyperedit_state_v3', JSON.stringify(appState)); } catch(e) {}
@@ -852,13 +885,14 @@ function loadState() {
   try {
     const s = JSON.parse(saved);
     if (s.view && s.view !== currentView) setView(s.view);
-    if (s.darkCanvas !== darkCanvas) toggleTheme();
+    if (typeof s.darkCanvas === 'boolean' && s.darkCanvas !== darkCanvas) toggleTheme();
     if (s.zoomLevel && s.zoomLevel !== 100) {
       zoomLevel = s.zoomLevel;
       editor.style.zoom = zoomLevel / 100;
       document.getElementById('zoom-pct').textContent = zoomLevel + '%';
     }
     if (s.awmContent) awmEd.value = s.awmContent;
+    if (s.awmMode && !awmMode) toggleAWMMode();
     if (s.customCSS) document.getElementById('custom-style-tag').textContent = s.customCSS;
   } catch(e) {}
 }
@@ -876,6 +910,21 @@ function cmd(command) {
   if (awmMode) { awmCmd(command); return; }
   restoreSelection();
   editor.focus();
+  if (command === 'insertOrderedList' || command === 'insertUnorderedList') {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      const anc = sel.getRangeAt(0).commonAncestorContainer;
+      const cell = (anc.nodeType === Node.TEXT_NODE ? anc.parentElement : anc).closest('td,th');
+      if (cell) {
+        const tag = command === 'insertOrderedList' ? 'ol' : 'ul';
+        const text = sel.toString().trim() || 'List item';
+        document.execCommand('insertHTML', false,
+          `<${tag} style="margin:2px 0;padding-left:18px;"><li>${text}</li></${tag}>`);
+        markModified();
+        return;
+      }
+    }
+  }
   document.execCommand(command, false, null);
   markModified();
 }
@@ -924,8 +973,7 @@ function transformText(type) {
     case 'title': text = text.replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase()); break;
     case 'sentence': text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(); break;
   }
-  range.deleteContents();
-  range.insertNode(document.createTextNode(text));
+  document.execCommand('insertText', false, text);
   markModified();
 }
 
@@ -938,9 +986,9 @@ function insertHR() {
 
 function insertBlockquote() {
   restoreSelection();
-  const sel = window.getSelection();
-  const text = sel.rangeCount ? sel.toString() : 'Quoted text here…';
   editor.focus();
+  const sel = window.getSelection();
+  const text = (sel && sel.rangeCount && sel.toString().trim()) ? sel.toString() : 'Quoted text here…';
   document.execCommand('insertHTML', false, `<blockquote>${text}</blockquote><p><br></p>`);
   markModified();
 }
@@ -964,23 +1012,12 @@ function wrapSelection(tag, style) {
   if (!sel.rangeCount) return;
   const range = sel.getRangeAt(0);
   if (range.collapsed) {
-    const span = document.createElement(tag);
-    span.style.cssText = style;
-    span.appendChild(document.createTextNode('\u200b'));
-    range.insertNode(span);
-    range.setStart(span.firstChild, 1);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    document.execCommand('insertHTML', false, `<${tag} style="${style}">\u200b</${tag}>`);
     return;
   }
-  try {
-    const span = document.createElement(tag);
-    span.style.cssText = style;
-    range.surroundContents(span);
-  } catch(e) {
-    document.execCommand('insertHTML', false, `<${tag} style="${style}">${range.toString()}</${tag}>`);
-  }
+  const tmp = document.createElement('div');
+  tmp.appendChild(range.cloneContents());
+  document.execCommand('insertHTML', false, `<${tag} style="${style}">${tmp.innerHTML}</${tag}>`);
   markModified();
 }
 
@@ -1048,11 +1085,12 @@ function insertColumns(type) {
 
 function setView(mode) {
   if (mode === currentView) return;
-  if (currentView === 'source' || currentView === 'split') {
+  // editor.innerHTML is already kept in sync by onSourceChange; only sync on initial switch
+  if ((currentView === 'source' || currentView === 'split') && srcEd.value !== editor.innerHTML) {
     editor.innerHTML = srcEd.value;
   }
   if (mode === 'source' || mode === 'split') {
-    srcEd.value = editor.innerHTML;
+    srcEd.value = prettyHTML(editor.innerHTML);
     updateLineNumbers();
   }
   currentView = mode;
@@ -1061,6 +1099,14 @@ function setView(mode) {
   const showSource = mode !== 'wysiwyg';
   editor.style.display = showEditor ? '' : 'none';
   srcWrap.style.display = showSource ? 'flex' : 'none';
+  const resizer = document.getElementById('split-resizer');
+  if (resizer) {
+    resizer.style.display = mode === 'split' ? '' : 'none';
+    if (mode !== 'split') {
+      editor.style.flex = ''; editor.style.width = '';
+      srcWrap.style.flex = ''; srcWrap.style.width = '';
+    }
+  }
   document.getElementById('wysiwyg-btn').classList.toggle('active', mode === 'wysiwyg');
   document.getElementById('src-btn').classList.toggle('active', mode === 'source');
   document.getElementById('split-btn').classList.toggle('active', mode === 'split');
@@ -1075,7 +1121,9 @@ function cycleView() {
 }
 
 function onSourceChange() {
-  if (currentView === 'split') editor.innerHTML = srcEd.value;
+  if (currentView === 'split' || currentView === 'source') {
+    editor.innerHTML = srcEd.value;
+  }
   updateLineNumbers();
   markModified();
 }
@@ -1083,6 +1131,31 @@ function onSourceChange() {
 function updateLineNumbers() {
   const lines = srcEd.value.split('\n').length;
   srcLines.textContent = Array.from({length: lines}, (_, i) => i + 1).join('\n');
+}
+
+function prettyHTML(html) {
+  const VOID = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+  let out = '', indent = 0;
+  // Tokenise into tags and text
+  const tokens = html.match(/<!--[\s\S]*?-->|<[^>]+>|[^<]+/g) || [];
+  tokens.forEach(tok => {
+    if (!tok.trim()) return;
+    if (tok.startsWith('<!--')) {
+      out += '  '.repeat(indent) + tok.trim() + '\n';
+    } else if (tok.startsWith('</')) {
+      indent = Math.max(0, indent - 1);
+      out += '  '.repeat(indent) + tok.trim() + '\n';
+    } else if (tok.startsWith('<')) {
+      const tag = (tok.match(/^<([a-zA-Z0-9-]+)/) || [])[1] || '';
+      const selfClose = tok.endsWith('/>') || VOID.has(tag.toLowerCase());
+      out += '  '.repeat(indent) + tok.trim() + '\n';
+      if (!selfClose) indent++;
+    } else {
+      const txt = tok.trim();
+      if (txt) out += '  '.repeat(indent) + txt + '\n';
+    }
+  });
+  return out.trim();
 }
 
 function syncSrcScroll() {
@@ -1095,15 +1168,21 @@ function sourceKeyDown(e) {
     const start = srcEd.selectionStart, end = srcEd.selectionEnd;
     srcEd.value = srcEd.value.slice(0, start) + '  ' + srcEd.value.slice(end);
     srcEd.selectionStart = srcEd.selectionEnd = start + 2;
-    if (currentView === 'split') editor.innerHTML = srcEd.value;
+    if (currentView === 'split' || currentView === 'source') editor.innerHTML = srcEd.value;
     markModified();
   }
 }
 
 function toggleFindBar() {
   findBar.classList.toggle('open');
-  if (findBar.classList.contains('open')) document.getElementById('find-input').focus();
-  else closeFindBar();
+  if (findBar.classList.contains('open')) {
+    if (currentView === 'source') {
+      showToast('ℹ Find works in WYSIWYG/Split view — use browser Ctrl+F in Source view', 'info');
+      findBar.classList.remove('open');
+      return;
+    }
+    document.getElementById('find-input').focus();
+  } else closeFindBar();
 }
 
 function closeFindBar() {
@@ -1265,11 +1344,12 @@ function doInsertImage() {
   editor.focus();
   if (file) {
     const reader = new FileReader();
-    reader.onload = e => { document.execCommand('insertHTML', false, buildHTML(e.target.result)); markModified(); };
+    reader.onload = e => { document.execCommand('insertHTML', false, buildHTML(e.target.result)); markModified(); setTimeout(injectImgResizers, 50); };
     reader.readAsDataURL(file);
   } else if (url) {
     document.execCommand('insertHTML', false, buildHTML(url));
     markModified();
+    setTimeout(injectImgResizers, 50);
   }
 }
 
@@ -1277,14 +1357,13 @@ function doInsertVideo() {
   let url = document.getElementById('yt-url').value.trim();
   const w = document.getElementById('yt-w').value || 560;
   const h = document.getElementById('yt-h').value || 315;
-  const noRel = document.getElementById('yt-related').checked ? '' : '&rel=0';
-  let vid = url;
+  const noRel = document.getElementById('yt-related').checked ? '&rel=1' : '&rel=0';  let vid = url;
   const match = url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/);
   if (match) vid = match[1];
   hideModal();
   restoreSelection();
   editor.focus();
-  document.execCommand('insertHTML', false, `<div style="margin:12px 0;"><iframe width="${w}" height="${h}" src="https://www.youtube.com/embed/${vid}?rel=0${noRel}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe></div><p><br></p>`);
+  document.execCommand('insertHTML', false, `<div style="margin:12px 0;"><iframe width="${w}" height="${h}" src="https://www.youtube.com/embed/${vid}?${noRel.slice(1)}" frameborder="0" allowfullscreen style="max-width:100%;border-radius:6px;"></iframe></div><p><br></p>`);
   markModified();
 }
 
@@ -1299,14 +1378,14 @@ function doInsertTable() {
   let html = `<table style="border-collapse:collapse;width:${width};margin:10px 0;" border="${border}">`;
   if (header) {
     html += '<thead><tr>';
-    for (let j = 0; j < cols; j++) html += `<th style="border:${border}px solid #ccc;padding:${pad}px;background:#f5f5f5;font-weight:600;">Header ${j+1}</th>`;
+    for (let j = 0; j < cols; j++) html += `<th style="border:${border}px solid #ccc;padding:${pad}px;background:#f5f5f5;font-weight:600;">Header ${j+1}<div class="col-resizer" onmousedown="initColResize(event)"></div></th>`;
     html += '</tr></thead>';
   }
   html += '<tbody>';
   for (let i = header ? 1 : 0; i < rows; i++) {
     const bg = stripe && i % 2 === 1 ? 'background:#f9f9f9;' : '';
     html += `<tr>`;
-    for (let j = 0; j < cols; j++) html += `<td style="border:${border}px solid #ccc;padding:${pad}px;${bg}">&nbsp;</td>`;
+    for (let j = 0; j < cols; j++) html += `<td style="border:${border}px solid #ccc;padding:${pad}px;${bg}">&nbsp;<div class="col-resizer" onmousedown="initColResize(event)"></div></td>`;
     html += '</tr>';
   }
   html += '</tbody></table><p><br></p>';
@@ -1315,6 +1394,7 @@ function doInsertTable() {
   editor.focus();
   document.execCommand('insertHTML', false, html);
   markModified();
+  setTimeout(injectTableResizers, 50);
 }
 
 const EMOJI_CATS = {
@@ -1549,6 +1629,8 @@ const SHORTCUTS_LIST = [
   ['Fullscreen', 'F11'], ['Focus Mode', 'Ctrl+Shift+L'],
   ['Zoom In', 'Ctrl+='], ['Zoom Out', 'Ctrl+-'], ['Reset Zoom', 'Ctrl+0'],
   ['Dark Canvas', 'Ctrl+Shift+D'], ['New Document', 'Ctrl+N'],
+  ['Format Painter', 'Ctrl+Shift+Alt+P'], ['Copy Rich Text', 'Ctrl+Shift+R'],
+  ['Insert TOC', 'Toolbar only'], ['Copy Rich Text', 'Ctrl+Shift+R'], ['Format Painter', 'Ctrl+Shift+Alt+P'],
   ['Indent', 'Tab (in list)'], ['Close dialogs', 'Escape'],
 ];
 
@@ -1567,6 +1649,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); return; }
   if (!ctrl) return;
   switch (e.key.toLowerCase()) {
+    case 'z': if (!shift) { e.preventDefault(); document.execCommand('undo'); return; } break;
+    case 'y': if (!shift) { e.preventDefault(); document.execCommand('redo'); return; } break;
     case 'n': if (!e.shiftKey) { e.preventDefault(); newDoc(); } break;
     case 's':
       if (shift) { e.preventDefault(); setView(currentView === 'split' ? 'wysiwyg' : 'split'); }
@@ -1583,10 +1667,13 @@ document.addEventListener('keydown', e => {
     case '=': case '+': e.preventDefault(); zoom(10); break;
     case '-': e.preventDefault(); zoom(-10); break;
     case '0': e.preventDefault(); resetZoom(); break;
-    case 'p': if (!shift) { e.preventDefault(); window.print(); } break;
+    case 'p':
+      if (shift && e.altKey) { e.preventDefault(); toggleFormatPainter(); }
+      else if (!shift) { e.preventDefault(); window.print(); }
+      break;
     case 'v': if (shift) { e.preventDefault(); pastePlain(); } break;
     case 'c': if (shift) { e.preventDefault(); copySelectionHTML(); } break;
-    case 'p': if (shift && e.altKey) { e.preventDefault(); toggleFormatPainter(); } break;
+    case 'r': if (shift) { e.preventDefault(); copySelectionFormatted(); } break;
   }
 });
 
@@ -1614,16 +1701,13 @@ function editorKeyDown(e) {
     else if (before.endsWith('(tm)')) { rep = '™'; repLen = 4; }
     if (rep) {
       e.preventDefault();
+      // Select the trigger chars so execCommand replaces them (stays on undo stack)
       const r2 = range.cloneRange();
       r2.setStart(node, pos - repLen);
       r2.setEnd(node, pos);
-      r2.deleteContents();
-      r2.insertNode(document.createTextNode(rep + (e.key === 'Enter' ? '' : ' ')));
-      const newRange = document.createRange();
-      newRange.setStartAfter(r2.startContainer);
-      newRange.collapse(true);
       sel.removeAllRanges();
-      sel.addRange(newRange);
+      sel.addRange(r2);
+      document.execCommand('insertText', false, rep + (e.key === 'Enter' ? '' : ' '));
       if (e.key === 'Enter') document.execCommand('insertParagraph');
       markModified();
     }
@@ -1645,7 +1729,9 @@ function toggleFocusMode() {
   editor.classList.toggle('focus-mode', focusMode);
   document.getElementById('focus-btn').classList.toggle('active', focusMode);
   document.getElementById('toolbar-wrap').style.display = focusMode ? 'none' : '';
-  showToast(focusMode ? '🎯 Focus mode — press Ctrl+Shift+L to exit' : 'Focus mode off');
+  document.getElementById('app-header').style.display = focusMode ? 'none' : '';
+  document.getElementById('awm-bar').style.display = focusMode ? 'none' : (awmMode ? 'flex' : 'none');
+  showToast(focusMode ? '🎯 Focus mode — Ctrl+Shift+L to exit' : 'Focus mode off');
 }
 
 function toggleTheme() {
@@ -1694,7 +1780,6 @@ function markModified() {
   clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(saveDoc, 3000);
   updateStats();
-  debounceSave();
 }
 
 let saveDebounce;
@@ -1704,15 +1789,25 @@ function debounceSave() {
 }
 
 function saveDoc() {
-  const html = currentView === 'source' ? srcEd.value : editor.innerHTML;
-  try {
-    localStorage.setItem('hyperedit_v3', html);
-    localStorage.setItem('hyperedit_v3_ts', new Date().toISOString());
+  if (awmMode) {
+    saveState();
     isModified = false;
     document.getElementById('saved-dot').classList.remove('modified');
     const ts = new Date().toLocaleTimeString();
     document.getElementById('save-status').textContent = 'Saved ' + ts;
-    document.getElementById('st-time').textContent = ts;
+    // st-time is now the live clock; save time shown in save-status only
+    return;
+  }
+  const html = currentView === 'source' ? srcEd.value : editor.innerHTML;
+  try {
+    localStorage.setItem('hyperedit_v3', html);
+    localStorage.setItem('hyperedit_v3_ts', new Date().toISOString());
+    localStorage.setItem('hyperedit_v3_title', document.getElementById('doc-title').value || 'Untitled Document');
+    isModified = false;
+    document.getElementById('saved-dot').classList.remove('modified');
+    const ts = new Date().toLocaleTimeString();
+    document.getElementById('save-status').textContent = 'Saved ' + ts;
+    // st-time is now the live clock; save time shown in save-status only
   } catch(e) { showToast('⚠ Could not save: storage full?', 'error'); }
   saveState();
 }
@@ -1725,11 +1820,20 @@ function loadDoc() {
     const ts = localStorage.getItem('hyperedit_v3_ts');
     if (ts) document.getElementById('st-time').textContent = 'Loaded: ' + new Date(ts).toLocaleTimeString();
   }
+  const savedTitle = localStorage.getItem('hyperedit_v3_title');
+  if (savedTitle) {
+    document.getElementById('doc-title').value = savedTitle;
+    document.title = savedTitle + ' — HyperEdit Pro';
+  }
 }
 
 function newDoc() {
   if (isModified && !confirm('Discard unsaved changes?')) return;
+  if (awmMode) toggleAWMMode();
+  awmEd.value = '';
   editor.innerHTML = '<p>Start typing…</p>';
+  document.getElementById('doc-title').value = 'Untitled Document';
+  document.title = 'Untitled Document — HyperEdit Pro';
   if (currentView !== 'wysiwyg') setView('wysiwyg');
   markModified();
   editor.focus();
@@ -1749,8 +1853,18 @@ function openHTMLFile() {
         tmp.innerHTML = ev.target.result;
         const body = tmp.querySelector('body');
         editor.innerHTML = body ? body.innerHTML : ev.target.result;
+        // Restore <title> from the file if present
+        const titleMatch = ev.target.result.match(/<title[^>]*>([^<]*)<\/title>/i);
+        const fileTitle = titleMatch ? titleMatch[1].trim() : file.name.replace(/\.html?$/i,'');
+        if (fileTitle) {
+          document.getElementById('doc-title').value = fileTitle;
+          document.title = fileTitle + ' — HyperEdit Pro';
+        }
       } else {
         editor.textContent = ev.target.result;
+        const plainTitle = file.name.replace(/\.[^.]+$/, '');
+        document.getElementById('doc-title').value = plainTitle;
+        document.title = plainTitle + ' — HyperEdit Pro';
       }
       if (currentView !== 'wysiwyg') setView('wysiwyg');
       markModified();
@@ -1762,16 +1876,19 @@ function openHTMLFile() {
 
 function handleExport(type) {
   const content = currentView === 'source' ? srcEd.value : editor.innerHTML;
+  const docTitle = (document.getElementById('doc-title').value || 'document').trim();
+  const safeTitle = docTitle.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, '_').slice(0, 80) || 'document';
   if (type === 'html') {
-    const full = `<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Document</title>\n<style>\nbody{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#222;}\nblockquote{border-left:4px solid #4fc3f7;margin:12px 0;padding:8px 16px;background:#f0f8ff;color:#444;font-style:italic;}\npre{background:#1e1e2e;color:#a0a0d0;padding:14px;border-radius:6px;overflow-x:auto;font-family:monospace;}\ntable{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:8px;}\n.panel{padding:12px 16px;border-radius:6px;margin:10px 0;}\n.panel-info{background:#e8f4fd;border-left:4px solid #2196F3;color:#1565c0;}\n.panel-warn{background:#fff8e1;border-left:4px solid #FFC107;color:#7a5200;}\n.panel-ok{background:#e8f5e9;border-left:4px solid #4CAF50;color:#1b5e20;}\n.panel-err{background:#fce4ec;border-left:4px solid #F44336;color:#b71c1c;}\n.panel-note{background:#f3e5f5;border-left:4px solid #9C27B0;color:#4a148c;}\n.col2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}\n.col3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}\n</style>\n</head>\n<body>\n${content}\n</body>\n</html>`;
-    downloadFile(full, 'document.html', 'text/html');
+    const customCSS = document.getElementById('custom-style-tag').textContent || '';
+    const full = `<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>${docTitle}</title>\n${customCSS ? '<style>' + customCSS + '</style>\n' : ''}</head>\n<body>\n${content}\n</body>\n</html>`;
+    downloadFile(full, safeTitle + '.html', 'text/html');
   } else if (type === 'txt') {
-    downloadFile(editor.innerText, 'document.txt', 'text/plain');
+    downloadFile(editor.innerText, safeTitle + '.txt', 'text/plain');
   } else if (type === 'md') {
-    downloadFile(htmlToMarkdown(editor.innerHTML), 'document.md', 'text/markdown');
+    downloadFile(htmlToMarkdown(editor.innerHTML), safeTitle + '.md', 'text/markdown');
   } else if (type === 'awm') {
     const awmContent = awmMode ? awmEd.value : editorToAWM();
-    downloadFile(awmContent, 'document.wiki', 'text/plain');
+    downloadFile(awmContent, safeTitle + '.wiki', 'text/plain');
   } else if (type === 'print') {
     window.print();
   }
@@ -1800,6 +1917,8 @@ function htmlToMarkdown(html) {
   md = md.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
   md = md.replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '![$2]($1)');
   md = md.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gis, '> $1\n\n');
+  md = md.replace(/<div[^>]*class="[^"]*col-resizer[^"]*"[^>]*>.*?<\/div>/gi, '');
+  md = md.replace(/<span[^>]*class="[^"]*img-resize[^"]*"[^>]*>.*?<\/span>/gi, '');
   md = md.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
   md = md.replace(/<hr[^>]*>/gi, '\n---\n\n');
   md = md.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
@@ -1811,10 +1930,10 @@ function htmlToMarkdown(html) {
 }
 
 function updateStats() {
-  const text = editor.innerText || '';
+  const text = awmMode ? (awmEd.value || '') : (editor.innerText || '');
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const chars = text.length;
-  const lines = editor.innerHTML.split(/<\/p>|<br|<\/div>|<\/h[1-6]>/i).length;
+  const lines = (editor.innerText.match(/\n/g) || []).length + 1;
   const readMin = Math.ceil(words / 200);
   document.getElementById('st-words').textContent = words.toLocaleString();
   document.getElementById('st-chars').textContent = chars.toLocaleString();
@@ -1824,6 +1943,11 @@ function updateStats() {
     const pct = Math.min(100, Math.round(words / _wordGoal * 100));
     document.getElementById('st-goal-pct').textContent = pct + '%';
     document.getElementById('st-goal-wrap').style.display = '';
+    const fill = document.getElementById('st-goal-bar-fill');
+    if (fill) {
+      fill.style.width = pct + '%';
+      fill.className = pct >= 100 ? 'done' : pct >= 75 ? 'near' : '';
+    }
   }
 }
 
@@ -1845,7 +1969,7 @@ function updateSelectionCount() {
 function onEditorChange() {
   markModified();
   if (currentView === 'split') {
-    srcEd.value = editor.innerHTML;
+    srcEd.value = prettyHTML(editor.innerHTML);
     updateLineNumbers();
   }
   debounceSave();
@@ -1871,6 +1995,27 @@ function showToast(msg, type = 'info') {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.style.opacity = '0', 2500);
 }
+editor.addEventListener('paste', e => {
+  const html = e.clipboardData && e.clipboardData.getData('text/html');
+  if (!html) return;            // let plain-text paste through normally
+  if (!html.includes('mso-') && !html.includes('google-docs') && !html.includes('urn:schemas')) return;
+  e.preventDefault();
+  // Strip Word/GDocs cruft: remove mso styles, class attrs, Office XML tags
+  let clean = html
+    .replace(/<\?xml[^>]*>/gi, '')
+    .replace(/<!--\[if[\s\S]*?<!\[endif\]-->/gi, '')
+    .replace(/<o:[^>]*>[\s\S]*?<\/o:[^>]*>/gi, '')
+    .replace(/<w:[^>]*>[\s\S]*?<\/w:[^>]*>/gi, '')
+    .replace(/\s*mso-[^:;"]+:[^;"]+(;|(?="))/gi, '')
+    .replace(/\s*MARGIN:\s*0[^;"]*(;|(?="))/gi, '')
+    .replace(/\s*class="[^"]*"/gi, '')
+    .replace(/<font[^>]*>/gi, '').replace(/<\/font>/gi, '')
+    .replace(/<span\s*>/gi, '').replace(/(<span[^>]*>)\s*(<\/span>)/gi, '')
+    .replace(/<p[^>]*>/gi, '<p>');
+  document.execCommand('insertHTML', false, clean);
+  markModified();
+  showToast('📋 Pasted (Word/Docs formatting cleaned)', 'info');
+});
 editor.addEventListener('dragover', e => { e.preventDefault(); editor.style.outline = '2px dashed var(--accent)'; });
 editor.addEventListener('dragleave', () => { editor.style.outline = ''; });
 editor.addEventListener('drop', e => {
@@ -1919,6 +2064,44 @@ editor.addEventListener('contextmenu', e => {
   document.body.appendChild(menu);
   setTimeout(() => document.addEventListener('mousedown', function rm(ev){ if(!menu.contains(ev.target)){document.body.removeChild(menu);document.removeEventListener('mousedown',rm);} }), 10);
 });
+editor.addEventListener('contextmenu', e => {
+  const img = e.target.closest('img');
+  if (!img) return;
+  e.preventDefault();
+  const wrap = img.closest('.img-resize-wrap');
+  const menu = document.createElement('div');
+  menu.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;background:var(--bg1);border:1px solid var(--border2);border-radius:6px;padding:4px;z-index:9999;min-width:170px;box-shadow:0 6px 24px rgba(0,0,0,.5);font-size:.78rem;`;
+  const items = [
+    ['↔ Set width…', () => {
+      const w = prompt('Width (px or %):', img.style.width || img.offsetWidth + 'px');
+      if (!w) return;
+      img.style.width = isNaN(+w) ? w : w + 'px';
+      img.style.height = '';
+      markModified();
+    }],
+    ['⬚ Original size', () => { img.style.width=''; img.style.height=''; markModified(); }],
+    ['── Align ──', null],
+    ['⬱ Float left',   () => { img.style.float='left';  img.style.display=''; img.style.margin='0 12px 8px 0'; markModified(); }],
+    ['⬲ Float right',  () => { img.style.float='right'; img.style.display=''; img.style.margin='0 0 8px 12px'; markModified(); }],
+    ['≡ Center',        () => { img.style.float='';      img.style.display='block'; img.style.margin='0 auto'; markModified(); }],
+    ['✗ No float',      () => { img.style.float='';      img.style.display=''; img.style.margin=''; markModified(); }],
+    ['── ──', null],
+    ['✎ Edit alt text…', () => {
+      const alt = prompt('Alt text:', img.alt || '');
+      if (alt !== null) { img.alt = alt; markModified(); }
+    }],
+    ['🗑 Remove image', () => { (wrap || img).remove(); markModified(); }],
+  ];
+  items.forEach(([label, fn]) => {
+    const item = document.createElement('div');
+    item.style.cssText = fn ? 'padding:5px 10px;cursor:pointer;border-radius:4px;color:var(--text);' : 'padding:2px 10px;color:var(--text3);pointer-events:none;';
+    item.textContent = label;
+    if (fn) { item.onmouseenter=()=>item.style.background='var(--btn-h)'; item.onmouseleave=()=>item.style.background=''; item.onclick=()=>{ fn(); document.body.removeChild(menu); }; }
+    menu.appendChild(item);
+  });
+  document.body.appendChild(menu);
+  setTimeout(()=>document.addEventListener('mousedown',function rm(ev){if(!menu.contains(ev.target)){document.body.removeChild(menu);document.removeEventListener('mousedown',rm);}}),10);
+});
 function updateToolbarState() {
   if (awmMode) return;
   const pairs = [
@@ -1940,9 +2123,11 @@ let _painterActive = false, _painterCSS = '';
 
 function toggleFormatPainter() {
   const btn = document.getElementById('fmt-painter-btn');
+  const selBtn = document.getElementById('sel-painter-btn');
+  const syncBtns = a => { btn && btn.classList.toggle('active', a); selBtn && selBtn.classList.toggle('active', a); };
   if (_painterActive) {
     _painterActive = false; _painterCSS = '';
-    btn.classList.remove('active');
+    syncBtns(false);
     editor.style.cursor = '';
     showToast('🖌 Format Painter cancelled');
     return;
@@ -1989,15 +2174,23 @@ function toggleFormatPainter() {
   }
 
   _painterActive = true;
-  btn.classList.add('active');
+  syncBtns(true);
   editor.style.cursor = 'copy';
   showToast('🖌 Format copied — now select the target text', 'info');
 }
 
-editor.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', () => {
   if (!_painterActive) return;
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed || !editor.contains(sel.anchorNode)) return;
+  if (!sel || sel.isCollapsed || !editor.contains(sel.anchorNode)) {
+    // Cancel painter on empty click
+    _painterActive = false; _painterCSS = '';
+    document.getElementById('fmt-painter-btn') && document.getElementById('fmt-painter-btn').classList.remove('active');
+    document.getElementById('sel-painter-btn') && document.getElementById('sel-painter-btn').classList.remove('active');
+    editor.style.cursor = '';
+    showToast('🖌 Format Painter cancelled (no text selected)', 'warning');
+    return;
+  }
 
   const range = sel.getRangeAt(0);
   const css = _painterCSS;
@@ -2005,64 +2198,117 @@ editor.addEventListener('mouseup', () => {
   // Deactivate first to avoid recursive trigger
   _painterActive = false;
   _painterCSS = '';
-  document.getElementById('fmt-painter-btn').classList.remove('active');
+  document.getElementById('fmt-painter-btn') && document.getElementById('fmt-painter-btn').classList.remove('active');
+  document.getElementById('sel-painter-btn') && document.getElementById('sel-painter-btn').classList.remove('active');
   editor.style.cursor = '';
 
-  try {
-    const span = document.createElement('span');
-    span.style.cssText = css;
-    range.surroundContents(span);
-  } catch (e) {
-    // Selection crosses element boundaries — use insertHTML fallback
-    const tmp = document.createElement('div');
-    tmp.appendChild(range.cloneContents());
-    document.execCommand('insertHTML', false,
-      `<span style="${css}">${tmp.innerHTML}</span>`);
-  }
+  const tmp = document.createElement('div');
+  tmp.appendChild(range.cloneContents());
+  document.execCommand('insertHTML', false, `<span style="${css}">${tmp.innerHTML}</span>`);
 
   markModified();
   showToast('🖌 Format applied', 'success');
 });
-editor.addEventListener('dragover', e => {
-  e.preventDefault();
-  editor.style.outline = '3px dashed var(--accent)';
-  editor.style.outlineOffset = '-4px';
-});
-editor.addEventListener('dragleave', () => { editor.style.outline = ''; });
-editor.addEventListener('drop', e => {
-  e.preventDefault();
-  editor.style.outline = '';
-  const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
-  if (!files.length) return;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const range = document.caretRangeFromPoint
-        ? document.caretRangeFromPoint(e.clientX, e.clientY)
-        : null;
-      if (range) { const s = window.getSelection(); s.removeAllRanges(); s.addRange(range); }
-      document.execCommand('insertHTML', false,
-        `<img src="${ev.target.result}" alt="${file.name}" style="max-width:100%;">`);
-      markModified();
-    };
-    reader.readAsDataURL(file);
-  });
-  showToast('🖼 Image dropped', 'success');
-});
+
 editor.addEventListener('click', e => {
+  // deselect all
+  editor.querySelectorAll('.img-resize-wrap.selected-wrap').forEach(w => w.classList.remove('selected-wrap'));
   if (e.target.tagName === 'IMG') {
-    editor.querySelectorAll('img.selected').forEach(i => i.classList.remove('selected'));
-    e.target.classList.add('selected');
-  } else {
-    editor.querySelectorAll('img.selected').forEach(i => i.classList.remove('selected'));
+    const wrap = e.target.closest('.img-resize-wrap');
+    if (wrap) wrap.classList.add('selected-wrap');
+    else makeImgResizable(e.target);
   }
   updateToolbarState();
 });
 
+function makeImgResizable(img) {
+  if (img.closest('.img-resize-wrap')) return;
+  const wrap = document.createElement('span');
+  wrap.className = 'img-resize-wrap';
+  wrap.contentEditable = 'false';
+  img.parentNode.insertBefore(wrap, img);
+  wrap.appendChild(img);
+
+  ['nw','ne','sw','se'].forEach(pos => {
+    const handle = document.createElement('span');
+    handle.className = 'img-resize-handle ' + pos;
+    handle.onmousedown = (e) => startImgResize(e, img, wrap, pos);
+    wrap.appendChild(handle);
+  });
+
+  const label = document.createElement('span');
+  label.className = 'img-size-label';
+  const setLbl2 = () => { label.textContent = img.offsetWidth + '×' + img.offsetHeight; };
+  if (img.complete && img.naturalWidth) setLbl2();
+  else { label.textContent = '…'; img.addEventListener('load', setLbl2, {once:true}); }
+  wrap.appendChild(label);
+
+  wrap.classList.add('selected-wrap');
+}
+
+function startImgResize(e, img, wrap, pos) {
+  e.preventDefault();
+  e.stopPropagation();
+  const startX = e.clientX, startY = e.clientY;
+  const startW = img.offsetWidth, startH = img.offsetHeight;
+  const aspectRatio = startW / startH;
+  const label = wrap.querySelector('.img-size-label');
+
+  function onMove(ev) {
+    let dx = ev.clientX - startX;
+    let dy = ev.clientY - startY;
+    if (pos === 'sw' || pos === 'nw') dx = -dx;
+    if (pos === 'nw' || pos === 'ne') dy = -dy;
+    // maintain aspect ratio using largest delta
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    let newW = Math.max(30, startW + delta);
+    let newH = Math.round(newW / aspectRatio);
+    img.style.width = newW + 'px';
+    img.style.height = newH + 'px';
+    if (label) label.textContent = newW + '×' + newH;
+  }
+
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    markModified();
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function injectImgResizers() {
+  editor.querySelectorAll('img').forEach(img => {
+    if (!img.closest('.img-resize-wrap')) {
+      // wrap silently without selecting
+      const wrap = document.createElement('span');
+      wrap.className = 'img-resize-wrap';
+      wrap.contentEditable = 'false';
+      img.parentNode.insertBefore(wrap, img);
+      wrap.appendChild(img);
+      ['nw','ne','sw','se'].forEach(pos => {
+        const handle = document.createElement('span');
+        handle.className = 'img-resize-handle ' + pos;
+        handle.onmousedown = (ev) => startImgResize(ev, img, wrap, pos);
+        wrap.appendChild(handle);
+      });
+      const label = document.createElement('span');
+      label.className = 'img-size-label';
+      const setLbl = () => { label.textContent = img.offsetWidth + '×' + img.offsetHeight; };
+      if (img.complete && img.naturalWidth) setLbl();
+      else { label.textContent = '…'; img.addEventListener('load', setLbl, {once:true}); }
+      wrap.appendChild(label);
+    }
+  });
+}
+
 function updateClock() {
   const el = document.getElementById('st-time');
-  if (!isModified) el.textContent = new Date().toLocaleTimeString();
+  // Only show live clock; save messages are shown separately by saveDoc()
+  el.textContent = new Date().toLocaleTimeString();
 }
+
 setInterval(updateClock, 1000);
 
 function copySelectionHTML() {
@@ -2143,16 +2389,9 @@ function doWrapInTag() {
   if (id) attrs += ` id="${id}"`;
   if (style) attrs += ` style="${style}"`;
   if (attr) attrs += ` ${attr}`;
-  try {
-    const wrapper = document.createElement(tag);
-    if (cls) wrapper.className = cls;
-    if (id) wrapper.id = id;
-    if (style) wrapper.style.cssText = style;
-    range.surroundContents(wrapper);
-  } catch(e) {
-    const selText = range.toString();
-    document.execCommand('insertHTML', false, `<${tag}${attrs}>${selText}</${tag}>`);
-  }
+  const tmp2 = document.createElement('div');
+  tmp2.appendChild(range.cloneContents());
+  document.execCommand('insertHTML', false, `<${tag}${attrs}>${tmp2.innerHTML}</${tag}>`);
   markModified();
   showToast(`⟨⟩ Wrapped in <${tag}>`);
 }
@@ -2513,10 +2752,10 @@ function awmToHTML(awm) {
   html = html.replace(/!([^!]+)!/g, '<img src="$1">');
   panels.forEach((p, i) => { html = html.replace(`%%PANEL_${i}%%`, p); });
   codeBlocks.forEach((c, i) => { html = html.replace(`%%CODE_BLOCK_${i}%%`, c); });
+  // restore panels/code BEFORE paragraph wrapping so placeholders aren't wrapped
   html = html.replace(/^([^\n<].*?)$/gm, '<p>$1</p>');
   return html.trim();
 }
-
 function insertAWMFromHTML() {
   const converted = editorToAWM();
   if (!awmEd.value.trim() || confirm('Replace AWM content with a conversion of the current WYSIWYG document?')) {
@@ -2540,41 +2779,64 @@ function convertAWMToHTML() {
   showToast('✅ Converted AWM → WYSIWYG', 'success');
 }
 
+function initSplitResizer() {
+  const resizer = document.getElementById('split-resizer');
+  if (!resizer) return;
+  resizer.addEventListener('mousedown', e => {
+    e.preventDefault();
+    resizer.classList.add('dragging');
+    const startX = e.clientX;
+    const edW = editor.offsetWidth, srcW = srcWrap.offsetWidth;
+    const total = edW + srcW;
+    function onMove(ev) {
+      const newW = Math.max(120, Math.min(total - 120, edW + ev.clientX - startX));
+      editor.style.flex = 'none'; editor.style.width = newW + 'px';
+      srcWrap.style.flex = 'none'; srcWrap.style.width = (total - newW) + 'px';
+    }
+    function onUp() {
+      resizer.classList.remove('dragging');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+}
+
 function init() {
   loadDoc();
-  loadState();
   updateStats();
-  setView('wysiwyg');
+  setView('wysiwyg');   // default first
+  loadState();          // may override with saved view
   document.getElementById('spell-btn').classList.add('active');
   buildTemplates();
   buildCustomTemplates();
+  injectTableResizers();
+  injectImgResizers();
+  initSplitResizer();
+  // Wrap selects with styled tooltip system
+  document.querySelectorAll('#toolbar-wrap .tb-sel[title]').forEach(sel => {
+    const wrap = document.createElement('span');
+    wrap.className = 'tip-wrap';
+    wrap.setAttribute('data-tip', sel.getAttribute('title'));
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.removeAttribute('title');
+  });
+  // Tooltip on zoom % display
+  const zp = document.getElementById('zoom-pct');
+  if (zp) { zp.title = ''; zp.closest('.tbg') && (zp.setAttribute('data-tip','Current zoom level'), zp.style.position='relative'); }
+  // Extend tooltip coverage to status bar items
+  document.querySelectorAll('#status-bar [data-tip]').forEach(el => {
+    if (!el.style.position) el.style.position = 'relative';
+  });
+  // Wrap doc-title input for tooltip
+  const dt = document.getElementById('doc-title');
+  if (dt) { dt.style.position = 'relative'; }
 }
+
 window.onload = init;
 
-function updateToolbarState() {
-  const cmds = ['bold','italic','underline','strikeThrough','insertOrderedList','insertUnorderedList','justifyLeft','justifyCenter','justifyRight','justifyFull'];
-  const ids   = ['btn-bold','btn-italic','btn-underline','btn-strike','btn-ol','btn-ul','btn-left','btn-center','btn-right','btn-justify'];
-  cmds.forEach((c, i) => {
-    const el = document.getElementById(ids[i]);
-    if (el) el.classList.toggle('active', document.queryCommandState(c));
-  });
-  updateSelectionCount();
-  showSelectionToolbar();
-}
-editor.addEventListener('mouseup', () => {
-  if (!_painterActive) return;
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) return;
-  const range = sel.getRangeAt(0);
-  const span = document.createElement('span');
-  if (_painterStyle) span.setAttribute('style', _painterStyle);
-  try { range.surroundContents(span); } catch(e) { document.execCommand('insertHTML', false, `<span style="${_painterStyle}">${range.toString()}</span>`); }
-  _painterActive = false;
-  document.getElementById('fmt-painter-btn').classList.remove('active');
-  editor.style.cursor = '';
-  markModified();
-  showToast('🖌 Format applied', 'success');
-});
 let _wordGoal = 0;
 function setWordGoal() {
   const g = prompt('Word count goal (0 to disable):', _wordGoal || '');
@@ -2595,18 +2857,69 @@ function generateTOC() {
     html += `<li style="margin-left:${indent}px;list-style:disc;"><a href="#${id}">${h.textContent}</a></li>`;
   });
   html += '</ul></div>';
-  restoreSelection();
-  editor.focus();
-  document.execCommand('insertHTML', false, html);
+  const atTop = confirm('Insert TOC at the TOP of document?\nCancel = insert at current cursor position.');
+  if (atTop) {
+    editor.insertAdjacentHTML('afterbegin', html);
+  } else {
+    restoreSelection();
+    editor.focus();
+    document.execCommand('insertHTML', false, html);
+  }
   markModified();
   showToast('📑 TOC inserted', 'success');
+}
+// ── COLUMN RESIZE ─────────────────────────────────────────────────────
+function initColResize(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const resizer = e.target;
+  const th = resizer.parentElement;
+  const table = th.closest('table');
+  if (!table) return;
+  const startX = e.clientX;
+  const startW = th.offsetWidth;
+  const tableStartW = table.offsetWidth;
+
+  function onMove(ev) {
+    const diff = ev.clientX - startX;
+    const newW = Math.max(40, startW + diff);
+    th.style.width = newW + 'px';
+    // sync all cells in same column index
+    const idx = Array.from(th.parentElement.children).indexOf(th);
+    table.querySelectorAll('tr').forEach(row => {
+      const cell = row.children[idx];
+      if (cell && cell !== th) cell.style.width = newW + 'px';
+    });
+    table.style.width = Math.max(tableStartW, table.offsetWidth) + 'px';
+  }
+
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    markModified();
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// inject resizers into tables loaded from storage
+function injectTableResizers() {
+  editor.querySelectorAll('td, th').forEach(cell => {
+    if (!cell.querySelector('.col-resizer')) {
+      const r = document.createElement('div');
+      r.className = 'col-resizer';
+      r.onmousedown = initColResize;
+      cell.appendChild(r);
+    }
+  });
 }
 (function exposeGlobals() {
   const fns = {
     cmd, cmdArg, applyColor, transformText, insertHR, insertBlockquote,
     applyLineHeight, applyLetterSpacing, applyWordSpacing, applyTextShadow,
     applyTextDecoration, applyOpacity, toggleDirection, removeLink, pastePlain,
-    insertPanel, insertColumns, setView, cycleView, onSourceChange,
+    insertPanel, insertColumns, setView, onSourceChange,
     updateLineNumbers, syncSrcScroll, sourceKeyDown, toggleFindBar, closeFindBar,
     findHighlight, findNext, findPrev, findKey, clearFindMarks,
     replaceCurrent, replaceAll, showModal, hideModal, overlayClick,
@@ -2623,8 +2936,9 @@ function generateTOC() {
     insertDateTime, cycleView, buildTemplates, downloadFile,
     toggleAWMMode, awmCmd, awmCmdArg, awmKeyDown, onAWMChange, copyAWM,
     insertAWMFromHTML, editorToAWM, nodeToAWM, awmWrapInline, awmInsertBlock,
-    convertAWMToHTML, awmToHTML,
-    toggleFormatPainter, addToTemplate, doAddTemplate, exportTemplates, importTemplatesFile,
+    convertAWMToHTML, awmToHTML, initColResize,
+    injectImgResizers, makeImgResizable, startImgResize, injectTableResizers,
+    toggleFormatPainter,
     addToTemplate, doAddTemplate, exportTemplates, importTemplatesFile,
     doImportTemplates, clearCustomTemplates, buildCustomTemplates,
   };
