@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HyperEdit Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+     <style>
+            .hover-popup{
+                position: absolute;
+                top:75%;
+                right: 90px;
+                display: none;
+                z-index: 99999;
+            }
+        </style>
+        
+        
+        <script>
+            
+            function showPopup() {
+                document.getElementById("hoverpop").style.display = "block";
+            }
+
+            function hidePopup() {
+                document.getElementById("hoverpop").style.display = "none";
+            }
+
+        </script>
     <style>
         :root {
             --bg: #13131f;
@@ -525,6 +547,29 @@
             border: 1px dashed #ccc;
             padding: 10px;
             min-height: 60px;
+        }
+        #editor ul.task-list {
+            list-style: none;
+            padding-left: 4px;
+            margin: 8px 0;
+        }
+        #editor ul.task-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 5px 0;
+        }
+        #editor ul.task-list li input[type=checkbox] {
+            margin-top: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #editor ul li::marker {
+            color: #888;
+        }
+        #editor ol li::marker {
+            font-weight: 600;
+            color: #555;
         }
         #src-wrap {
             flex: 1;
@@ -1210,6 +1255,28 @@
                 color: #000 !important;
             }
         }
+       .tbl-corner-btn {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #000;
+            font-size: 14px;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 8000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+            user-select: none;
+            line-height: 1;
+        }
+        .tbl-corner-btn:hover {
+            background: var(--accent2);
+            transform: scale(1.1);
+        }
         #split-resizer {
             width: 5px;
             background: var(--border2);
@@ -1491,6 +1558,7 @@
             <div class="tbg">
                 <button class="tb" id="btn-ol" onclick="cmd('insertOrderedList')" title="Ordered List">1.</button>
                 <button class="tb" id="btn-ul" onclick="cmd('insertUnorderedList')" title="Unordered List">•</button>
+                <button class="tb" onclick="insertTaskList()" title="Checklist / Task List">☑</button>
                 <button class="tb" onclick="cmd('indent')" title="Indent →">⇥</button>
                 <button class="tb" onclick="cmd('outdent')" title="Outdent ←">⇤</button>
             </div>
@@ -1654,6 +1722,16 @@
         <div class="st-group">
             <div class="st-item" id="st-selection" style="display:none">Sel: <strong id="sel-count">—</strong></div>
             <div class="st-item" id="st-mode" onclick="cycleView()" title="Current editing mode — click to cycle: WYSIWYG → Split → Source → WYSIWYG" style="position:relative;cursor:pointer;">WYSIWYG</div>
+            <div class="st-item" title="Developer" style="position:relative;" onmouseenter="showPopup()" onmouseleave="hidePopup()">@Eziadi</div>
+            
+            <div class="hover-popup" id="hoverpop">
+              <img style="height:120px;width:120px;border-radius:12px;border:1px solid #ddd" src="data:image/png;base64,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">
+              <p>
+                Ezzet Ziadi<br>
+                Database Designer
+              </p>                                                                                                                                                                                                                                                                    </p>
+            </div>
+             
             <div class="st-item" id="st-time" title="Current time" style="position:relative;"></div>
         </div>
     </div>
@@ -1910,6 +1988,8 @@
         <div class="tbs"></div>
         <button class="tb" id="sel-painter-btn" onmousedown="toggleFormatPainter()" title="Copy/Paste Format">🖌</button>
         <button class="tb" onmousedown="selCmd('removeFormat')" title="Clear Format">🧹</button>
+        <div class="tbs" id="sel-recent-sep" style="display:none;"></div>
+        <div id="sel-recent" style="display:flex;align-items:center;gap:1px;"></div>
     </div>
 
     <style id="custom-style-tag"></style>
@@ -1947,7 +2027,9 @@
                 zoomLevel: zoomLevel,
                 awmContent: awmEd.value,
                 awmMode: awmMode,
-                customCSS: document.getElementById('custom-style-tag').textContent || ''
+                customCSS: document.getElementById('custom-style-tag').textContent || '',
+                marginLeft: marginLeft,
+                marginRight: marginRight
             };
             try { localStorage.setItem('hyperedit_state_v3', JSON.stringify(appState)); } catch (e) {}
         }
@@ -1967,6 +2049,10 @@
                 if (s.awmContent) awmEd.value = s.awmContent;
                 if (s.awmMode && !awmMode) toggleAWMMode();
                 if (s.customCSS) document.getElementById('custom-style-tag').textContent = s.customCSS;
+                if (typeof s.marginLeft === 'number') { marginLeft = s.marginLeft;
+                    editor.style.paddingLeft = marginLeft + 'px'; }
+                if (typeof s.marginRight === 'number') { marginRight = s.marginRight;
+                    editor.style.paddingRight = marginRight + 'px'; }
             } catch (e) {}
         }
 
@@ -2000,6 +2086,7 @@
             }
             document.execCommand(command, false, null);
             markModified();
+            trackRecentCmd(command);
         }
 
         function cmdArg(command, value) {
@@ -2017,6 +2104,7 @@
             document.execCommand(command, false, value);
             document.getElementById('swatch-' + (command === 'foreColor' ? 'text' : 'hi')).style.background = value;
             markModified();
+            trackRecentCmd(command, value);
         }
 
         document.getElementById('toolbar-wrap').addEventListener('mousedown', function(e) {
@@ -2031,6 +2119,17 @@
             if (tag !== 'SELECT' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
                 e.preventDefault();
             }
+        }, true);
+
+        document.getElementById('sel-toolbar').addEventListener('mousedown', function(e) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount) {
+                const range = sel.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer) || editor === range.commonAncestorContainer) {
+                    savedRange = range.cloneRange();
+                }
+            }
+            e.preventDefault();
         }, true);
 
         function transformText(type) {
@@ -2150,6 +2249,14 @@
             document.execCommand('insertHTML', false,
                 `<div class="panel ${p.cls}" contenteditable="true"><strong>${p.ico} ${p.label}:</strong> Edit this text…</div><p><br></p>`
                 );
+            markModified();
+        }
+
+        function insertTaskList() {
+            restoreSelection();
+            editor.focus();
+            document.execCommand('insertHTML', false,
+                '<ul class="task-list"><li><input type="checkbox"> Task item</li></ul><p><br></p>');
             markModified();
         }
 
@@ -2629,9 +2736,214 @@
             wrapSelection("span", `opacity:${v}`);
             markModified(); }
 
-        function injectImgResizers() {}
+        // ─── IMAGE RESIZE OVERLAY (Word-style) ──────────────────────────────
+        let _selectedImg = null, _imgOverlayInit = false;
+        let imgOverlay;
+        
+                // ─── TABLE CORNER ADD BUTTONS (Word-style) ──────────────────────────
+        let _hoverTable = null, tblAddRowBtn, tblAddColBtn, _tblHoverTimeout;
+
+        function initTableCornerButtons() {
+            tblAddRowBtn = document.createElement('div');
+            tblAddRowBtn.className = 'tbl-corner-btn';
+            tblAddRowBtn.textContent = '+';
+            tblAddRowBtn.title = 'Add row below';
+            document.body.appendChild(tblAddRowBtn);
+
+            tblAddColBtn = document.createElement('div');
+            tblAddColBtn.className = 'tbl-corner-btn';
+            tblAddColBtn.textContent = '+';
+            tblAddColBtn.title = 'Add column right';
+            document.body.appendChild(tblAddColBtn);
+
+            tblAddRowBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation();
+                if (_hoverTable) addTableRow(_hoverTable); });
+            tblAddColBtn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation();
+                if (_hoverTable) addTableCol(_hoverTable); });
+
+            editor.addEventListener('mouseover', e => {
+                const table = e.target.closest('table');
+                if (table) showTableCornerButtons(table);
+            });
+            editor.addEventListener('mouseout', e => {
+                const toTable = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('table');
+                if (!toTable) scheduleHideTableButtons();
+            });
+            [tblAddRowBtn, tblAddColBtn].forEach(btn => {
+                btn.addEventListener('mouseenter', () => clearTimeout(_tblHoverTimeout));
+                btn.addEventListener('mouseleave', scheduleHideTableButtons);
+            });
+        }
+
+        function scheduleHideTableButtons() {
+            clearTimeout(_tblHoverTimeout);
+            _tblHoverTimeout = setTimeout(hideTableCornerButtons, 300);
+        }
+
+        function showTableCornerButtons(table) {
+            clearTimeout(_tblHoverTimeout);
+            _hoverTable = table;
+            const r = table.getBoundingClientRect();
+            tblAddRowBtn.style.left = (r.left - 10) + 'px';
+            tblAddRowBtn.style.top = (r.bottom - 10) + 'px';
+            tblAddRowBtn.style.display = 'flex';
+            tblAddColBtn.style.left = (r.right - 10) + 'px';
+            tblAddColBtn.style.top = (r.top - 10) + 'px';
+            tblAddColBtn.style.display = 'flex';
+        }
+
+        function hideTableCornerButtons() {
+            _hoverTable = null;
+            if (tblAddRowBtn) tblAddRowBtn.style.display = 'none';
+            if (tblAddColBtn) tblAddColBtn.style.display = 'none';
+        }
+
+        function addTableRow(table) {
+            const lastRow = table.rows[table.rows.length - 1];
+            if (!lastRow) return;
+            const r = table.insertRow(table.rows.length);
+            for (let i = 0; i < lastRow.cells.length; i++) {
+                const c = r.insertCell();
+                c.innerHTML = '&nbsp;<div class="col-resizer" onmousedown="initColResize(event)"></div>';
+                c.style.cssText = 'border:1px solid #ccc;padding:6px;position:relative;';
+            }
+            markModified();
+            showTableCornerButtons(table);
+        }
+
+        function addTableCol(table) {
+            Array.from(table.rows).forEach(row => {
+                const c = row.insertCell();
+                c.innerHTML = '&nbsp;<div class="col-resizer" onmousedown="initColResize(event)"></div>';
+                c.style.cssText = 'border:1px solid #ccc;padding:6px;position:relative;';
+            });
+            markModified();
+            showTableCornerButtons(table);
+        }
+
+        function injectImgResizers() {
+            if (_imgOverlayInit) return;
+            _imgOverlayInit = true;
+            imgOverlay = document.createElement('div');
+            imgOverlay.id = 'img-resize-overlay';
+            imgOverlay.style.cssText = 'position:fixed;display:none;z-index:8000;';
+            imgOverlay.innerHTML =
+                '<div class="img-resize-handle nw"></div><div class="img-resize-handle ne"></div>' +
+                '<div class="img-resize-handle sw"></div><div class="img-resize-handle se"></div>' +
+                '<div class="img-size-label" id="img-size-label"></div>';
+            document.body.appendChild(imgOverlay);
+
+            imgOverlay.addEventListener('mousedown', e => {
+                const h = e.target.closest('.img-resize-handle');
+                if (!h) return;
+                const corner = ['nw', 'ne', 'sw', 'se'].find(c => h.classList.contains(c));
+                startImgResize(e, corner);
+            });
+
+            document.addEventListener('mousedown', e => {
+                if (e.target.tagName === 'IMG' && editor.contains(e.target)) { selectImg(e.target); return; }
+                if (imgOverlay.contains(e.target)) return;
+                deselectImg();
+            });
+            document.addEventListener('scroll', () => _selectedImg && positionImgOverlay(), true);
+            window.addEventListener('resize', () => _selectedImg && positionImgOverlay());
+        }
+
+        function selectImg(img) {
+            if (_selectedImg && _selectedImg !== img) _selectedImg.classList.remove('selected');
+            _selectedImg = img;
+            img.classList.add('selected');
+            positionImgOverlay();
+            imgOverlay.style.display = 'block';
+        }
+
+        function deselectImg() {
+            if (_selectedImg) _selectedImg.classList.remove('selected');
+            _selectedImg = null;
+            if (imgOverlay) imgOverlay.style.display = 'none';
+        }
+
+        function positionImgOverlay() {
+            if (!_selectedImg || !imgOverlay) return;
+            const r = _selectedImg.getBoundingClientRect();
+            imgOverlay.style.left = r.left + 'px';
+            imgOverlay.style.top = r.top + 'px';
+            imgOverlay.style.width = r.width + 'px';
+            imgOverlay.style.height = r.height + 'px';
+            const label = document.getElementById('img-size-label');
+            if (label) label.textContent = Math.round(r.width) + ' × ' + Math.round(r.height);
+        }
+
         function makeImgResizable() {}
-        function startImgResize() {}
+
+        function startImgResize(e, corner) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!_selectedImg) return;
+            const img = _selectedImg;
+            const startX = e.clientX;
+            const startW = img.offsetWidth || 100;
+            const startH = img.offsetHeight || 100;
+            const aspect = startW / startH;
+            function onMove(ev) {
+                let dx = ev.clientX - startX;
+                if (corner === 'nw' || corner === 'sw') dx = -dx;
+                const newW = Math.max(20, startW + dx);
+                img.style.width = newW + 'px';
+                img.style.height = (newW / aspect) + 'px';
+                positionImgOverlay();
+            }
+            function onUp() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                markModified();
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        }
+
+        // ─── RECENTLY USED FORMATTING ────────────────────────────────────────
+        const RECENT_CMD_WHITELIST = ['bold', 'italic', 'underline', 'strikeThrough', 'insertOrderedList',
+            'insertUnorderedList', 'justifyLeft', 'justifyCenter', 'justifyRight', 'removeFormat'
+        ];
+        const RECENT_CMD_ICONS = { bold: '<b>B</b>', italic: '<i>I</i>', underline: '<u>U</u>', strikeThrough: '<s>S</s>',
+            insertOrderedList: '1.', insertUnorderedList: '•', justifyLeft: '⬱', justifyCenter: '≡', justifyRight: '⬲',
+            removeFormat: '🧹'
+        };
+        let _recentCmds = [];
+
+        function trackRecentCmd(command, value) {
+            const isColor = command === 'foreColor' || command === 'hiliteColor';
+            if (!isColor && !RECENT_CMD_WHITELIST.includes(command)) return;
+            const key = isColor ? command + ':' + value : command;
+            _recentCmds = _recentCmds.filter(r => r.key !== key);
+            _recentCmds.unshift({ key, command, value, isColor });
+            _recentCmds = _recentCmds.slice(0, 4);
+            renderRecentBar();
+        }
+
+        function renderRecentBar() {
+            const bar = document.getElementById('sel-recent');
+            const sep = document.getElementById('sel-recent-sep');
+            if (!bar) return;
+            bar.innerHTML = '';
+            if (!_recentCmds.length) { if (sep) sep.style.display = 'none'; return; }
+            if (sep) sep.style.display = '';
+            _recentCmds.forEach(r => {
+                const btn = document.createElement('button');
+                btn.className = 'tb';
+                btn.title = 'Recent: ' + r.command + (r.isColor ? ' ' + r.value : '');
+                btn.innerHTML = r.isColor ?
+                    `<span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${r.value};border:1px solid #666;"></span>` :
+                    (RECENT_CMD_ICONS[r.command] || r.command);
+                btn.onmousedown = e => {
+                    e.preventDefault();
+                    if (r.isColor) applyColor(r.command, r.value);
+                    else selCmd(r.command);
+                };
+                bar.appendChild(btn);
+            });
+        }
 
         function showSelectionToolbar() {
             const tb = document.getElementById('sel-toolbar');
@@ -2642,6 +2954,7 @@
             tb.style.left = (r.left + window.scrollX) + 'px';
             tb.style.top = (r.top + window.scrollY - 40) + 'px';
             tb.classList.add('show');
+            renderRecentBar();
         }
 
         function hideSelectionToolbar() { const tb = document.getElementById('sel-toolbar'); if (tb) tb.classList.remove(
@@ -3330,6 +3643,39 @@
             showToast('📋 Pasted (Word/Docs formatting cleaned)', 'info');
         });
 
+        // ─── CLICK-TO-SOURCE SYNC (split view) ──────────────────────────────
+        function jumpToSourceForElement(el) {
+            if (currentView !== 'split' || !el || el === editor) return;
+            const m = el.outerHTML.match(/^<[^>]+>/);
+            if (!m) return;
+            const tagText = m[0];
+            const sameTag = Array.from(editor.querySelectorAll(el.tagName.toLowerCase()));
+            let occurrence = 0;
+            for (const node of sameTag) {
+                if (node === el) break;
+                const nm = node.outerHTML.match(/^<[^>]+>/);
+                if (nm && nm[0] === tagText) occurrence++;
+            }
+            const src = srcEd.value;
+            let idx = -1, from = 0;
+            for (let i = 0; i <= occurrence; i++) {
+                idx = src.indexOf(tagText, from);
+                if (idx === -1) break;
+                from = idx + tagText.length;
+            }
+            if (idx === -1) return;
+            srcEd.focus();
+            srcEd.setSelectionRange(idx, idx + tagText.length);
+            const line = src.slice(0, idx).split('\n').length;
+            srcEd.scrollTop = Math.max(0, (line - 4) * 20.8);
+            syncSrcScroll();
+        }
+        editor.addEventListener('click', e => {
+            if (currentView !== 'split' || _painterActive) return;
+            const t = e.target.closest('*');
+            if (t) jumpToSourceForElement(t);
+        });
+
         editor.addEventListener('dragover', e => { e.preventDefault();
             editor.style.outline = '2px dashed var(--accent)'; });
         editor.addEventListener('dragleave', () => { editor.style.outline = ''; });
@@ -3593,8 +3939,22 @@
                 }
                 i++;
             }
+            // margin markers (draggable, like Word)
+            const zf = zoomLevel / 100;
+            const lX = startPx + marginLeft * zf - scrollLeft;
+            const rX = startPx + (editor.clientWidth - marginRight * zf) - scrollLeft;
+            hCtx.fillStyle = '#4fc3f7';
+            [lX, rX].forEach(mx => {
+                hCtx.beginPath();
+                hCtx.moveTo(mx - 5, hRect.height);
+                hCtx.lineTo(mx + 5, hRect.height);
+                hCtx.lineTo(mx, hRect.height - 8);
+                hCtx.closePath();
+                hCtx.fill();
+            });
         }
 
+        let marginLeft = 60, marginRight = 60, _draggingMargin = null;
         let rulerTimeout;
 
         function scheduleRulerDraw() {
@@ -3604,6 +3964,43 @@
 
         editor.addEventListener('scroll', scheduleRulerDraw);
         window.addEventListener('resize', scheduleRulerDraw);
+
+        // ─── MARGIN DRAG HANDLERS ────────────────────────────────────────────
+        const rulerHCanvas = document.getElementById('ruler-h-canvas');
+        rulerHCanvas.addEventListener('mousedown', e => {
+            const hRect = document.getElementById('ruler-h').getBoundingClientRect();
+            const editorRect = editor.getBoundingClientRect();
+            const startPx = editorRect.left - hRect.left;
+            const zf = zoomLevel / 100;
+            const x = e.clientX - hRect.left;
+            const lX = startPx + marginLeft * zf - editor.scrollLeft;
+            const rX = startPx + (editor.clientWidth - marginRight * zf) - editor.scrollLeft;
+            if (Math.abs(x - lX) < 7) _draggingMargin = 'left';
+            else if (Math.abs(x - rX) < 7) _draggingMargin = 'right';
+            if (_draggingMargin) rulerHCanvas.style.cursor = 'col-resize';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!_draggingMargin) return;
+            const hRect = document.getElementById('ruler-h').getBoundingClientRect();
+            const editorRect = editor.getBoundingClientRect();
+            const startPx = editorRect.left - hRect.left;
+            const zf = zoomLevel / 100;
+            const x = e.clientX - hRect.left;
+            if (_draggingMargin === 'left') {
+                marginLeft = Math.max(0, Math.round((x - startPx + editor.scrollLeft) / zf));
+                editor.style.paddingLeft = marginLeft + 'px';
+            } else {
+                const rightPos = x - startPx + editor.scrollLeft;
+                marginRight = Math.max(0, Math.round((editor.clientWidth - rightPos) / zf));
+                editor.style.paddingRight = marginRight + 'px';
+            }
+            drawRulers();
+        });
+        document.addEventListener('mouseup', () => {
+            if (_draggingMargin) { _draggingMargin = null;
+                rulerHCanvas.style.cursor = '';
+                saveState(); }
+        });
 
         // ─── FORMAT PAINTER ────────────────────────────────────────────────────
         let _painterActive = false,
@@ -3622,7 +4019,11 @@
                 showToast('🖌 Format Painter cancelled');
                 return;
             }
-            const sel = window.getSelection();
+            let sel = window.getSelection();
+            if (!sel || !sel.rangeCount || sel.isCollapsed) {
+                restoreSelection();
+                sel = window.getSelection();
+            }
             if (!sel || !sel.rangeCount || sel.isCollapsed) {
                 showToast('Select the text whose format you want to copy first', 'warning');
                 return;
@@ -3777,6 +4178,7 @@
             // inject resizers into any existing tables
             setTimeout(injectTableResizers, 50);
             initSplitResizer();
+            initTableCornerButtons();
 
             document.querySelectorAll('#toolbar-wrap .tb-sel[title]').forEach(sel => {
                 const wrap = document.createElement('span');
@@ -4064,6 +4466,18 @@
                 ensureTableResizers,
                 generateTOC,
                 setWordGoal,
+                initTableCornerButtons,
+                showTableCornerButtons,
+                hideTableCornerButtons,
+                addTableRow,
+                addTableCol,
+                insertTaskList,
+                injectImgResizers,
+                selectImg,
+                deselectImg,
+                positionImgOverlay,
+                makeImgResizable,
+                startImgResize,
             };
             Object.assign(window, fns);
         })();
