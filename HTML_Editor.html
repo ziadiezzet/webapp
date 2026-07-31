@@ -1031,7 +1031,7 @@
         #awm-wrap {
             background: #0a0a16;
         }
-        #awm-bar {
+        #awm-bar, #latex-bar {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -1051,7 +1051,7 @@
             font-size: .67rem;
             color: var(--text3);
         }
-        #awm-editor {
+        #awm-editor, #latex-editor {
             flex: 1;
             font-family: var(--font-mono);
             font-size: 13px;
@@ -1067,12 +1067,12 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-        #awm-editor::placeholder {
+        #awm-editor::placeholder, #latex-editor::placeholder {
             color: var(--text3);
             font-size: .78rem;
             line-height: 2;
         }
-        #awm-editor::selection {
+        #awm-editor::selection, #latex-editor::selection {
             background: rgba(79, 195, 247, .2);
         }
         body.awm-active #editor {
@@ -1084,14 +1084,38 @@
         body.awm-active #awm-wrap {
             display: flex !important;
         }
+        body.awm-active #latex-wrap {
+            display: none !important;
+        }
+        body.latex-active #editor {
+            display: none !important;
+        }
+        body.latex-active #src-wrap {
+            display: none !important;
+        }
+        body.latex-active #awm-wrap {
+            display: none !important;
+        }
+        body.latex-active #latex-wrap {
+            display: flex !important;
+        }
         #st-mode.awm-st {
             background: linear-gradient(90deg, #3d0a7a, #0a3d6e);
             color: #d4a0ff;
+        }
+        #st-mode.latex-st {
+            background: linear-gradient(90deg, #0a3d3a, #0a2a6e);
+            color: #7ad4ff;
         }
         #awm-toggle-btn.active {
             background: #2a0066 !important;
             color: #c090ff !important;
             border: 1px solid #6030bb;
+        }
+        #latex-toggle-btn.active {
+            background: #063a55 !important;
+            color: #7ad4ff !important;
+            border: 1px solid #1a7fa8;
         }
         #toast-container {
             position: fixed;
@@ -1255,7 +1279,216 @@
                 color: #000 !important;
             }
         }
-       .tbl-corner-btn {
+      #history-panel {
+            position: fixed;
+            top: calc(var(--toolbar-h) + 90px);
+            right: 0;
+            width: 260px;
+            max-height: 60vh;
+            background: var(--bg1);
+            border: 1px solid var(--border2);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -4px 0 18px rgba(0, 0, 0, .4);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #history-panel.open {
+            display: flex;
+        }
+        #history-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        #history-list {
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+        .history-item {
+            padding: 7px 12px;
+            font-size: .74rem;
+            color: var(--text2);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background .12s, color .12s;
+        }
+        .history-item:hover {
+            background: var(--btn-h);
+            color: var(--accent);
+        }
+        .history-item .h-time {
+            font-family: var(--font-mono);
+            color: var(--accent2);
+            font-size: .68rem;
+        }
+        .history-item .h-meta {
+            font-size: .66rem;
+            color: var(--text3);
+            margin-top: 2px;
+        }
+        .history-empty {
+            padding: 14px 12px;
+            font-size: .72rem;
+            color: var(--text3);
+            text-align: center;
+        }
+        #recovery-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: #4a3a00;
+            border-bottom: 1px solid var(--border);
+            font-size: .78rem;
+            color: #ffd43b;
+            flex-shrink: 0;
+        }
+        #recovery-bar.open {
+            display: flex;
+        }
+        .block-drag-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: -28px;
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            font-size: .8rem;
+            color: var(--text2);
+            z-index: 400;
+            user-select: none;
+        }
+        .block-drag-handle:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .block-drag-target {
+            outline: 2px dashed var(--accent) !important;
+            outline-offset: 2px;
+        }
+        .block-drop-line {
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin: 2px 0;
+            pointer-events: none;
+        }
+        .ctxmenu-item {
+            padding: 6px 12px 6px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            white-space: nowrap;
+        }
+        .ctxmenu-item:hover {
+            background: var(--btn-h);
+        }
+        .ctxmenu-item.disabled {
+            color: var(--text3);
+            pointer-events: none;
+        }
+        .ctxmenu-item .arrow {
+            color: var(--text3);
+            font-size: .65rem;
+        }
+        .ctxmenu-sep {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 6px;
+        }
+        .ctxmenu-sub {
+            position: fixed;
+            background: var(--bg1);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            padding: 4px;
+            min-width: 150px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.5);
+            z-index: 10000;
+            display: none;
+        }
+        .comment-mark {
+            background: rgba(255, 212, 59, .35);
+            border-bottom: 2px dotted #b8860b;
+            cursor: help;
+        }
+        #outline-panel {
+            position: fixed;
+            top: calc(var(--toolbar-h) + 90px);
+            right: 0;
+            width: 260px;
+            max-height: 60vh;
+            background: var(--bg1);
+            border: 1px solid var(--border2);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -4px 0 18px rgba(0, 0, 0, .4);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #outline-panel.open {
+            display: flex;
+        }
+        #outline-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        #outline-list {
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+        .outline-item {
+            padding: 5px 12px;
+            font-size: .75rem;
+            color: var(--text2);
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background .12s, color .12s;
+        }
+        .outline-item:hover {
+            background: var(--btn-h);
+            color: var(--accent);
+        }
+        .outline-item.h1 { padding-left: 12px; font-weight: 600; color: var(--text); }
+        .outline-item.h2 { padding-left: 24px; }
+        .outline-item.h3 { padding-left: 36px; font-size: .72rem; }
+        .outline-item.h4 { padding-left: 48px; font-size: .7rem; color: var(--text3); }
+        .outline-empty {
+            padding: 14px 12px;
+            font-size: .72rem;
+            color: var(--text3);
+            text-align: center;
+        }
+        .tbl-corner-btn {
             position: fixed;
             width: 20px;
             height: 20px;
@@ -1382,6 +1615,7 @@
             <button class="tb lbl" onclick="showModal('tpl')" title="Document templates — load a built-in or custom starter layout">📑 Templates</button>
             <button class="tb lbl" onclick="addToTemplate()" title="Save current document as a new template">📌 Add Tpl</button>
             <button class="tb lbl" id="awm-toggle-btn" onclick="toggleAWMMode()" title="Atlassian Wiki Markup mode">🔣 AWM</button>
+            <button class="tb lbl" id="latex-toggle-btn" onclick="toggleLatexMode()" title="LaTeX mode — edit/convert document as LaTeX source">∑ LaTeX</button>
             <button class="tb lbl" onclick="showModal('css')" title="Inject custom CSS — style the editor content with your own rules">🎨 CSS</button>
             <button class="tb lbl" onclick="showModal('kbd')" title="Keyboard Shortcuts">⌨ Shortcuts</button>
             <button class="tb icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light editor">🌓</button>
@@ -1402,6 +1636,7 @@
                         <option value="txt">As Plain Text</option>
                         <option value="md">As Markdown</option>
                         <option value="awm">⬇ Wiki Markup (.wiki)</option>
+                        <option value="latex">⬇ LaTeX (.tex)</option>
                         <option value="print">🖨 Print</option>
                     </select>
                 </div>
@@ -1572,6 +1807,36 @@
             </div>
             <div class="tbs"></div>
             <div class="tbg">
+                <span class="tip-wrap" title="Space Before — vertical space above the paragraph" style="font-size:.68rem;color:var(--text3);padding:0 2px;">Bef:</span>
+                <select class="tb-sel" onchange="applyParaSpacing('before',this.value);this.value=''" style="width:58px;" title="Space before paragraph">
+                    <option value="">─</option>
+                    <option value="0">0</option>
+                    <option value="4">4px</option>
+                    <option value="8">8px</option>
+                    <option value="12">12px</option>
+                    <option value="16">16px</option>
+                    <option value="24">24px</option>
+                </select>
+                <span class="tip-wrap" title="Space After — vertical space below the paragraph" style="font-size:.68rem;color:var(--text3);padding:0 2px;">Aft:</span>
+                <select class="tb-sel" onchange="applyParaSpacing('after',this.value);this.value=''" style="width:58px;" title="Space after paragraph">
+                    <option value="">─</option>
+                    <option value="0">0</option>
+                    <option value="4">4px</option>
+                    <option value="8">8px</option>
+                    <option value="12">12px</option>
+                    <option value="16">16px</option>
+                    <option value="24">24px</option>
+                </select>
+                <span class="tip-wrap" title="Indent — first line, hanging, or none" style="font-size:.68rem;color:var(--text3);padding:0 2px;">Indent:</span>
+                <select class="tb-sel" onchange="applyParaIndent(this.value);this.value=''" style="width:90px;" title="Paragraph indent style">
+                    <option value="">─</option>
+                    <option value="none">None</option>
+                    <option value="first">First-line</option>
+                    <option value="hanging">Hanging</option>
+                </select>
+            </div>
+            <div class="tbs"></div>
+            <div class="tbg">
                 <span class="tip-wrap" title="Word Spacing — horizontal space between words" style="font-size:.68rem;color:var(--text3);padding:0 2px;">WS:</span>
                 <select class="tb-sel" onchange="applyWordSpacing(this.value);this.value=''" style="width:60px;" title="Word spacing — adjusts horizontal space between words in the selected text">
                     <option value="">─</option>
@@ -1607,6 +1872,8 @@
                 <button class="tb lbl" onclick="showModal('link')" title="Insert Link [Ctrl+K]">🔗 Link</button>
                 <button class="tb" onclick="removeLink()" title="Remove Link">🔗̶</button>
                 <button class="tb lbl" onclick="generateTOC()" title="Auto-generate a Table of Contents from all H1–H4 headings in the document, with anchor links">📑 TOC</button>
+                <button class="tb lbl" id="outline-btn" onclick="toggleOutlinePanel()" title="Document Outline — live sidebar listing all headings, click to jump">🗂 Outline</button>
+                <button class="tb lbl" id="history-btn" onclick="toggleHistoryPanel()" title="Undo History — browse and restore earlier snapshots of the document">🕘 History</button>
                 <button class="tb lbl" onclick="showModal('image')" title="Insert Image">🖼 Image</button>
                 <button class="tb lbl" onclick="showModal('video')" title="Embed YouTube">▶ Video</button>
                 <button class="tb lbl" onclick="showModal('table')" title="Insert Table">▦ Table</button>
@@ -1650,11 +1917,21 @@
                 <button class="tb lbl" id="focus-btn" onclick="toggleFocusMode()" title="Focus / Distraction-free Mode">🎯 Focus</button>
                 <button class="tb lbl" id="src-btn" onclick="setView('source')" title="Source view — edit the raw HTML directly [Ctrl+Shift+H]">&lt;/&gt; Source</button>
                 <button class="tb lbl" id="split-btn" onclick="setView('split')" title="Split view — visual editor on the left, live HTML source on the right [Ctrl+Shift+S]">⊟ Split</button>
+                <select class="tb-sel" id="split-source-sel" onchange="setSplitSource(this.value)" style="width:78px;" title="Split view pairing — choose which format shows alongside WYSIWYG in Split mode">
+                    <option value="html">HTML</option>
+                    <option value="awm">AWM</option>
+                    <option value="latex">LaTeX</option>
+                </select>
                 <button class="tb lbl active" id="wysiwyg-btn" onclick="setView('wysiwyg')" title="WYSIWYG Editor">✎ WYSIWYG</button>
             </div>
         </div>
     </div>
 
+    <div id="recovery-bar">
+        <span>⚠ Unsaved changes were found from a previous session.</span>
+        <button class="btn btn-primary" style="padding:3px 10px;font-size:.72rem;" onclick="restoreCrashRecovery()">Restore</button>
+        <button class="btn btn-ghost" style="padding:3px 10px;font-size:.72rem;" onclick="dismissCrashRecovery()">Dismiss</button>
+    </div>
     <div id="find-bar">
         <input id="find-input" type="text" placeholder="Find…" oninput="findHighlight()" onkeydown="findKey(event)">
         <button class="tb" onclick="findPrev()" title="Previous match">▲</button>
@@ -1699,6 +1976,18 @@
                 <textarea id="awm-editor" oninput="onAWMChange()" onkeydown="awmKeyDown(event)" spellcheck="false" placeholder="Atlassian Wiki Markup mode&#10;&#10;Toolbar buttons insert AWM syntax:&#10;  *bold*   _italic_   +underline+   -strikethrough-&#10;  ^superscript^   ~subscript~   {{monospace}}&#10;  h1. Heading   bq. Quote   ---- Horizontal rule&#10;  * Bullet   # Numbered   [text|url]   !image.png!&#10;  {code}...{code}   {info}...{info}   {warning}...{warning}&#10;&#10;Click ⇄ From WYSIWYG to convert existing document."></textarea>
             </div>
 
+            <div id="latex-wrap" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+                <div id="latex-bar">
+                    <span class="awm-label">∑ LaTeX</span>
+                    <span class="awm-hint">Toolbar inserts LaTeX syntax · article-class document body</span>
+                    <div style="margin-left:auto;display:flex;gap:5px;">
+                        <button class="tb lbl" onclick="copyLatex()" title="Copy all LaTeX content">⎘ Copy All</button>
+                        <button class="tb lbl" onclick="insertLatexFromHTML()" title="Convert WYSIWYG to LaTeX">⇄ From WYSIWYG</button>
+                        <button class="tb lbl" onclick="convertLatexToHTML()" title="Convert LaTeX to WYSIWYG HTML">⇄ To WYSIWYG</button>
+                    </div>
+                </div>
+                <textarea id="latex-editor" oninput="onLatexChange()" onkeydown="latexKeyDown(event)" spellcheck="false" placeholder="LaTeX mode&#10;&#10;Toolbar buttons insert LaTeX syntax:&#10;  \textbf{bold}   \textit{italic}   \underline{underline}&#10;  \section{Heading}   \begin{quote}...\end{quote}&#10;  \begin{itemize}\item ...\end{itemize}&#10;  \begin{enumerate}\item ...\end{enumerate}&#10;  \href{url}{text}   \includegraphics{image}&#10;&#10;Click ⇄ From WYSIWYG to convert existing document."></textarea>
+            </div>
             <div id="split-resizer"></div>
             <div id="src-wrap">
                 <div id="src-lines">1</div>
@@ -1736,6 +2025,20 @@
         </div>
     </div>
     </div>
+    </div>
+    <div id="history-panel">
+        <div id="history-hdr">
+            <span>🕘 Undo History</span>
+            <button class="modal-close" onclick="toggleHistoryPanel()" title="Close">✕</button>
+        </div>
+        <div id="history-list"></div>
+    </div>
+    <div id="outline-panel">
+        <div id="outline-hdr">
+            <span>🗂 Document Outline</span>
+            <button class="modal-close" onclick="toggleOutlinePanel()" title="Close">✕</button>
+        </div>
+        <div id="outline-list"></div>
     </div>
     <div id="zoom-ind"></div>
     <div id="toast-container"></div>
@@ -2005,6 +2308,8 @@
         const overlay = document.getElementById('modal-overlay');
         const awmWrap = document.getElementById('awm-wrap');
         const awmEd = document.getElementById('awm-editor');
+        const latexWrap = document.getElementById('latex-wrap');
+        const latexEd = document.getElementById('latex-editor');
 
         let currentView = 'wysiwyg';
         let zoomLevel = 100;
@@ -2017,7 +2322,8 @@
         let findMarks = [];
         let findIdx = -1;
         let awmMode = false;
-
+        let latexMode = false;
+        let splitSource = 'html';
         let appState = { view: 'wysiwyg', darkCanvas: false, zoomLevel: 100, awmContent: '', customCSS: '' };
 
         function saveState() {
@@ -2027,6 +2333,9 @@
                 zoomLevel: zoomLevel,
                 awmContent: awmEd.value,
                 awmMode: awmMode,
+                latexContent: latexEd.value,
+                latexMode: latexMode,
+                splitSource: splitSource,
                 customCSS: document.getElementById('custom-style-tag').textContent || '',
                 marginLeft: marginLeft,
                 marginRight: marginRight
@@ -2047,7 +2356,10 @@
                     document.getElementById('zoom-pct').textContent = zoomLevel + '%';
                 }
                 if (s.awmContent) awmEd.value = s.awmContent;
+                if (s.latexContent) latexEd.value = s.latexContent;
+                if (typeof s.splitSource === 'string') { splitSource = s.splitSource; const sel = document.getElementById('split-source-sel'); if (sel) sel.value = splitSource; }
                 if (s.awmMode && !awmMode) toggleAWMMode();
+                if (s.latexMode && !latexMode) toggleLatexMode();
                 if (s.customCSS) document.getElementById('custom-style-tag').textContent = s.customCSS;
                 if (typeof s.marginLeft === 'number') { marginLeft = s.marginLeft;
                     editor.style.paddingLeft = marginLeft + 'px'; }
@@ -2067,6 +2379,7 @@
 
         function cmd(command) {
             if (awmMode) { awmCmd(command); return; }
+            if (latexMode) { latexCmd(command); return; }
             restoreSelection();
             editor.focus();
             if (command === 'insertOrderedList' || command === 'insertUnorderedList') {
@@ -2091,6 +2404,7 @@
 
         function cmdArg(command, value) {
             if (awmMode) { awmCmdArg(command, value); return; }
+            if (latexMode) { latexCmdArg(command, value); return; }
             if (!value) return;
             restoreSelection();
             editor.focus();
@@ -2289,9 +2603,18 @@
             currentView = mode;
             document.body.classList.toggle('split', mode === 'split');
             const showEditor = mode !== 'source';
-            const showSource = mode !== 'wysiwyg';
             editor.style.display = showEditor ? '' : 'none';
-            srcWrap.style.display = showSource ? 'flex' : 'none';
+            if (mode === 'source') {
+                srcWrap.style.display = 'flex';
+                awmWrap.style.display = 'none';
+                latexWrap.style.display = 'none';
+            } else if (mode === 'split') {
+                applySplitPanes();
+            } else {
+                srcWrap.style.display = 'none';
+                awmWrap.style.display = 'none';
+                latexWrap.style.display = 'none';
+            }
             const resizer = document.getElementById('split-resizer');
             if (resizer) {
                 resizer.style.display = mode === 'split' ? '' : 'none';
@@ -2720,6 +3043,41 @@
             wrapSelection("span", `word-spacing:${value}`);
             markModified(); }
 
+        function getCurrentBlock() {
+            restoreSelection();
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return null;
+            let node = sel.getRangeAt(0).commonAncestorContainer;
+            if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+            const block = node.closest('p,h1,h2,h3,h4,h5,h6,li,blockquote,div');
+            return (block && editor.contains(block)) ? block : null;
+        }
+
+        function applyParaSpacing(which, value) {
+            if (value === '') return;
+            const block = getCurrentBlock();
+            if (!block) { showToast('Click inside a paragraph first', 'warning'); return; }
+            if (which === 'before') block.style.marginTop = value + 'px';
+            else block.style.marginBottom = value + 'px';
+            markModified();
+        }
+
+        function applyParaIndent(value) {
+            if (value === '') return;
+            const block = getCurrentBlock();
+            if (!block) { showToast('Click inside a paragraph first', 'warning'); return; }
+            block.style.textIndent = '';
+            block.style.paddingLeft = '';
+            block.style.marginLeft = '';
+            if (value === 'first') {
+                block.style.textIndent = '32px';
+            } else if (value === 'hanging') {
+                block.style.paddingLeft = '32px';
+                block.style.textIndent = '-32px';
+            }
+            markModified();
+        }
+
         function applyTextShadow(value) {
             if (!value) return;
             const m = { none: 'none', soft: '1px 1px 2px rgba(0,0,0,.25)', strong: '2px 2px 4px rgba(0,0,0,.5)',
@@ -2820,7 +3178,325 @@
             markModified();
             showTableCornerButtons(table);
         }
+        // ─── TABLE STYLES: HEADER TOGGLE / COLORS / MERGE / SPLIT ───────────
+        function setRowColor(row) {
+            const current = row.cells[0] ? rgbToHex(row.cells[0].style.backgroundColor) : '#ffffff';
+            const color = prompt('Row background color (hex):', current || '#ffffff');
+            if (!color) return;
+            Array.from(row.cells).forEach(c => c.style.backgroundColor = color);
+            markModified();
+        }
 
+        function setColColor(table, colIdx) {
+            const firstCell = table.rows[0] && table.rows[0].cells[colIdx];
+            const current = firstCell ? rgbToHex(firstCell.style.backgroundColor) : '#ffffff';
+            const color = prompt('Column background color (hex):', current || '#ffffff');
+            if (!color) return;
+            Array.from(table.rows).forEach(r => { const c = r.cells[colIdx]; if (c) c.style.backgroundColor = color; });
+            markModified();
+        }
+
+        function rgbToHex(rgb) {
+            if (!rgb || !rgb.startsWith('rgb')) return rgb || '';
+            const m = rgb.match(/\d+/g);
+            if (!m) return '';
+            return '#' + m.slice(0, 3).map(n => (+n).toString(16).padStart(2, '0')).join('');
+        }
+
+        function toggleTableHeader(table, row) {
+            const isHeader = row.cells[0] && row.cells[0].tagName === 'TH';
+            const newTag = isHeader ? 'td' : 'th';
+            Array.from(row.cells).forEach(cell => {
+                const repl = document.createElement(newTag);
+                repl.innerHTML = cell.innerHTML;
+                repl.style.cssText = cell.style.cssText;
+                if (!isHeader) { repl.style.background = '#f5f5f5'; repl.style.fontWeight = '600'; }
+                else { repl.style.background = ''; repl.style.fontWeight = ''; }
+                Array.from(cell.attributes).forEach(a => { if (a.name !== 'style') repl.setAttribute(a.name, a.value); });
+                cell.replaceWith(repl);
+            });
+            markModified();
+            setTimeout(injectTableResizers, 30);
+        }
+
+        function mergeCellRight(table, cell) {
+            const row = cell.parentElement;
+            const idx = Array.from(row.cells).indexOf(cell);
+            const next = row.cells[idx + 1];
+            if (!next) { showToast('No cell to the right to merge', 'warning'); return; }
+            const span = (parseInt(cell.getAttribute('colspan')) || 1) + (parseInt(next.getAttribute('colspan')) || 1);
+            cell.setAttribute('colspan', span);
+            cell.innerHTML = (cell.innerHTML.replace(/&nbsp;/g, '').trim() + ' ' +
+                next.innerHTML.replace(/&nbsp;/g, '').trim()).trim() || '&nbsp;';
+            next.remove();
+            markModified();
+            setTimeout(injectTableResizers, 30);
+        }
+
+        function mergeCellDown(table, cell) {
+            const row = cell.parentElement;
+            const rows = Array.from(table.rows);
+            const rowIdx = rows.indexOf(row);
+            const colIdx = Array.from(row.cells).indexOf(cell);
+            const nextRow = rows[rowIdx + 1];
+            if (!nextRow) { showToast('No row below to merge', 'warning'); return; }
+            const below = nextRow.cells[colIdx];
+            if (!below) { showToast('No cell below to merge', 'warning'); return; }
+            const span = (parseInt(cell.getAttribute('rowspan')) || 1) + (parseInt(below.getAttribute('rowspan')) || 1);
+            cell.setAttribute('rowspan', span);
+            cell.innerHTML = (cell.innerHTML.replace(/&nbsp;/g, '').trim() + ' ' +
+                below.innerHTML.replace(/&nbsp;/g, '').trim()).trim() || '&nbsp;';
+            below.remove();
+            markModified();
+            setTimeout(injectTableResizers, 30);
+        }
+
+        function splitCell(table, cell) {
+            const span = parseInt(cell.getAttribute('colspan')) || 1;
+            if (span <= 1) { showToast('Cell is not merged', 'warning'); return; }
+            cell.setAttribute('colspan', span - 1);
+            const newCell = document.createElement(cell.tagName.toLowerCase());
+            newCell.innerHTML = '&nbsp;<div class="col-resizer" onmousedown="initColResize(event)"></div>';
+            newCell.style.cssText = cell.style.cssText.replace(/width:[^;]+;?/, '');
+            cell.after(newCell);
+            markModified();
+            setTimeout(injectTableResizers, 30);
+        }
+
+        // ─── BLOCK DRAG-REORDER ──────────────────────────────────────────────
+        let _dragHandle, _dragBlock = null, _dropLine, _dragActive = false;
+
+        const DRAG_BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,table,ul,ol,blockquote,div.panel,div.col2,div.col3,img';
+
+        function initBlockDrag() {
+            _dragHandle = document.createElement('div');
+            _dragHandle.className = 'block-drag-handle';
+            _dragHandle.textContent = '⠿';
+            _dragHandle.title = 'Drag to reorder';
+            editor.parentElement.style.position = editor.parentElement.style.position || 'relative';
+            document.getElementById('main-area').appendChild(_dragHandle);
+
+            _dropLine = document.createElement('div');
+            _dropLine.className = 'block-drop-line';
+            _dropLine.style.display = 'none';
+
+            editor.addEventListener('mousemove', e => {
+                if (_dragActive || currentView !== 'wysiwyg') return;
+                const block = e.target.closest(DRAG_BLOCK_SELECTOR);
+                if (!block || !editor.contains(block) || block === editor) { _dragHandle.style.display = 'none'; return; }
+                positionDragHandle(block);
+            });
+            editor.addEventListener('mouseleave', () => { if (!_dragActive) _dragHandle.style.display = 'none'; });
+
+            _dragHandle.addEventListener('mousedown', e => {
+                e.preventDefault();
+                startBlockDrag();
+            });
+        }
+
+        function positionDragHandle(block) {
+            _dragBlock = block.closest('.img-resize-wrap') || block;
+            const r = _dragBlock.getBoundingClientRect();
+            const areaRect = document.getElementById('main-area').getBoundingClientRect();
+            const left = Math.max(2, r.left - areaRect.left - 24);
+            _dragHandle.style.left = left + 'px';
+            _dragHandle.style.top = (r.top - areaRect.top + (r.height / 2 - 10)) + 'px';
+            _dragHandle.style.display = 'flex';
+        }
+
+        function startBlockDrag() {
+            if (!_dragBlock) return;
+            _dragActive = true;
+            document.body.style.userSelect = 'none';
+            _dragHandle.style.cursor = 'grabbing';
+            editor.appendChild(_dropLine);
+            _dropLine.style.display = 'block';
+
+            function onMove(ev) {
+                const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                const block = target && target.closest(DRAG_BLOCK_SELECTOR);
+                if (!block || !editor.contains(block) || block === _dragBlock) return;
+                const r = block.getBoundingClientRect();
+                const before = ev.clientY < r.top + r.height / 2;
+                block.parentNode.insertBefore(_dropLine, before ? block : block.nextSibling);
+            }
+
+            function onUp() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                document.body.style.userSelect = '';
+                _dragHandle.style.cursor = 'grab';
+                _dragActive = false;
+                if (_dropLine.parentNode) {
+                    _dropLine.parentNode.insertBefore(_dragBlock, _dropLine);
+                    _dropLine.style.display = 'none';
+                    _dropLine.remove();
+                    markModified();
+                    scheduleOutlineRebuild();
+                    setTimeout(injectTableResizers, 30);
+                    showToast('↕ Block moved', 'success');
+                }
+                _dragHandle.style.display = 'none';
+                _dragBlock = null;
+            }
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        }
+        // ─── TEXT SELECTION CONTEXT MENU ────────────────────────────────────
+        let _clipboardFilled = false;
+
+        editor.addEventListener('contextmenu', e => {
+            if (e.target.closest('img')) return;
+            const sel = window.getSelection();
+            const hasSelection = sel && !sel.isCollapsed && editor.contains(sel.anchorNode);
+            const inCell = e.target.closest('td,th');
+            if (inCell && !hasSelection) return;
+            e.preventDefault();
+            if (hasSelection) {
+                savedRange = sel.getRangeAt(0).cloneRange();
+            } else {
+                const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
+                if (range && editor.contains(range.commonAncestorContainer)) {
+                    savedRange = range.cloneRange();
+                    sel.removeAllRanges();
+                    sel.addRange(savedRange);
+                } else {
+                    savedRange = null;
+                }
+            }
+            showTextContextMenu(e.clientX, e.clientY, hasSelection);
+        });
+        function closeAllCtxMenus() {
+            document.querySelectorAll('.ctxmenu-root,.ctxmenu-sub').forEach(m => m.remove());
+        }
+
+        function showTextContextMenu(x, y, hasSelection) {
+            closeAllCtxMenus();
+            const menu = document.createElement('div');
+            menu.className = 'ctxmenu-root';
+            menu.style.cssText =
+                `position:fixed;left:${x}px;top:${y}px;background:var(--bg1);border:1px solid var(--border2);border-radius:6px;padding:4px;z-index:9999;min-width:180px;box-shadow:0 6px 24px rgba(0,0,0,.5);font-size:.78rem;`;
+
+            const addItem = (parent, label, fn, opts = {}) => {
+                const item = document.createElement('div');
+                item.className = 'ctxmenu-item' + (opts.disabled ? ' disabled' : '');
+                item.innerHTML = `<span>${label}</span>` + (opts.arrow ? '<span class="arrow">▶</span>' : '');
+                if (fn) item.onclick = () => { fn(); closeAllCtxMenus(); };
+                item.addEventListener('mouseenter', () => {
+                    document.querySelectorAll('.ctxmenu-sub').forEach(s => s.remove());
+                });
+                parent.appendChild(item);
+                return item;
+            };
+
+            addItem(menu, '✂ Cut', () => { restoreSelection(); document.execCommand('cut'); _clipboardFilled = true; markModified(); }, { disabled: !hasSelection });
+            addItem(menu, '⎘ Copy', () => { restoreSelection(); document.execCommand('copy'); _clipboardFilled = true; }, { disabled: !hasSelection });
+            addItem(menu, '📋 Paste', () => doContextPaste(), { disabled: !_clipboardFilled });
+
+            const sep1 = document.createElement('div');
+            sep1.className = 'ctxmenu-sep';
+            menu.appendChild(sep1);
+
+            const fontItem = addItem(menu, '🔤 Font', null, { arrow: true });
+            const paraItem = addItem(menu, '¶ Paragraph', null, { arrow: true });
+            addItem(menu, '🔗 Link', () => showModal('link'));
+            addItem(menu, '💬 Add Comment', () => addCommentToSelection(), { disabled: !hasSelection });
+
+            document.body.appendChild(menu);
+
+            attachSubmenu(fontItem, [
+                ['Bold', () => cmd('bold')],
+                ['Italic', () => cmd('italic')],
+                ['Underline', () => cmd('underline')],
+                ['Strikethrough', () => cmd('strikeThrough')],
+                ['Clear Formatting', () => cmd('removeFormat')],
+            ]);
+            attachSubmenu(paraItem, [
+                ['Heading 1', () => cmdArg('formatBlock', 'h1')],
+                ['Heading 2', () => cmdArg('formatBlock', 'h2')],
+                ['Heading 3', () => cmdArg('formatBlock', 'h3')],
+                ['Paragraph', () => cmdArg('formatBlock', 'p')],
+                ['Blockquote', () => cmdArg('formatBlock', 'blockquote')],
+                ['Align Left', () => cmd('justifyLeft')],
+                ['Align Center', () => cmd('justifyCenter')],
+                ['Align Right', () => cmd('justifyRight')],
+                ['Line Spacing: 1.0', () => applyLineHeight('1')],
+                ['Line Spacing: 1.15', () => applyLineHeight('1.2')],
+                ['Line Spacing: 1.5', () => applyLineHeight('1.6')],
+                ['Line Spacing: 2.0', () => applyLineHeight('2')],
+            ]);
+
+            setTimeout(() => document.addEventListener('mousedown', function rm(ev) {
+                if (!ev.target.closest('.ctxmenu-root,.ctxmenu-sub')) {
+                    closeAllCtxMenus();
+                    document.removeEventListener('mousedown', rm);
+                }
+            }), 10);
+        }
+
+        function attachSubmenu(parentItem, entries) {
+            let sub = null;
+            parentItem.addEventListener('mouseenter', () => {
+                document.querySelectorAll('.ctxmenu-sub').forEach(s => s.remove());
+                sub = document.createElement('div');
+                sub.className = 'ctxmenu-sub';
+                const r = parentItem.getBoundingClientRect();
+                sub.style.left = r.right + 'px';
+                sub.style.top = r.top + 'px';
+                sub.style.display = 'block';
+                entries.forEach(([label, fn]) => {
+                    const item = document.createElement('div');
+                    item.className = 'ctxmenu-item';
+                    item.textContent = label;
+                    item.onclick = () => { restoreSelection(); fn(); closeAllCtxMenus(); };
+                    sub.appendChild(item);
+                });
+                document.body.appendChild(sub);
+            });
+        }
+
+        function doContextPaste() {
+            restoreSelection();
+            editor.focus();
+            navigator.clipboard.read().then(items => {
+                for (const item of items) {
+                    if (item.types.includes('text/html')) {
+                        item.getType('text/html').then(blob => blob.text()).then(html => {
+                            document.execCommand('insertHTML', false, html);
+                            markModified();
+                        });
+                        return;
+                    }
+                }
+                navigator.clipboard.readText().then(text => {
+                    document.execCommand('insertText', false, text);
+                    markModified();
+                });
+            }).catch(() => {
+                navigator.clipboard.readText().then(text => {
+                    document.execCommand('insertText', false, text);
+                    markModified();
+                }).catch(() => showToast('⚠ Clipboard access denied', 'error'));
+            });
+        }
+
+        function addCommentToSelection() {
+            const note = prompt('Comment text:');
+            if (note === null || !note.trim()) return;
+            restoreSelection();
+            editor.focus();
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            const tmp = document.createElement('div');
+            tmp.appendChild(range.cloneContents());
+            document.execCommand('insertHTML', false,
+                `<span class="comment-mark" title="💬 ${note.replace(/"/g, '&quot;')}">${tmp.innerHTML}</span>`);
+            markModified();
+            showToast('💬 Comment added', 'success');
+        }
+        
         function injectImgResizers() {
             if (_imgOverlayInit) return;
             _imgOverlayInit = true;
@@ -2965,34 +3641,547 @@
             navigator.clipboard?.writeText(t);
         }
 
-        function flashCopyFeedback() {}
+        function flashCopyFeedback() {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return;
+            try {
+                const range = sel.getRangeAt(0);
+                const rects = range.getClientRects();
+                if (!rects.length) return;
+                Array.from(rects).forEach(r => {
+                    const el = document.createElement('div');
+                    el.style.cssText =
+                        `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background:rgba(79,195,247,.35);pointer-events:none;z-index:9998;border-radius:2px;`;
+                    el.className = 'copy-flash';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 450);
+                });
+            } catch (e) {}
+        }
 
-        function doWrapInTag() {}
-        function updateWrapPreview() {}
+        function updateWrapPreview() {
+            const tag = document.getElementById('wrap-tag').value;
+            const cls = document.getElementById('wrap-class').value.trim();
+            const id = document.getElementById('wrap-id').value.trim();
+            const style = document.getElementById('wrap-style').value.trim();
+            const attr = document.getElementById('wrap-attr').value.trim();
+            let attrs = '';
+            if (id) attrs += ` id="${id}"`;
+            if (cls) attrs += ` class="${cls}"`;
+            if (style) attrs += ` style="${style}"`;
+            if (attr) attrs += ` ${attr}`;
+            document.getElementById('wrap-preview').textContent = `<${tag}${attrs}>…selection…</${tag}>`;
+        }
+
+        function doWrapInTag() {
+            const tag = document.getElementById('wrap-tag').value;
+            const cls = document.getElementById('wrap-class').value.trim();
+            const id = document.getElementById('wrap-id').value.trim();
+            const style = document.getElementById('wrap-style').value.trim();
+            const attr = document.getElementById('wrap-attr').value.trim();
+            hideModal();
+            restoreSelection();
+            editor.focus();
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            const tmp = document.createElement('div');
+            if (range.collapsed) tmp.innerHTML = '\u200b';
+            else tmp.appendChild(range.cloneContents());
+            let attrs = '';
+            if (id) attrs += ` id="${id}"`;
+            if (cls) attrs += ` class="${cls}"`;
+            if (style) attrs += ` style="${style}"`;
+            if (attr) attrs += ` ${attr}`;
+            document.execCommand('insertHTML', false, `<${tag}${attrs}>${tmp.innerHTML}</${tag}>`);
+            markModified();
+        }
 
         function selShowModal(id) { showModal && showModal(id); }
 
         function selCmd(c) { cmd && cmd(c); }
 
-        function toggleAWMMode() {}
-        function awmCmd() {}
-        function awmCmdArg() {}
-        function awmKeyDown() {}
-        function copyAWM() {}
-        function insertAWMFromHTML() {}
-        function editorToAWM() { return ''; }
+        function toggleAWMMode() {
+            if (!awmMode && latexMode) { latexMode = false; document.body.classList.remove('latex-active'); document.getElementById('latex-toggle-btn').classList.remove('active'); }
+            awmMode = !awmMode;
+            document.body.classList.toggle('awm-active', awmMode);
+            document.getElementById('awm-toggle-btn').classList.toggle('active', awmMode);
+            document.getElementById('st-mode').classList.toggle('awm-st', awmMode);
+            document.getElementById('st-mode').textContent = awmMode ? 'AWM' : currentView.toUpperCase();
+            if (awmMode) { if (!awmEd.value.trim()) awmEd.value = editorToAWM(); awmEd.focus(); }
+            else editor.focus();
+            updateStats();
+            saveState();
+        }
 
-        function nodeToAWM() { return ''; }
+        function awmWrapSelection(open, close) {
+            const s = awmEd.selectionStart, e = awmEd.selectionEnd;
+            const val = awmEd.value;
+            const sel = val.slice(s, e) || 'text';
+            awmEd.value = val.slice(0, s) + open + sel + close + val.slice(e);
+            awmEd.selectionStart = s + open.length;
+            awmEd.selectionEnd = s + open.length + sel.length;
+            awmEd.focus();
+            onAWMChange();
+        }
 
-        function awmWrapInline(v) { return v; }
+        function awmPrefixLine(prefix) {
+            const s = awmEd.selectionStart;
+            const val = awmEd.value;
+            const lineStart = val.lastIndexOf('\n', s - 1) + 1;
+            awmEd.value = val.slice(0, lineStart) + prefix + val.slice(lineStart);
+            awmEd.selectionStart = awmEd.selectionEnd = s + prefix.length;
+            awmEd.focus();
+            onAWMChange();
+        }
 
-        function awmInsertBlock() {}
+        function awmCmd(command) {
+            const inlineMap = { bold:['*','*'], italic:['_','_'], underline:['+','+'], strikeThrough:['-','-'],
+                subscript:['~','~'], superscript:['^','^'] };
+            if (inlineMap[command]) { awmWrapSelection(inlineMap[command][0], inlineMap[command][1]); return; }
+            if (command === 'insertUnorderedList') { awmPrefixLine('* '); return; }
+            if (command === 'insertOrderedList') { awmPrefixLine('# '); return; }
+            if (command === 'undo' || command === 'redo' || command === 'cut' || command === 'copy') { document.execCommand(command); return; }
+            if (command === 'selectAll') { awmEd.select(); return; }
+            // indent/outdent/justify/removeFormat have no AWM equivalent — ignored
+        }
 
-        function convertAWMToHTML() {}
+        function awmCmdArg(command, value) {
+            if (command !== 'formatBlock' || !value) return;
+            const map = { h1:'h1. ', h2:'h2. ', h3:'h3. ', h4:'h4. ', h5:'h5. ', h6:'h6. ', blockquote:'bq. ', pre:'{code}\n' };
+            if (map[value]) awmPrefixLine(map[value]);
+        }
 
-        function awmToHTML(v) { return v; }
+        function awmKeyDown(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = awmEd.selectionStart, en = awmEd.selectionEnd;
+                awmEd.value = awmEd.value.slice(0, s) + '  ' + awmEd.value.slice(en);
+                awmEd.selectionStart = awmEd.selectionEnd = s + 2;
+                onAWMChange();
+            }
+        }
 
-        function initSplitResizer() {}
+        function copyAWM() {
+            navigator.clipboard.writeText(awmEd.value)
+                .then(() => showToast('⎘ AWM copied to clipboard', 'success'))
+                .catch(() => showToast('⚠ Clipboard access denied', 'error'));
+        }
+
+        function insertAWMFromHTML() {
+            if (!confirm('Replace AWM content with a conversion of the current WYSIWYG document?')) return;
+            awmEd.value = editorToAWM();
+            onAWMChange();
+            showToast('⇄ Converted WYSIWYG → AWM', 'success');
+        }
+
+        function editorToAWM() {
+            const out = Array.from(editor.childNodes).map(nodeToAWM).join('\n');
+            return out.replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        function awmWrapInline(node) {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+            const tag = node.tagName.toLowerCase();
+            const inner = Array.from(node.childNodes).map(awmWrapInline).join('');
+            switch (tag) {
+                case 'strong': case 'b': return `*${inner}*`;
+                case 'em': case 'i': return `_${inner}_`;
+                case 'u': return `+${inner}+`;
+                case 's': case 'strike': case 'del': return `-${inner}-`;
+                case 'sup': return `^${inner}^`;
+                case 'sub': return `~${inner}~`;
+                case 'code': return `{{${inner}}}`;
+                case 'a': return `[${inner || node.getAttribute('href') || ''}|${node.getAttribute('href') || ''}]`;
+                case 'img': return `!${node.getAttribute('src') || ''}!`;
+                case 'br': return '\n';
+                default: return inner;
+            }
+        }
+
+        function nodeToAWM(node) {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent.trim();
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+            const tag = node.tagName.toLowerCase();
+            switch (tag) {
+                case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
+                    return `${tag}. ${awmWrapInline(node).trim()}`;
+                case 'blockquote':
+                    return `bq. ${awmWrapInline(node).trim()}`;
+                case 'hr':
+                    return '----';
+                case 'ul':
+                    return Array.from(node.children).map(li => `* ${awmWrapInline(li).trim()}`).join('\n');
+                case 'ol':
+                    return Array.from(node.children).map(li => `# ${awmWrapInline(li).trim()}`).join('\n');
+                case 'pre':
+                    return `{code}\n${node.textContent}\n{code}`;
+                case 'table':
+                    return Array.from(node.querySelectorAll('tr')).map(tr => {
+                        const isHeader = tr.children[0] && tr.children[0].tagName === 'TH';
+                        const sep = isHeader ? '||' : '|';
+                        return sep + Array.from(tr.children).map(c => awmWrapInline(c).trim()).join(sep) + sep;
+                    }).join('\n');
+                case 'p': case 'div':
+                    return awmWrapInline(node).trim();
+                default:
+                    return awmWrapInline(node).trim();
+            }
+        }
+
+        function awmInsertBlock(before, after) {
+            after = after || '';
+            const s = awmEd.selectionStart, e = awmEd.selectionEnd;
+            const val = awmEd.value;
+            const sel = val.slice(s, e);
+            awmEd.value = val.slice(0, s) + before + sel + after + val.slice(e);
+            awmEd.selectionStart = s + before.length;
+            awmEd.selectionEnd = s + before.length + sel.length;
+            awmEd.focus();
+            onAWMChange();
+        }
+
+        function convertAWMToHTML() {
+            if (!confirm('Replace WYSIWYG content with a conversion of the current AWM text?')) return;
+            editor.innerHTML = awmToHTML(awmEd.value);
+            markModified();
+            setTimeout(injectTableResizers, 30);
+            scheduleOutlineRebuild();
+            showToast('⇄ Converted AWM → WYSIWYG', 'success');
+        }
+
+        function awmInlineToHTML(s) {
+            return s
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\{\{(.+?)\}\}/g, '<code>$1</code>')
+                .replace(/\*(.+?)\*/g, '<strong>$1</strong>')
+                .replace(/_(.+?)_/g, '<em>$1</em>')
+                .replace(/\+(.+?)\+/g, '<u>$1</u>')
+                .replace(/\^(.+?)\^/g, '<sup>$1</sup>')
+                .replace(/~(.+?)~/g, '<sub>$1</sub>')
+                .replace(/!([^!\s]+)!/g, '<img src="$1">')
+                .replace(/\[([^\]|]+)\|([^\]]+)\]/g, '<a href="$2">$1</a>');
+        }
+
+        function awmToHTML(text) {
+            const lines = text.split('\n');
+            let html = '', i = 0, listType = null;
+            const closeList = () => { if (listType) { html += `</${listType}>`; listType = null; } };
+            while (i < lines.length) {
+                const line = lines[i];
+                const h = line.match(/^h([1-6])\.\s?(.*)$/);
+                const panel = line.match(/^\{(code|info|warning|note|panel)\}$/);
+                if (h) { closeList(); html += `<h${h[1]}>${awmInlineToHTML(h[2])}</h${h[1]}>`; i++; continue; }
+                if (/^bq\.\s?/.test(line)) { closeList(); html += `<blockquote>${awmInlineToHTML(line.replace(/^bq\.\s?/, ''))}</blockquote>`; i++; continue; }
+                if (/^-{4,}$/.test(line.trim())) { closeList(); html += '<hr>'; i++; continue; }
+                if (panel) {
+                    const tag = panel[1];
+                    const endRe = new RegExp(`^\\{${tag}\\}$`);
+                    const body = [];
+                    i++;
+                    while (i < lines.length && !endRe.test(lines[i])) { body.push(lines[i]); i++; }
+                    i++;
+                    if (tag === 'code') html += `<pre>${body.join('\n').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>`;
+                    else {
+                        const cls = { info:'panel-info', warning:'panel-warn', note:'panel-note', panel:'panel-info' }[tag];
+                        html += `<div class="panel ${cls}">${body.map(awmInlineToHTML).join('<br>')}</div>`;
+                    }
+                    closeList();
+                    continue;
+                }
+                if (/^\*\s+/.test(line)) {
+                    if (listType !== 'ul') { closeList(); html += '<ul>'; listType = 'ul'; }
+                    html += `<li>${awmInlineToHTML(line.replace(/^\*\s+/, ''))}</li>`;
+                    i++; continue;
+                }
+                if (/^#\s+/.test(line)) {
+                    if (listType !== 'ol') { closeList(); html += '<ol>'; listType = 'ol'; }
+                    html += `<li>${awmInlineToHTML(line.replace(/^#\s+/, ''))}</li>`;
+                    i++; continue;
+                }
+                closeList();
+                if (line.trim() === '') { i++; continue; }
+                html += `<p>${awmInlineToHTML(line)}</p>`;
+                i++;
+            }
+            closeList();
+            return html || '<p><br></p>';
+        }
+
+        // ─── LATEX MODE ────────────────────────────────────────────────────
+        function toggleLatexMode() {
+            if (!latexMode && awmMode) { awmMode = false; document.body.classList.remove('awm-active'); document.getElementById('awm-toggle-btn').classList.remove('active'); }
+            latexMode = !latexMode;
+            document.body.classList.toggle('latex-active', latexMode);
+            document.getElementById('latex-toggle-btn').classList.toggle('active', latexMode);
+            document.getElementById('st-mode').classList.toggle('latex-st', latexMode);
+            document.getElementById('st-mode').textContent = latexMode ? 'LATEX' : currentView.toUpperCase();
+            if (latexMode) { if (!latexEd.value.trim()) latexEd.value = editorToLatex(); latexEd.focus(); }
+            else editor.focus();
+            updateStats();
+            saveState();
+        }
+
+        function latexWrapSelection(open, close) {
+            const s = latexEd.selectionStart, e = latexEd.selectionEnd;
+            const val = latexEd.value;
+            const sel = val.slice(s, e) || 'text';
+            latexEd.value = val.slice(0, s) + open + sel + close + val.slice(e);
+            latexEd.selectionStart = s + open.length;
+            latexEd.selectionEnd = s + open.length + sel.length;
+            latexEd.focus();
+            onLatexChange();
+        }
+
+        function latexInsertBlock(before, after) {
+            after = after || '';
+            const s = latexEd.selectionStart, e = latexEd.selectionEnd;
+            const val = latexEd.value;
+            const sel = val.slice(s, e);
+            latexEd.value = val.slice(0, s) + before + sel + after + val.slice(e);
+            latexEd.selectionStart = s + before.length;
+            latexEd.selectionEnd = s + before.length + sel.length;
+            latexEd.focus();
+            onLatexChange();
+        }
+
+        function latexCmd(command) {
+            const inlineMap = { bold:['\\textbf{','}'], italic:['\\textit{','}'], underline:['\\underline{','}'],
+                strikeThrough:['\\sout{','}'], subscript:['\\textsubscript{','}'], superscript:['\\textsuperscript{','}'] };
+            if (inlineMap[command]) { latexWrapSelection(inlineMap[command][0], inlineMap[command][1]); return; }
+            if (command === 'insertUnorderedList') { latexInsertBlock('\\begin{itemize}\n\\item ', '\n\\end{itemize}\n'); return; }
+            if (command === 'insertOrderedList') { latexInsertBlock('\\begin{enumerate}\n\\item ', '\n\\end{enumerate}\n'); return; }
+            if (command === 'undo' || command === 'redo' || command === 'cut' || command === 'copy') { document.execCommand(command); return; }
+            if (command === 'selectAll') { latexEd.select(); return; }
+        }
+
+        function latexCmdArg(command, value) {
+            if (command !== 'formatBlock' || !value) return;
+            if (value === 'blockquote') { latexInsertBlock('\\begin{quote}\n', '\n\\end{quote}\n'); return; }
+            if (value === 'pre') { latexInsertBlock('\\begin{verbatim}\n', '\n\\end{verbatim}\n'); return; }
+            const map = { h1:'\\section{', h2:'\\subsection{', h3:'\\subsubsection{', h4:'\\paragraph{' };
+            if (map[value]) latexWrapSelection(map[value], '}');
+        }
+
+        function latexKeyDown(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = latexEd.selectionStart, en = latexEd.selectionEnd;
+                latexEd.value = latexEd.value.slice(0, s) + '  ' + latexEd.value.slice(en);
+                latexEd.selectionStart = latexEd.selectionEnd = s + 2;
+                onLatexChange();
+            }
+        }
+
+        function onLatexChange() {
+            if (currentView === 'split' && splitSource === 'latex') {
+                editor.innerHTML = latexToHTML(latexEd.value);
+            }
+            markModified();
+            debounceSave();
+        }
+
+        function copyLatex() {
+            navigator.clipboard.writeText(latexEd.value)
+                .then(() => showToast('⎘ LaTeX copied to clipboard', 'success'))
+                .catch(() => showToast('⚠ Clipboard access denied', 'error'));
+        }
+
+        function insertLatexFromHTML() {
+            if (!confirm('Replace LaTeX content with a conversion of the current WYSIWYG document?')) return;
+            latexEd.value = editorToLatex();
+            onLatexChange();
+            showToast('⇄ Converted WYSIWYG → LaTeX', 'success');
+        }
+
+        function escLatex(s) {
+            return String(s).replace(/[\\&%$#_{}~^]/g, c => ({
+                '\\': '\\textbackslash{}', '&': '\\&', '%': '\\%', '$': '\\$', '#': '\\#',
+                '_': '\\_', '{': '\\{', '}': '\\}', '~': '\\textasciitilde{}', '^': '\\textasciicircum{}'
+            }[c]));
+        }
+
+        function editorToLatex() {
+            const body = Array.from(editor.childNodes).map(nodeToLatex).join('\n');
+            return `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage{graphicx}\n\\usepackage{hyperref}\n\\usepackage{ulem}\n\\begin{document}\n\n${body.replace(/\n{3,}/g, '\n\n').trim()}\n\n\\end{document}`;
+        }
+
+        function latexWrapInline(node) {
+            if (node.nodeType === Node.TEXT_NODE) return escLatex(node.textContent);
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+            const tag = node.tagName.toLowerCase();
+            const inner = Array.from(node.childNodes).map(latexWrapInline).join('');
+            switch (tag) {
+                case 'strong': case 'b': return `\\textbf{${inner}}`;
+                case 'em': case 'i': return `\\textit{${inner}}`;
+                case 'u': return `\\underline{${inner}}`;
+                case 's': case 'strike': case 'del': return `\\sout{${inner}}`;
+                case 'sup': return `\\textsuperscript{${inner}}`;
+                case 'sub': return `\\textsubscript{${inner}}`;
+                case 'code': return `\\texttt{${inner}}`;
+                case 'a': return `\\href{${node.getAttribute('href') || ''}}{${inner}}`;
+                case 'img': return `\\includegraphics{${node.getAttribute('src') || ''}}`;
+                case 'br': return '\\\\\n';
+                default: return inner;
+            }
+        }
+
+        function nodeToLatex(node) {
+            if (node.nodeType === Node.TEXT_NODE) return escLatex(node.textContent.trim());
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+            const tag = node.tagName.toLowerCase();
+            switch (tag) {
+                case 'h1': return `\\section{${latexWrapInline(node).trim()}}`;
+                case 'h2': return `\\subsection{${latexWrapInline(node).trim()}}`;
+                case 'h3': return `\\subsubsection{${latexWrapInline(node).trim()}}`;
+                case 'h4': case 'h5': case 'h6': return `\\paragraph{${latexWrapInline(node).trim()}}`;
+                case 'blockquote': return `\\begin{quote}\n${latexWrapInline(node).trim()}\n\\end{quote}`;
+                case 'hr': return '\\hrulefill';
+                case 'ul': return `\\begin{itemize}\n${Array.from(node.children).map(li => `\\item ${latexWrapInline(li).trim()}`).join('\n')}\n\\end{itemize}`;
+                case 'ol': return `\\begin{enumerate}\n${Array.from(node.children).map(li => `\\item ${latexWrapInline(li).trim()}`).join('\n')}\n\\end{enumerate}`;
+                case 'pre': return `\\begin{verbatim}\n${node.textContent}\n\\end{verbatim}`;
+                case 'table': {
+                    const rows = Array.from(node.querySelectorAll('tr'));
+                    const cols = rows[0] ? rows[0].children.length : 1;
+                    const spec = 'l'.repeat(cols);
+                    const body = rows.map(tr => Array.from(tr.children).map(c => latexWrapInline(c).trim()).join(' & ') + ' \\\\').join('\n');
+                    return `\\begin{tabular}{${spec}}\n${body}\n\\end{tabular}`;
+                }
+                case 'p': case 'div': return latexWrapInline(node).trim();
+                default: return latexWrapInline(node).trim();
+            }
+        }
+
+        function convertLatexToHTML() {
+            if (!confirm('Replace WYSIWYG content with a conversion of the current LaTeX text?')) return;
+            editor.innerHTML = latexToHTML(latexEd.value);
+            markModified();
+            setTimeout(injectTableResizers, 30);
+            scheduleOutlineRebuild();
+            showToast('⇄ Converted LaTeX → WYSIWYG', 'success');
+        }
+
+        function latexInlineToHTML(s) {
+            return s
+                .replace(/\\textbf\{(.+?)\}/g, '<strong>$1</strong>')
+                .replace(/\\textit\{(.+?)\}/g, '<em>$1</em>')
+                .replace(/\\underline\{(.+?)\}/g, '<u>$1</u>')
+                .replace(/\\sout\{(.+?)\}/g, '<s>$1</s>')
+                .replace(/\\texttt\{(.+?)\}/g, '<code>$1</code>')
+                .replace(/\\textsuperscript\{(.+?)\}/g, '<sup>$1</sup>')
+                .replace(/\\textsubscript\{(.+?)\}/g, '<sub>$1</sub>')
+                .replace(/\\href\{([^}]*)\}\{(.+?)\}/g, '<a href="$1">$2</a>')
+                .replace(/\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}/g, '<img src="$1">')
+                .replace(/\\\\/g, '<br>');
+        }
+
+        function latexToHTML(text) {
+            const m = text.match(/\\begin\{document\}([\s\S]*)\\end\{document\}/);
+            const body = m ? m[1] : text;
+            const lines = body.split('\n');
+            let html = '', i = 0;
+            while (i < lines.length) {
+                let line = lines[i];
+                const sec = line.match(/^\\(section|subsection|subsubsection|paragraph)\{(.*)\}\s*$/);
+                if (sec) {
+                    const tagMap = { section: 'h1', subsection: 'h2', subsubsection: 'h3', paragraph: 'h4' };
+                    html += `<${tagMap[sec[1]]}>${latexInlineToHTML(sec[2])}</${tagMap[sec[1]]}>`;
+                    i++; continue;
+                }
+                if (/^\\begin\{quote\}/.test(line)) {
+                    const body2 = []; i++;
+                    while (i < lines.length && !/^\\end\{quote\}/.test(lines[i])) { body2.push(lines[i]); i++; }
+                    i++;
+                    html += `<blockquote>${latexInlineToHTML(body2.join(' ').trim())}</blockquote>`;
+                    continue;
+                }
+                if (/^\\begin\{verbatim\}/.test(line)) {
+                    const body2 = []; i++;
+                    while (i < lines.length && !/^\\end\{verbatim\}/.test(lines[i])) { body2.push(lines[i]); i++; }
+                    i++;
+                    html += `<pre>${body2.join('\n').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>`;
+                    continue;
+                }
+                if (/^\\begin\{itemize\}/.test(line)) {
+                    const items = []; i++;
+                    while (i < lines.length && !/^\\end\{itemize\}/.test(lines[i])) {
+                        const im = lines[i].match(/^\\item\s?(.*)$/);
+                        if (im) items.push(im[1]);
+                        i++;
+                    }
+                    i++;
+                    html += `<ul>${items.map(it => `<li>${latexInlineToHTML(it)}</li>`).join('')}</ul>`;
+                    continue;
+                }
+                if (/^\\begin\{enumerate\}/.test(line)) {
+                    const items = []; i++;
+                    while (i < lines.length && !/^\\end\{enumerate\}/.test(lines[i])) {
+                        const im = lines[i].match(/^\\item\s?(.*)$/);
+                        if (im) items.push(im[1]);
+                        i++;
+                    }
+                    i++;
+                    html += `<ol>${items.map(it => `<li>${latexInlineToHTML(it)}</li>`).join('')}</ol>`;
+                    continue;
+                }
+                if (/^\\hrulefill\s*$/.test(line)) { html += '<hr>'; i++; continue; }
+                if (/^\\(documentclass|usepackage)/.test(line) || line.trim() === '') { i++; continue; }
+                html += `<p>${latexInlineToHTML(line)}</p>`;
+                i++;
+            }
+            return html || '<p><br></p>';
+        }
+
+        // ─── SPLIT VIEW: CHOOSE SECONDARY PANE ────────────────────────────────
+        function setSplitSource(val) {
+            splitSource = val;
+            if (currentView === 'split') applySplitPanes();
+            saveState();
+        }
+
+        function applySplitPanes() {
+            const showSrc = splitSource === 'html';
+            const showAwm = splitSource === 'awm';
+            const showLatex = splitSource === 'latex';
+            srcWrap.style.display = showSrc ? 'flex' : 'none';
+            awmWrap.style.display = showAwm ? 'flex' : 'none';
+            latexWrap.style.display = showLatex ? 'flex' : 'none';
+            if (showSrc) { srcEd.value = prettyHTML(editor.innerHTML); updateLineNumbers(); }
+            else if (showAwm) { awmEd.value = editorToAWM(); }
+            else if (showLatex) { latexEd.value = editorToLatex(); }
+        }
+
+        function initSplitResizer() {
+            const resizer = document.getElementById('split-resizer');
+            if (!resizer || resizer._init) return;
+            resizer._init = true;
+            let dragging = false;
+            resizer.addEventListener('mousedown', e => {
+                if (currentView !== 'split') return;
+                dragging = true;
+                resizer.classList.add('dragging');
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', e => {
+                if (!dragging) return;
+                const area = document.getElementById('main-area');
+                const rect = area.getBoundingClientRect();
+                let pct = ((e.clientX - rect.left) / rect.width) * 100;
+                pct = Math.min(85, Math.max(15, pct));
+                editor.style.flex = 'none';
+                editor.style.width = pct + '%';
+                srcWrap.style.flex = 'none';
+                srcWrap.style.width = (100 - pct) + '%';
+            });
+            document.addEventListener('mouseup', () => {
+                if (!dragging) return;
+                dragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.userSelect = '';
+            });
+        }
 
         // ─── CUSTOM TEMPLATE STUBS ────────────────────────────────────────────
         const TEMPLATES = [
@@ -3282,7 +4471,10 @@
                     break;
                 case 'c':
                     if (shift) { e.preventDefault();
-                        copySelectionHTML(); }
+                        copySelectionHTML(); } else { _clipboardFilled = true; }
+                    break;
+                case 'x':
+                    _clipboardFilled = true;
                     break;
                 case 'r':
                     if (shift) { e.preventDefault();
@@ -3396,7 +4588,124 @@
             clearTimeout(autoSaveTimer);
             autoSaveTimer = setTimeout(saveDoc, 3000);
             updateStats();
+            maybeSnapshotHistory();
         }
+
+        // ─── UNDO HISTORY PANEL ──────────────────────────────────────────────
+        let _undoHistory = [];
+        let _lastSnapshotTs = 0;
+        let _historySaveDebounce;
+
+        function maybeSnapshotHistory() {
+            if (awmMode) return;
+            const now = Date.now();
+            if (now - _lastSnapshotTs < 8000) return;
+            _lastSnapshotTs = now;
+            const html = editor.innerHTML;
+            const last = _undoHistory[0];
+            if (last && last.html === html) return;
+            const words = (editor.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+            _undoHistory.unshift({ html, ts: now, words });
+            if (_undoHistory.length > 25) _undoHistory.pop();
+            clearTimeout(_historySaveDebounce);
+            _historySaveDebounce = setTimeout(() => {
+                try { localStorage.setItem('hyperedit_history_v3', JSON.stringify(_undoHistory)); } catch (e) {}
+            }, 4000);
+            if (_historyOpen) buildHistoryPanel();
+        }
+
+        function loadHistoryFromStorage() {
+            try {
+                const saved = localStorage.getItem('hyperedit_history_v3');
+                if (saved) _undoHistory = JSON.parse(saved);
+            } catch (e) { _undoHistory = []; }
+        }
+
+        let _historyOpen = false;
+
+        function toggleHistoryPanel() {
+            _historyOpen = !_historyOpen;
+            document.getElementById('history-panel').classList.toggle('open', _historyOpen);
+            document.getElementById('history-btn').classList.toggle('active', _historyOpen);
+            if (_historyOpen) buildHistoryPanel();
+        }
+
+        function buildHistoryPanel() {
+            const list = document.getElementById('history-list');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!_undoHistory.length) {
+                list.innerHTML = '<div class="history-empty">No snapshots yet — keep editing, they save automatically</div>';
+                return;
+            }
+            _undoHistory.forEach((snap, i) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                const time = new Date(snap.ts).toLocaleTimeString();
+                const dateStr = new Date(snap.ts).toLocaleDateString();
+                item.innerHTML = `<div class="h-time">${time}</div><div class="h-meta">${dateStr} · ${snap.words} words</div>`;
+                item.onclick = () => restoreHistorySnapshot(i);
+                list.appendChild(item);
+            });
+        }
+
+        function restoreHistorySnapshot(idx) {
+            const snap = _undoHistory[idx];
+            if (!snap) return;
+            if (!confirm('Restore this version from ' + new Date(snap.ts).toLocaleString() + '? Current content will be replaced (but kept in history).')) return;
+            maybeSnapshotHistory();
+            editor.innerHTML = snap.html;
+            markModified();
+            updateStats();
+            setTimeout(injectTableResizers, 30);
+            scheduleOutlineRebuild();
+            showToast('🕘 Restored version from ' + new Date(snap.ts).toLocaleTimeString(), 'success');
+        }
+
+        // ─── CRASH / AUTOSAVE RECOVERY ───────────────────────────────────────
+        function saveCrashRecovery() {
+            if (awmMode) return;
+            try {
+                localStorage.setItem('hyperedit_v3_crash', JSON.stringify({ html: editor.innerHTML, ts: Date.now() }));
+            } catch (e) {}
+        }
+
+        function checkCrashRecovery() {
+            try {
+                const crash = localStorage.getItem('hyperedit_v3_crash');
+                if (!crash) return;
+                const data = JSON.parse(crash);
+                const savedHtml = localStorage.getItem('hyperedit_v3') || '';
+                const savedTs = new Date(localStorage.getItem('hyperedit_v3_ts') || 0).getTime();
+                if (data.html && data.html !== savedHtml && data.ts > savedTs) {
+                    document.getElementById('recovery-bar').classList.add('open');
+                }
+            } catch (e) {}
+        }
+
+        function restoreCrashRecovery() {
+            try {
+                const crash = JSON.parse(localStorage.getItem('hyperedit_v3_crash'));
+                if (crash && crash.html) {
+                    editor.innerHTML = crash.html;
+                    markModified();
+                    updateStats();
+                    setTimeout(injectTableResizers, 30);
+                    scheduleOutlineRebuild();
+                    showToast('✅ Unsaved changes restored', 'success');
+                }
+            } catch (e) {}
+            document.getElementById('recovery-bar').classList.remove('open');
+            localStorage.removeItem('hyperedit_v3_crash');
+        }
+
+        function dismissCrashRecovery() {
+            document.getElementById('recovery-bar').classList.remove('open');
+            localStorage.removeItem('hyperedit_v3_crash');
+        }
+
+        window.addEventListener('beforeunload', saveCrashRecovery);
+        setInterval(saveCrashRecovery, 15000);
 
         let saveDebounce;
 
@@ -3419,6 +4728,7 @@
                 localStorage.setItem('hyperedit_v3', html);
                 localStorage.setItem('hyperedit_v3_ts', new Date().toISOString());
                 localStorage.setItem('hyperedit_v3_title', document.getElementById('doc-title').value || 'Untitled Document');
+                localStorage.removeItem('hyperedit_v3_crash');
                 isModified = false;
                 document.getElementById('saved-dot').classList.remove('modified');
                 const ts = new Date().toLocaleTimeString();
@@ -3436,6 +4746,7 @@
                 if (ts) document.getElementById('st-time').textContent = 'Loaded: ' + new Date(ts).toLocaleTimeString();
                 // ensure resizers are injected after load
                 setTimeout(injectTableResizers, 50);
+                scheduleOutlineRebuild();
             }
             const savedTitle = localStorage.getItem('hyperedit_v3_title');
             if (savedTitle) {
@@ -3447,7 +4758,9 @@
         function newDoc() {
             if (isModified && !confirm('Discard unsaved changes?')) return;
             if (awmMode) toggleAWMMode();
+            if (latexMode) toggleLatexMode();
             awmEd.value = '';
+            latexEd.value = '';
             editor.innerHTML = '<p>Start typing…</p>';
             document.getElementById('doc-title').value = 'Untitled Document';
             document.title = 'Untitled Document — HyperEdit Pro';
@@ -3508,6 +4821,9 @@
             } else if (type === 'awm') {
                 const awmContent = awmMode ? awmEd.value : editorToAWM();
                 downloadFile(awmContent, safeTitle + '.wiki', 'text/plain');
+            } else if (type === 'latex') {
+                const texContent = latexMode ? latexEd.value : editorToLatex();
+                downloadFile(texContent, safeTitle + '.tex', 'text/plain');
             } else if (type === 'print') {
                 window.print();
             }
@@ -3590,15 +4906,17 @@
         function onEditorChange() {
             markModified();
             if (currentView === 'split') {
-                srcEd.value = prettyHTML(editor.innerHTML);
-                updateLineNumbers();
+                if (splitSource === 'html') { srcEd.value = prettyHTML(editor.innerHTML); updateLineNumbers(); }
+                else if (splitSource === 'awm') { awmEd.value = editorToAWM(); }
+                else if (splitSource === 'latex') { latexEd.value = editorToLatex(); }
             }
             debounceSave();
-            // re-inject resizers if table content changed
-            setTimeout(injectTableResizers, 30);
         }
 
         function onAWMChange() {
+            if (currentView === 'split' && splitSource === 'awm') {
+                editor.innerHTML = awmToHTML(awmEd.value);
+            }
             markModified();
             debounceSave();
         }
@@ -3704,6 +5022,8 @@
         editor.addEventListener('contextmenu', e => {
             const cell = e.target.closest('td,th');
             if (!cell) return;
+            const _cellSel = window.getSelection();
+            if (_cellSel && !_cellSel.isCollapsed && editor.contains(_cellSel.anchorNode)) return;
             e.preventDefault();
             const table = cell.closest('table');
             const row = cell.closest('tr');
@@ -3721,6 +5041,7 @@
                         c.style.cssText = 'border:1px solid #ccc;padding:6px;position:relative;'; } }],
                 ['Delete row', () => { if (table.rows.length > 1) table.deleteRow(row.rowIndex); else showToast(
                         'Cannot delete last row', 'warning'); }],
+                ['🎨 Row color…', () => setRowColor(row)],
                 ['──────────────', null],
                 ['Insert col left', () => { Array.from(table.rows).forEach(r => { const c = r.insertCell(cell
                             .cellIndex);
@@ -3733,6 +5054,12 @@
                 ['Delete column', () => { const ci = cell.cellIndex;
                     Array.from(table.rows).forEach(r => { if (r.cells.length > 1) r.deleteCell(ci);
                         else showToast('Cannot delete last col', 'warning'); }); }],
+                ['🎨 Column color…', () => setColColor(table, cell.cellIndex)],
+                ['──────────────', null],
+                ['⬛ Toggle header row', () => toggleTableHeader(table, row)],
+                ['⬌ Merge with right cell', () => mergeCellRight(table, cell)],
+                ['⬇ Merge with cell below', () => mergeCellDown(table, cell)],
+                ['⬍ Split cell', () => splitCell(table, cell)],
                 ['──────────────', null],
                 ['Delete table', () => { if (confirm('Delete entire table?')) table.remove(); }],
             ];
@@ -4172,6 +5499,8 @@
             updateStats();
             setView('wysiwyg');
             loadState();
+            loadHistoryFromStorage();
+            checkCrashRecovery();
             document.getElementById('spell-btn').classList.add('active');
             buildTemplates();
             buildCustomTemplates();
@@ -4179,6 +5508,7 @@
             setTimeout(injectTableResizers, 50);
             initSplitResizer();
             initTableCornerButtons();
+            initBlockDrag();
 
             document.querySelectorAll('#toolbar-wrap .tb-sel[title]').forEach(sel => {
                 const wrap = document.createElement('span');
@@ -4218,6 +5548,47 @@
             _wordGoal = parseInt(g) || 0;
             document.getElementById('st-goal-wrap').style.display = _wordGoal ? '' : 'none';
             updateStats();
+        }
+
+        let _outlineOpen = false, _outlineDebounce;
+
+        function toggleOutlinePanel() {
+            _outlineOpen = !_outlineOpen;
+            document.getElementById('outline-panel').classList.toggle('open', _outlineOpen);
+            document.getElementById('outline-btn').classList.toggle('active', _outlineOpen);
+            if (_outlineOpen) buildOutline();
+        }
+
+        function scheduleOutlineRebuild() {
+            if (!_outlineOpen) return;
+            clearTimeout(_outlineDebounce);
+            _outlineDebounce = setTimeout(buildOutline, 400);
+        }
+
+        function buildOutline() {
+            const list = document.getElementById('outline-list');
+            if (!list) return;
+            const headings = editor.querySelectorAll('h1,h2,h3,h4');
+            list.innerHTML = '';
+            if (!headings.length) {
+                list.innerHTML = '<div class="outline-empty">No headings yet — add H1–H4 to build an outline</div>';
+                return;
+            }
+            headings.forEach((h, i) => {
+                if (!h.id) h.id = 'outline-' + i;
+                const item = document.createElement('div');
+                item.className = 'outline-item ' + h.tagName.toLowerCase();
+                item.textContent = h.textContent.trim() || '(untitled heading)';
+                item.title = item.textContent;
+                item.onclick = () => {
+                    h.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    h.style.transition = 'background .3s';
+                    const prevBg = h.style.backgroundColor;
+                    h.style.backgroundColor = 'rgba(79,195,247,.25)';
+                    setTimeout(() => h.style.backgroundColor = prevBg, 900);
+                };
+                list.appendChild(item);
+            });
         }
 
         function generateTOC() {
@@ -4447,6 +5818,21 @@
                 awmInsertBlock,
                 convertAWMToHTML,
                 awmToHTML,
+                toggleLatexMode,
+                latexCmd,
+                latexCmdArg,
+                latexKeyDown,
+                onLatexChange,
+                copyLatex,
+                insertLatexFromHTML,
+                editorToLatex,
+                nodeToLatex,
+                latexWrapInline,
+                latexInsertBlock,
+                convertLatexToHTML,
+                latexToHTML,
+                setSplitSource,
+                applySplitPanes,
                 initColResize,
                 injectImgResizers,
                 makeImgResizable,
@@ -4466,6 +5852,35 @@
                 ensureTableResizers,
                 generateTOC,
                 setWordGoal,
+                setRowColor,
+                setColColor,
+                toggleTableHeader,
+                mergeCellRight,
+                mergeCellDown,
+                splitCell,
+                getCurrentBlock,
+                applyParaSpacing,
+                applyParaIndent,
+                toggleOutlinePanel,
+                buildOutline,
+                scheduleOutlineRebuild,
+                maybeSnapshotHistory,
+                loadHistoryFromStorage,
+                toggleHistoryPanel,
+                buildHistoryPanel,
+                restoreHistorySnapshot,
+                saveCrashRecovery,
+                checkCrashRecovery,
+                restoreCrashRecovery,
+                dismissCrashRecovery,
+                initBlockDrag,
+                positionDragHandle,
+                startBlockDrag,
+                showTextContextMenu,
+                closeAllCtxMenus,
+                attachSubmenu,
+                doContextPaste,
+                addCommentToSelection,
                 initTableCornerButtons,
                 showTableCornerButtons,
                 hideTableCornerButtons,
