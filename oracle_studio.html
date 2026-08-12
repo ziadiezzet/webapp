@@ -126,6 +126,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 .tb-btn.cyan:hover{background:rgba(34,211,238,.08);border-color:var(--cyan)}
 .tb-btn.dim{color:var(--text3)}
 .tb-btn.active-btn{background:var(--bg3);color:var(--cyan);border-color:var(--cyan)}
+.tb-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;z-index:500;min-width:170px;padding:4px 0;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.tb-dropdown.align-right{left:auto;right:0}
+.tb-dd-item{padding:6px 14px;cursor:pointer;font-family:var(--mono);font-size:.6rem;color:var(--text2);white-space:nowrap;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:background .1s}
+.tb-dd-item:hover{background:var(--bg3);color:var(--text)}
+.tb-dd-sep{height:1px;background:var(--border);margin:3px 0}
+.tb-dd-kb{font-size:.5rem;color:var(--text4);flex-shrink:0}
+.settings-menu-item{padding:7px 14px;cursor:pointer;font-family:var(--mono);font-size:.6rem;color:var(--text2);white-space:nowrap;transition:background .1s}
+.settings-menu-item:hover{background:var(--bg3);color:var(--text)}
 .theme-select{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:3px 6px;font-family:var(--mono);font-size:.6rem;outline:none;cursor:pointer}
 .theme-select:focus{border-color:var(--amber)}
 .io-tab{font-family:var(--mono);font-size:.58rem;font-weight:600;letter-spacing:.5px;padding:5px 11px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .13s}
@@ -158,7 +166,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 .file-dot.dirty{background:var(--orange)}
 #editor-actions{display:flex;gap:8px;align-items:center}
 #cm-wrap{flex:1;overflow:hidden;position:relative}
-.CodeMirror{height:100%!important;font-family:var(--mono)!important;font-size:13.5px!important;line-height:1.7!important;background:var(--bg0)!important;color:#c9d1d9!important;}
+.CodeMirror{height:100%!important;font-family:var(--mono)!important;font-size:var(--editor-font-size,13.5px)!important;line-height:1.7!important;background:var(--bg0)!important;color:#c9d1d9!important;}
 .CodeMirror-gutters{background:var(--bg1)!important;border-right:1px solid var(--border)!important}
 .CodeMirror-linenumber{color:var(--text4)!important;font-size:11px!important;padding-right:10px!important}
 .CodeMirror-cursor{border-left:2px solid var(--amber)!important}
@@ -471,6 +479,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--text);fo
 #sb-msg{margin-left:auto;font-style:italic;transition:color .2s}
 .err-gutter{color:var(--err)!important;font-size:9px}
 .warn-gutter{color:var(--amber)!important;font-size:9px}
+.bm-gutter{color:var(--cyan)!important;font-size:11px;line-height:1;cursor:pointer;transition:opacity .15s}
+.bm-gutter:hover{opacity:.7}
 
 /* ===== MODALS ===== */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);}
@@ -728,52 +738,83 @@ input.modal-input:focus{border-color:var(--amber)}
       <div class="logo-sub">PROFESSIONAL EDITOR · v4</div>
     </div>
   </div>
-  <div id="toolbar">
-    <button class="tb-btn dim" onclick="newFile()" title="New (Ctrl+N)">📄 NEW</button>
-    <button class="tb-btn dim" onclick="openFile()" title="Open">📂 OPEN</button>
-    <button class="tb-btn dim" onclick="saveFile()" title="Save (Ctrl+S)">💾 SAVE</button>
+  <div id="toolbar" style="display:flex;align-items:center;gap:3px;flex-shrink:0;overflow:visible">
+    <!-- FILE dropdown -->
+    <div style="position:relative;display:inline-flex;flex-shrink:0">
+      <button class="tb-btn dim" onclick="toggleDropdown('file-dd')" title="File operations">📁 FILE ▾</button>
+      <div id="file-dd" class="tb-dropdown">
+        <div class="tb-dd-item" onclick="closeAllDropdowns();newFile()">📄 New Tab<span class="tb-dd-kb">Ctrl+N</span></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();openFile()">📂 Open…</div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();saveFile()">💾 Save<span class="tb-dd-kb">Ctrl+S</span></div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();copyDDL()">📋 Copy DDL</div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();clearEditor()">🗑 Clear Editor</div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showIOPanel()">⇅ I/O Panel<span class="tb-dd-kb">Ctrl+⇧I</span></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();shareURL()">🔗 Share URL</div>
+      </div>
+    </div>
     <div class="tb-sep"></div>
-    <button class="tb-btn dim" onclick="doUndo()" title="Undo (Ctrl+Z)">⟲ UNDO</button>
-    <button class="tb-btn dim" onclick="doRedo()" title="Redo (Ctrl+Y)">⟳ REDO</button>
+    <!-- EDIT group -->
+    <button class="tb-btn dim" onclick="doUndo()" title="Undo (Ctrl+Z)">⟲</button>
+    <button class="tb-btn dim" onclick="doRedo()" title="Redo (Ctrl+Y)">⟳</button>
+    <button class="tb-btn dim" onclick="foldAll()" title="Fold all (Ctrl+Shift+[)">⊟</button>
+    <button class="tb-btn dim" onclick="unfoldAll()" title="Unfold all (Ctrl+Shift+])">⊞</button>
+    <button class="tb-btn dim" onclick="showFindReplace()" title="Find &amp; Replace (Ctrl+F)">🔍</button>
     <div class="tb-sep"></div>
-    <button class="tb-btn success" onclick="validateDDL()" title="Validate (F5)" aria-label="Validate DDL">✓ VALIDATE</button>
-    <button class="tb-btn primary" onclick="formatDDL()" title="Format (Ctrl+Shift+F)" aria-label="Format DDL">⌸ FORMAT</button>
-    <button class="tb-btn dim" onclick="showFmtOptions()" title="Format options" aria-label="Format options">⚙</button>
-    <button class="tb-btn cyan" onclick="fixDDL()" title="Auto-Fix (Ctrl+Shift+X)" aria-label="Auto-fix DDL issues">🔧 FIX</button>
+    <!-- DDL group -->
+    <button class="tb-btn success" onclick="validateDDL()" title="Validate (F5)">✓ VALID</button>
+    <button class="tb-btn primary" onclick="formatDDL()" title="Format (Ctrl+Shift+F)">⌸ FMT</button>
+    <button class="tb-btn cyan" onclick="fixDDL()" title="Auto-Fix (Ctrl+Shift+X)">🔧 FIX</button>
     <div class="tb-sep"></div>
-    <button class="tb-btn dim" onclick="copyDDL()">📋 COPY</button>
-    <button class="tb-btn danger" onclick="clearEditor()">🗑 CLEAR</button>
+    <!-- TOOLS dropdown -->
+    <div style="position:relative;display:inline-flex;flex-shrink:0">
+      <button class="tb-btn dim" onclick="toggleDropdown('tools-dd')" title="Tools">🛠 TOOLS ▾</button>
+      <div id="tools-dd" class="tb-dropdown">
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showDiffMigrate()">⟺ DDL Diff &amp; Migrate</div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();importJsSchema()">🗂 Import Schema JS</div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();openPalette()">⌘ Command Palette<span class="tb-dd-kb">Ctrl+K</span></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();renameIdentifier()">✏ Rename Identifier<span class="tb-dd-kb">F2</span></div>
+      </div>
+    </div>
+    <!-- SETTINGS dropdown -->
+    <div style="position:relative;display:inline-flex;flex-shrink:0">
+      <button class="tb-btn dim" onclick="toggleDropdown('cfg-dd')" title="Settings">⚙ CFG ▾</button>
+      <div id="cfg-dd" class="tb-dropdown align-right">
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showFmtOptions()">⌸ Format Options</div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showLintConfig()">⚙ Lint Rules</div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showNamingConfig()">🏷 Naming Conventions</div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();toggleLineWrap()" id="wrap-menu-item">↵ Toggle Line Wrap</div>
+        <div class="tb-dd-sep"></div>
+        <div class="tb-dd-item" onclick="closeAllDropdowns();showHelp()">? Keyboard Shortcuts</div>
+      </div>
+    </div>
     <div class="tb-sep"></div>
-    <button class="tb-btn dim" onclick="showIOPanel()" title="Import / Export DDL, Dictionary & Schema">⇅ I/O</button>
-    <div class="tb-sep"></div>
+    <!-- Theme + Font -->
     <select class="theme-select" onchange="setTheme(this.value)" title="Theme">
       <option value="dark">🌑 Dark</option>
       <option value="midnight">🌒 Midnight</option>
       <option value="dracula">🧛 Dracula</option>
       <option value="monokai">🎨 Monokai</option>
-      <option value="solarized">☀ Solarized Dark</option>
+      <option value="solarized">☀ Solarized</option>
       <option value="contrast">⬛ Contrast</option>
       <option value="light">🌤 Light</option>
-      <option value="github-light">🐙 GitHub Light</option>
-      <option value="warm-light">🌅 Warm Light</option>
+      <option value="github-light">🐙 GitHub</option>
+      <option value="warm-light">🌅 Warm</option>
       <option value="sepia">📜 Sepia</option>
-      <option value="ice-light">🧊 Ice Light</option>
-      <optgroup label="── Mixed / Special ──">
-      <option value="nord">❄️ Nord</option>
-      <option value="rosepine">🌹 Rosé Pine</option>
-      <option value="catppuccin">🐈 Catppuccin</option>
-      <option value="ayu-mirage">🌅 Ayu Mirage</option>
-      <option value="material-ocean">🌊 Material Ocean</option>
+      <option value="ice-light">🧊 Ice</option>
+      <optgroup label="── Special ──">
+        <option value="nord">❄️ Nord</option>
+        <option value="rosepine">🌹 Rosé Pine</option>
+        <option value="catppuccin">🐈 Catppuccin</option>
+        <option value="ayu-mirage">🌅 Ayu Mirage</option>
+        <option value="material-ocean">🌊 Material Ocean</option>
       </optgroup>
     </select>
-    <div class="tb-sep"></div>
-    <button class="tb-btn dim" onclick="foldAll()" title="Fold all blocks (Ctrl+Shift+[)">⊟ FOLD</button>
-    <button class="tb-btn dim" onclick="unfoldAll()" title="Unfold all blocks (Ctrl+Shift+])">⊞ UNFOLD</button>
-    <button class="tb-btn dim" onclick="showFindReplace()" title="Find & Replace (Ctrl+F)">🔍 FIND</button>
-    <button class="tb-btn dim" onclick="showDiffMigrate()" title="DDL Diff & Migration">⟺ MIGRATE</button>
-    <button class="tb-btn dim" onclick="shareURL()" title="Copy shareable link">🔗 SHARE</button>
-    <button class="tb-btn dim" onclick="openPalette()" title="Command palette (Ctrl+K)">⌘ CMD</button>
-    <button class="tb-btn dim" onclick="showHelp()">? HELP</button>
+    <button class="tb-btn dim" onclick="changeFontSize(1)" title="Font +">A＋</button>
+    <button class="tb-btn dim" onclick="changeFontSize(-1)" title="Font −">A－</button>
   </div>
   <input type="file" id="fileInput" style="display:none" accept=".sql,.ddl,.txt" onchange="handleFileOpen(event)">
   <input type="file" id="schemaJsInput" style="display:none" accept=".js" onchange="handleSchemaJsFile(event)">
@@ -783,6 +824,7 @@ input.modal-input:focus{border-color:var(--amber)}
 <div id="main">
   <!-- Editor pane -->
   <div id="editor-pane">
+   <div id="tabs-bar"></div>
     <div id="editor-header">
       <div class="file-tab">
         <div class="file-dot" id="dirtyDot"></div>
@@ -793,7 +835,7 @@ input.modal-input:focus{border-color:var(--amber)}
         <span style="margin:0 5px;color:var(--border2)">│</span>
         <span id="sel-info"></span>
         <span style="margin:0 5px;color:var(--border2)">│</span>
-        <span style="color:var(--text3)">Oracle 19c</span>
+        <span style="color:var(--text3)" title="Ctrl+Click on a REFERENCES table name to jump to its definition">Oracle 19c</span>
         <span style="margin:0 5px;color:var(--border2)">│</span>
         <span id="stat-words">0 words</span>
       </div>
@@ -814,6 +856,8 @@ input.modal-input:focus{border-color:var(--amber)}
         <button class="r-tab" onclick="switchRTab('dictionary')">📚 DICT</button>
         <button class="r-tab" onclick="switchRTab('history')">🕐 HISTORY</button>
         <button class="r-tab" onclick="switchRTab('templates')">📋 TEMPLATES</button>
+        <button class="r-tab" onclick="switchRTab('outline')">🗂 OUTLINE</button>
+        <button class="r-tab" onclick="switchRTab('stats')">📊 STATS</button>
         <button class="pane-pin-btn pinned" id="pinBtn" onclick="togglePanelPin()" title="Toggle auto-hide">📌 PIN</button>
       </div>
       <div id="right-body">
@@ -865,6 +909,17 @@ input.modal-input:focus{border-color:var(--amber)}
             <div class="val-empty"><div style="font-size:1.8rem;opacity:.25">🕐</div><div>No history yet. Copy or validate DDL to record entries.</div></div>
           </div>
         </div>
+        <!-- Outline Tab -->
+        <div id="tab-outline" style="display:none">
+          <div style="padding:5px 8px;border-bottom:1px solid var(--border);background:var(--bg1)">
+            <input class="dict-search" id="outline-search" placeholder="Filter objects…" style="width:100%" oninput="renderOutline()">
+          </div>
+          <div id="outline-list"></div>
+        </div>
+        <!-- Stats Tab -->
+        <div id="tab-stats" style="display:none;padding:10px 12px">
+          <div id="stats-body"><div class="val-empty"><div style="font-size:1.5rem;opacity:.3">📊</div><div>Validate DDL (F5) to see statistics</div></div></div>
+        </div>
         <!-- Templates Tab -->
         <div id="tab-templates" style="display:none;flex-direction:column;height:100%">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px 4px;border-bottom:1px solid var(--border);flex-shrink:0;gap:4px">
@@ -890,6 +945,7 @@ input.modal-input:focus{border-color:var(--amber)}
   <div class="sb-item" id="sb-warn" style="display:none"></div>
   <div class="sb-item" id="sb-tables" style="display:none"></div>
   <div class="sb-item" id="sb-lines" style="color:var(--text3)"></div>
+  <button id="sb-undo-fix" class="tb-btn" style="display:none;padding:2px 8px;font-size:.54rem;color:var(--cyan);border-color:rgba(34,211,238,.3);margin-left:auto;flex-shrink:0" onclick="undoFix()" title="Restore editor to state before last Auto-Fix">⟲ UNDO FIX</button>
   <div id="sb-msg" class="sb-item"></div>
 </div>
 
@@ -933,9 +989,10 @@ input.modal-input:focus{border-color:var(--amber)}
     </div>
     <!-- Schema JS section -->
     <div id="io-sect-schema" style="display:none">
-      <div class="modal-hint">Select a <code>pdmData</code> JS schema file to import object names into autocomplete.</div>
+      <div class="modal-hint">Select a <code>pdmData</code> JS schema file to import object names into autocomplete. Imported schemas now persist across page refreshes.</div>
       <div class="modal-actions" style="margin-top:12px">
         <button class="tb-btn primary" onclick="importJsSchema();closeModal('io-modal')">🗂 PICK SCHEMA JS FILE</button>
+        <button class="tb-btn danger" onclick="forgetImportedSchema()">🗑 FORGET SAVED SCHEMA</button>
         <button class="tb-btn" onclick="closeModal('io-modal')">CANCEL</button>
       </div>
     </div>
@@ -1522,6 +1579,23 @@ function parseDDL(sql) {
       if(u==='UNIQUE'){pos++;colInfo.unique=true;continue;}
       if(u==='REFERENCES'){pos++;const[,refTable]=parseSchemaObject();let refCols=[];if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')'){if(cur()?.type!=='PUNCT')refCols.push(cur().upper);pos++;}if(cur()?.value===')')pos++;}colInfo.references={table:refTable,cols:refCols};continue;}
       if(u==='CHECK'){pos++;if(cur()?.value==='('){let d=1;pos++;while(pos<toks.length&&d>0){if(cur()?.value==='(')d++;else if(cur()?.value===')')d--;pos++;}}continue;}
+      if(u==='GENERATED'){
+        pos++;
+        while(pos<toks.length&&cur()?.value!==','&&cur()?.value!==')'&&cur()?.value!==';'){
+          if(cur()?.value==='('){let d=1;pos++;while(pos<toks.length&&d>0){if(cur()?.value==='(')d++;else if(cur()?.value===')')d--;pos++;}}
+          else pos++;
+        }
+        colInfo.identity=true; continue;
+      }
+      if(u==='INVISIBLE'){pos++;colInfo.invisible=true;continue;}
+      if(u==='VISIBLE'){pos++;colInfo.invisible=false;continue;}
+      if(u==='AS'&&cur()?.value==='('){
+        pos++;let d=1,vx=[];pos++;
+        while(pos<toks.length&&d>0){if(cur()?.value==='(')d++;else if(cur()?.value===')'){d--;if(!d){pos++;break;}}if(d>0)vx.push(consume().value);else pos++;}
+        colInfo.virtual=vx.join(' ');
+        if(cur()?.upper==='VIRTUAL')pos++;
+        continue;
+      }
       if(['ENABLE','DISABLE','DEFERRABLE','INITIALLY','DEFERRED','IMMEDIATE','NOVALIDATE','VALIDATE','USING','INDEX'].includes(u)){pos++;continue;}
       break;
     }
@@ -1574,11 +1648,16 @@ function parseDDL(sql) {
             }
           }
           let onDelete=null;
-          if(cur()?.upper==='ON'){
+         if(cur()?.upper==='ON'){
             pos++;
-            if(cur()?.upper==='DELETE'){pos++;onDelete=consume()?.upper;}
+            if(cur()?.upper==='DELETE'){
+              pos++; const _od=cur()?.upper; onDelete=_od;
+              if(_od==='RESTRICT')
+                schema.errors.push({msg:`ON DELETE RESTRICT is not supported in Oracle — valid options: ON DELETE CASCADE, ON DELETE SET NULL, or omit the clause`,line:cLine});
+              consume();
+            }
             else if(cur()?.upper==='UPDATE'){
-              schema.errors.push({msg:`Oracle does not support ON UPDATE — only ON DELETE CASCADE / SET NULL is valid`,line:cLine});
+              schema.errors.push({msg:`Oracle does not support ON UPDATE — valid options: ON DELETE CASCADE or ON DELETE SET NULL only`,line:cLine});
               pos++;consume();
             }
           }
@@ -1647,6 +1726,17 @@ function parseDDL(sql) {
       tableObj.columns[colUp]=colInfo;
       tableObj.colOrder.push(colUp);
       parseColCons(colInfo,tblUp,colLine);
+      // ── Detect missing comma between column/constraint definitions ──
+      const _nxt = cur();
+      if(_nxt && _nxt.value!==',' && _nxt.value!==')' && _nxt.value!==';'){
+        const _nu = _nxt.upper;
+        if(!['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(_nu)){
+          schema.errors.push({
+            msg:`Missing comma after column "${colUp}" in "${tblUp}" — every column definition must be separated by a comma`,
+            line: colLine
+          });
+        }
+      }
     }
     if(cur()?.value===')')pos++;
     else schema.errors.push({msg:`Missing closing ')' for table "${tblUp}"`,line:cur()?.line});
@@ -1670,7 +1760,9 @@ function parseDDL(sql) {
       else if(u==='NOCACHE'){pos++;seqObj.cache=0;}
       else pos++;
     }
-    schema.sequences[name.toUpperCase()]=seqObj;
+    const _sdup=name.toUpperCase();
+    if(schema.sequences[_sdup]) schema.warnings.push({msg:`Duplicate sequence name "${_sdup}"`,line});
+    schema.sequences[_sdup]=seqObj;
   }
   function parseCreateIndex() {
     const line=cur()?.line; let unique=false;
@@ -1684,7 +1776,10 @@ function parseDDL(sql) {
     let cols=[];
     if(cur()?.value==='(')cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
     while(pos<toks.length&&cur()?.value!==';')pos++;
-    schema.indexes.push({name:idxName?.toUpperCase(),table:tableName?.toUpperCase(),cols,unique,line});
+    const _idup=idxName?.toUpperCase();
+    if(_idup&&schema.indexes.some(x=>x.name===_idup))
+      schema.warnings.push({msg:`Duplicate index name "${_idup}" — index names must be unique in schema`,line});
+    schema.indexes.push({name:_idup,table:tableName?.toUpperCase(),cols,unique,line});
   }
   function parseAlterTable() {
     const line=cur()?.line;
@@ -1696,7 +1791,21 @@ function parseDDL(sql) {
     if(!op){skipToSemicolon();return;}
     if(op==='ADD'){
       if(cur()?.upper==='CONSTRAINT'){
-        const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+        if(!schema.tables[tblUp]){
+          const _ext=externalSchema?.tables?.[tblUp];
+          if(_ext){
+            const _ec={},_eo=[];
+            Object.entries(_ext.columns||{}).forEach(([cn,cd])=>{_ec[cn]={type:{base:cd.datatype||'',full:cd.datatype||''},notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo.push(cn);});
+            schema.tables[tblUp]={columns:_ec,constraints:[],line,colOrder:_eo};
+            schema.warnings.push({
+               msg:`ALTER TABLE references unknown table "${tblUp}"`,
+               line
+            });
+          } else {
+            schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]};
+          }
+        }
+        const tObj=schema.tables[tblUp];
         parseTableConstraint(tblUp,tObj);
       } else if(cur()?.value==='('){
         pos++;
@@ -1712,7 +1821,10 @@ function parseDDL(sql) {
             if(!dt){schema.errors.push({msg:`Missing data type for "${cn}"`,line:cl});break;}
             const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
             const cu=cn.toUpperCase();
-            if(tObj.columns[cu])schema.errors.push({msg:`Column "${cu}" already exists in "${tblUp}"`,line:cl});
+            const extCol =
+               externalSchema?.tables?.[tblUp]?.columns?.[cu];
+
+            if(tObj.columns[cu] || extCol)schema.errors.push({msg:`Column "${cu}" already exists in "${tblUp}"`,line:cl});
             const ci={type:dt,notNull:false,pk:false,default:null,line:cl};
             tObj.columns[cu]=ci; tObj.colOrder.push(cu);
             parseColCons(ci,tblUp,cl);
@@ -1724,7 +1836,12 @@ function parseDDL(sql) {
         if(!colId){schema.errors.push({msg:'Expected column name in ADD',line:cl});skipToSemicolon();return;}
         const dt=parseDataType();
         if(!dt){schema.errors.push({msg:`Missing data type for "${colId.origCase}"`,line:cl});skipToSemicolon();return;}
-        const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+        if(!schema.tables[tblUp]){
+          const _ext2=externalSchema?.tables?.[tblUp];
+          if(_ext2){const _ec2={},_eo2=[];Object.entries(_ext2.columns||{}).forEach(([cn,cd])=>{_ec2[cn]={type:{base:cd.datatype||'',full:cd.datatype||''},notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo2.push(cn);});schema.tables[tblUp]={columns:_ec2,constraints:[],line,colOrder:_eo2};}
+          else{schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]};}
+        }
+        const tObj=schema.tables[tblUp];
         const cu=colId.nameU;
         const ci={type:dt,notNull:false,pk:false,default:null,line:cl,quoted:colId.quoted,origCase:colId.origCase};
         tObj.columns[cu]=ci; tObj.colOrder.push(cu);
@@ -1769,7 +1886,18 @@ function parseDDL(sql) {
           schema.errors.push({msg:`Missing TO keyword — use: RENAME CONSTRAINT ${_oldCon} TO new_name`,line:cur()?.line});
           parseIdentifier();
         } else {schema.errors.push({msg:`Missing TO keyword in RENAME CONSTRAINT — expected: RENAME CONSTRAINT ${_oldCon} TO new_name`,line:_renConLine});}
-      } else if(cur()?.upper==='TO'){pos++;parseIdentifier();}
+      } else if(cur()?.upper==='TO'){
+        pos++;
+        const _altRenNew=parseIdentifier();
+        if(_altRenNew){
+          const _altRenNewU=_altRenNew.toUpperCase();
+          if(schema.tables[tblUp]){
+            schema.tables[_altRenNewU]=schema.tables[tblUp];
+            delete schema.tables[tblUp];
+            schema.renames.push({old:tblUp,new:_altRenNewU});
+          }
+        }
+      }
       else schema.errors.push({msg:'Invalid RENAME syntax — expected COLUMN, CONSTRAINT, or TO',line:cur()?.line});
     }
     while(pos<toks.length&&cur()?.value!==';')pos++;
@@ -1947,6 +2075,27 @@ function checkPlsqlBalance(sql) {
       line:lastOpen||1});
   return issues;
 }
+function checkPlsqlSemantics(sql) {
+  const issues = [];
+  function lineOf(idx){let n=1;for(let i=0;i<idx;i++){if(sql[i]==='\n')n++;}return n;}
+  // 1. WHEN OTHERS THEN NULL — silently swallows exceptions
+  {const re=/\bWHEN\s+OTHERS\s+THEN\s+NULL\s*;/gi;let m;while((m=re.exec(sql))!==null)
+    issues.push({sev:'warning',msg:'WHEN OTHERS THEN NULL silently swallows all exceptions — add RAISE or logging to avoid hiding bugs',line:lineOf(m.index)});}
+  // 2. DBMS_OUTPUT in non-debug code
+  {const re=/\bDBMS_OUTPUT\s*\.\s*PUT_LINE\b/gi;let m;while((m=re.exec(sql))!==null)
+    issues.push({sev:'info',msg:'DBMS_OUTPUT.PUT_LINE found — debug-only; output is suppressed unless SET SERVEROUTPUT ON is active',line:lineOf(m.index)});}
+  // 3. Functions without apparent RETURN
+  {const re=/\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+\w+[\s\S]{0,800}?\bBEGIN\b([\s\S]{0,2000}?)\bEND\b/gi;let m;
+    while((m=re.exec(sql))!==null){
+      if(!/\bRETURN\s+\S/.test(m[1]))
+        issues.push({sev:'warning',msg:'FUNCTION body may be missing a RETURN statement — every execution path must return a value',line:lineOf(m.index)});
+    }}
+  // 4. Opened cursors not closed
+  {const opens=(sql.match(/\bOPEN\s+(\w+)/gi)||[]).map(s=>s.replace(/\bOPEN\s+/i,'').toUpperCase());
+   const closes=(sql.match(/\bCLOSE\s+(\w+)/gi)||[]).map(s=>s.replace(/\bCLOSE\s+/i,'').toUpperCase());
+   opens.forEach(c=>{if(!closes.includes(c))issues.push({sev:'info',msg:`Cursor "${c}" opened but CLOSE not found — ensure it is closed in all paths`,line:1});});}
+  return issues;
+}
 
 function checkParenBalance(sql) {
   const issues = [];
@@ -1990,6 +2139,31 @@ function checkParenBalance(sql) {
 // ============================================================================
 // VALIDATOR
 // ============================================================================
+function detectCircularFKs(schema) {
+  const adj={};
+  for(const [tbl,tblObj] of Object.entries(schema.tables)){
+    adj[tbl]=[];
+    for(const con of tblObj.constraints)
+      if(con.type==='FK'&&con.refTable&&con.refTable.toUpperCase()!==tbl)
+        adj[tbl].push({ref:con.refTable.toUpperCase(),name:con.name||'<unnamed>',line:con.line});
+  }
+  const visited={},stack={},cycles=[];
+  function dfs(node,path){
+    visited[node]=true;stack[node]=true;
+    for(const {ref,name,line} of (adj[node]||[])){
+      if(!visited[ref]) dfs(ref,[...path,{t:ref,line}]);
+      else if(stack[ref]){
+        const si=path.findIndex(p=>p.t===ref);
+        const cyc=si>=0?path.slice(si).map(p=>p.t):[node,ref];
+        cycles.push({path:[...cyc,ref].join(' → '),line:path[si>=0?si:0]?.line||line});
+      }
+    }
+    stack[node]=false;
+  }
+  Object.keys(adj).forEach(n=>{if(!visited[n])dfs(n,[{t:n,line:0}]);});
+  return cycles;
+}
+
 function validateSchema(schema, sql) {
   const issues = [];
   const err  = (msg, table, col, line) => issues.push({sev:'error',   msg, table, col, line});
@@ -2000,6 +2174,7 @@ function validateSchema(schema, sql) {
   if (sql) {
     checkParenBalance(sql).forEach(i => issues.push(i));
     checkPlsqlBalance(sql).forEach(i => issues.push(i));
+    checkPlsqlSemantics(sql).forEach(i => issues.push(i));
   }
 
   // Missing semicolons between DDL statements + missing trailing semicolon
@@ -2053,14 +2228,8 @@ function validateSchema(schema, sql) {
   if (externalSchema && externalSchema.tables) {
     const _ddlTbls = new Set(Object.keys(schema.tables));
     for (const [tblName, tbl] of Object.entries(schema.tables)) {
-      for (const con of tbl.constraints) {
-        if (con.type === 'FK' && con.refTable) {
-          const refUp = con.refTable.toUpperCase();
-          if (!_ddlTbls.has(refUp) && !externalSchema.tables[refUp]) {
-            err('FK "' + (con.name||'<unnamed>') + '" references table "' + refUp + '" — not found in current DDL or imported schema', tblName, null, con.line);
-          }
-        }
-      }
+      // (unknown-referenced-table check removed here — already reported once
+      // in the main FK constraint loop below; this avoided double-reporting)
       const _extTbl = externalSchema.tables[tblName.toUpperCase()];
       if (_extTbl) {
         for (const con of tbl.constraints) {
@@ -2094,6 +2263,15 @@ function validateSchema(schema, sql) {
       }
       if (baseUp === 'VARCHAR2' && dt.precision == null)
         err(`VARCHAR2 requires a size — "${colName}" missing size e.g. VARCHAR2(100)`, tblName, colName, col.line);
+        // Oracle 12c+ identity column — just informational
+      if (col.identity)
+        info(`Column "${colName}" uses IDENTITY — requires Oracle 12c+. Ensure DB version supports it.`, tblName, colName, col.line);
+      // Virtual column
+      if (col.virtual)
+        info(`Column "${colName}" is a virtual/computed column (AS expr VIRTUAL) — cannot be DML target`, tblName, colName, col.line);
+      // Invisible column
+      if (col.invisible)
+        info(`Column "${colName}" is INVISIBLE — excluded from SELECT * and must be referenced explicitly`, tblName, colName, col.line);
       if (baseUp === 'NVARCHAR2' && dt.precision == null)
         err(`NVARCHAR2 requires a size — "${colName}"`, tblName, colName, col.line);
       if (baseUp === 'RAW' && dt.precision == null)
@@ -2157,6 +2335,18 @@ function validateSchema(schema, sql) {
 
     // Table-level constraint checks
     for (const con of tbl.constraints) {
+      if (
+         con.type === 'FK' &&
+         con.refCols && con.refCols.length &&
+         con.cols.length !== con.refCols.length
+      ){
+         err(
+            `FK "${con.name||'<unnamed>'}" column count mismatch (${con.cols.length} local vs ${con.refCols.length} referenced)`,
+            tblName,
+            null,
+            con.line
+         );
+      }
       if (con.type === 'PK') {
         con.cols.forEach(colName => {
           if (!tbl.columns[colName.toUpperCase()])
@@ -2170,10 +2360,23 @@ function validateSchema(schema, sql) {
       } else if (con.type === 'FK') {
         const refTblName = con.refTable?.toUpperCase();
         if (!refTblName) continue;
-        const refTbl = schema.tables[refTblName];
+        let refTbl = schema.tables[refTblName];
+
+        if (!refTbl && externalSchema?.tables?.[refTblName]) {
+           refTbl = {
+              columns: externalSchema.tables[refTblName].columns || {},
+              constraints: externalSchema.tables[refTblName].constraints || []
+           };
+        }
+
         if (!refTbl) {
-          err(`FK "${con.name||'<unnamed>'}" references unknown table "${refTblName}"`, tblName, null, con.line);
-          continue;
+           err(
+              `FK "${con.name||'<unnamed>'}" references unknown table "${refTblName}" (not found in DDL or imported schema)`,
+              tblName,
+              null,
+              con.line
+           );
+           continue;
         }
         con.cols.forEach((fkColName, idx) => {
           const fkCol = tbl.columns[fkColName.toUpperCase()];
@@ -2192,11 +2395,20 @@ function validateSchema(schema, sql) {
                 err(`FK type mismatch: "${tblName}.${fkColName}" is ${fkCol.type.base} (${getTypeFamily(fkCol.type.base)} family) but "${refTblName}.${refColName}" is ${refCol.type.base} (${getTypeFamily(refCol.type.base)} family) — types must be from the same family`, tblName, fkColName, con.line);
               }
               // Check referenced col is PK or UNIQUE
-              const isPK  = refTbl.constraints.some(c => c.type==='PK'   && c.cols.includes(refColName.toUpperCase()));
-              const isUNQ = refTbl.constraints.some(c => c.type==='UNIQUE'&& c.cols.includes(refColName.toUpperCase()));
+              const hasMatchingPK =
+                 refTbl.constraints.some(c =>
+                    c.type === 'PK' &&
+                    JSON.stringify(c.cols) === JSON.stringify(con.refCols)
+                 );
+
+              const hasMatchingUQ =
+                 refTbl.constraints.some(c =>
+                    c.type === 'UNIQUE' &&
+                    JSON.stringify(c.cols) === JSON.stringify(con.refCols)
+                 );
               const isInlinePK  = refTbl.columns[refColName.toUpperCase()]?.pk;
               const isInlineUNQ = refTbl.columns[refColName.toUpperCase()]?.unique;
-              if (!isPK && !isUNQ && !isInlinePK && !isInlineUNQ) {
+              if (!hasMatchingPK && !hasMatchingUQ && !isInlinePK && !isInlineUNQ) {
                 warn(`FK "${con.name||'<unnamed>'}" references "${refTblName}.${refColName}" which is not declared as PRIMARY KEY or UNIQUE — Oracle requires the referenced column to have a unique constraint`, tblName, fkColName, con.line);
               }
             }
@@ -2219,7 +2431,22 @@ function validateSchema(schema, sql) {
     else if (ORACLE_UNRESERVED_KW.has(tblName))
       warn(`Table name "${tblName}" is an Oracle unreserved keyword — allowed but risky; consider renaming`, tblName, null, tbl.line);
   }
-
+  // ── Cross-table duplicate constraint names ───────────────────────────────
+  {
+    const _seen=new Map();
+    for(const [tblName,tbl] of Object.entries(schema.tables)){
+      for(const con of tbl.constraints){
+        if(!con.name)continue;
+        const cn=con.name.toUpperCase();
+        if(_seen.has(cn)) err(`Duplicate constraint name "${cn}" — also defined in table "${_seen.get(cn)}" — constraint names must be unique within the schema`,tblName,null,con.line);
+        else _seen.set(cn,tblName);
+      }
+    }
+  }
+  // ── Circular FK detection ────────────────────────────────────────────────
+  detectCircularFKs(schema).forEach(({path,line})=>{
+    warn(`Circular FK chain: ${path} — this makes DML ordering and cascades complex`,null,null,line);
+  });
   // ── GRANT / REVOKE privilege linter ─────────────────────────────────────
   if (sql) {
     const _grantRe = /\bGRANT\s+([\w\s,*]+?)\s+ON\s+(\w+)\s+TO\s+(\w+)/gi;
@@ -2251,13 +2478,15 @@ function validateSchema(schema, sql) {
     }
   });
   
-  // Constraint naming convention lint
-  const _conPrefixRules = [
-    { type:'PK',     prefix:'PK_',  label:'Primary Key' },
-    { type:'FK',     prefix:'FK_',  label:'Foreign Key' },
-    { type:'UNIQUE', prefix:'AK_',  label:'Unique'      },
-    { type:'CHECK',  prefix:'CK_',  label:'Check'       },
-  ];
+  // Constraint naming convention lint (configurable via 🏷 NAMING)
+  const _nc=getNamingConfig();
+  const _conPrefixRules=[
+    {type:'PK',     prefix:_nc.pk, label:'Primary Key'},
+    {type:'FK',     prefix:_nc.fk, label:'Foreign Key'},
+    {type:'UNIQUE', prefix:_nc.uq, label:'Unique'},
+    {type:'CHECK',  prefix:_nc.ck, label:'Check'},
+  ].filter(r=>r.prefix);
+  
   for (const [tblName, tbl] of Object.entries(schema.tables)) {
     for (const con of tbl.constraints) {
       if (!con.name) continue;
@@ -2269,13 +2498,20 @@ function validateSchema(schema, sql) {
           tblName, null, con.line
         );
       }
-    }
   }
-
+    // Table naming convention
+    if(_nc.tbl&&!tblName.startsWith(_nc.tbl))
+      info(`Table "${tblName}" does not follow the "${_nc.tbl}" naming convention`,tblName,null,tbl.line);
+  }
+  // Index naming convention
+  if(_nc.ix)(schema.indexes||[]).forEach(idx=>{
+    if(idx.name&&!idx.name.startsWith(_nc.ix))
+      info(`Index "${idx.name}" does not follow the "${_nc.ix}" naming convention`,null,null,idx.line);
+  });
   // Propagate syntax errors/warnings from parser
   schema.errors?.forEach(e  => err(e.msg,  e.table, e.col, e.line));
   schema.warnings?.forEach(w => warn(w.msg, w.table, w.col, w.line));
-  return issues;
+  return _applyLintConfig(issues);
 }
 
 // ============================================================================
@@ -2762,9 +2998,16 @@ function detectMissingSemicolons(sql) {
         // SELECT is a continuation when:
         //   INSERT … SELECT  (INSERT INTO tbl SELECT …)
         //   CREATE … AS SELECT  / ALTER … AS SELECT  (CTAS, view body)
-        var isContinuation = (tokUp === 'SELECT') && (
-          /^(INSERT)$/i.test(prevStmt.kw) ||
-          (sawAs && /^(CREATE|ALTER|REPLACE)$/i.test(prevStmt.kw))
+        // DROP / RENAME are continuations when they're ALTER TABLE sub-clauses:
+        //   ALTER TABLE x DROP COLUMN y / DROP CONSTRAINT y
+        //   ALTER TABLE x RENAME COLUMN a TO b / RENAME CONSTRAINT a TO b / RENAME TO b
+        var isContinuation = (
+          (tokUp === 'SELECT') && (
+            /^(INSERT)$/i.test(prevStmt.kw) ||
+            (sawAs && /^(CREATE|ALTER|REPLACE)$/i.test(prevStmt.kw))
+          )
+        ) || (
+          (tokUp === 'DROP' || tokUp === 'RENAME') && /^(ALTER)$/i.test(prevStmt.kw)
         );
         if (!isContinuation) {
           issues.push({ sev: 'error',
@@ -3043,8 +3286,54 @@ const DDL_COMPLETIONS = [
 // ============================================================================
 let externalSchema = null;
 
+// ============================================================================
+// EXTERNAL SCHEMA PERSISTENCE (IndexedDB) — survives page refresh
+// ============================================================================
+const EXT_SCHEMA_DB = 'oracle_ddl_studio_db';
+const EXT_SCHEMA_STORE = 'externalSchema';
+function _openExtSchemaDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) { reject(new Error('IndexedDB unavailable')); return; }
+    const req = indexedDB.open(EXT_SCHEMA_DB, 1);
+    req.onupgradeneeded = () => { req.result.createObjectStore(EXT_SCHEMA_STORE); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function saveExternalSchemaDB(schema) {
+  _openExtSchemaDB().then(db => {
+    const tx = db.transaction(EXT_SCHEMA_STORE, 'readwrite');
+    tx.objectStore(EXT_SCHEMA_STORE).put(schema, 'current');
+  }).catch(() => { /* IndexedDB unavailable — schema just won't survive refresh */ });
+}
+function loadExternalSchemaDB() {
+  return _openExtSchemaDB().then(db => new Promise(resolve => {
+    const tx = db.transaction(EXT_SCHEMA_STORE, 'readonly');
+    const req = tx.objectStore(EXT_SCHEMA_STORE).get('current');
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => resolve(null);
+  })).catch(() => null);
+}
+function clearExternalSchemaDB() {
+  _openExtSchemaDB().then(db => {
+    const tx = db.transaction(EXT_SCHEMA_STORE, 'readwrite');
+    tx.objectStore(EXT_SCHEMA_STORE).delete('current');
+  }).catch(() => {});
+}
+
 function importJsSchema() {
   document.getElementById('schemaJsInput').click();
+}
+
+function forgetImportedSchema() {
+  externalSchema = null;
+  clearExternalSchemaDB();
+  invalidateCompletionCache();
+  const badge = document.getElementById('ext-schema-badge');
+  if (badge) badge.style.display = 'none';
+  renderSchemaPanel(currentSchema);
+  closeModal('io-modal');
+  statusMsg('Imported schema forgotten', 'ok');
 }
 
 function handleSchemaJsFile(evt) {
@@ -3101,6 +3390,7 @@ function handleSchemaJsFile(evt) {
         } else {
           // Done
           externalSchema = schema;
+          saveExternalSchemaDB(schema);
           const tCount = Object.keys(schema.tables).length;
           statusMsg('✅ Schema loaded — ' + tCount + ' table(s)', 'ok');
           // Merge external schema names into autocomplete
@@ -3251,8 +3541,23 @@ function getTableColumns(tableName) {
 
 // Detect targeted table name from statement context
 function getContextTableName(stmtCtx) {
-  const m = stmtCtx.match(/^(?:ALTER\s+TABLE|UPDATE|INSERT\s+INTO)\s+(\S+)/i);
-  return m ? m[1].replace(/["`]/g, '') : null;
+  let m;
+  // ALTER TABLE / UPDATE / INSERT INTO
+  m = stmtCtx.match(/^(?:ALTER\s+TABLE|UPDATE|INSERT\s+INTO)\s+(\w+)/i);
+  if (m) return m[1];
+  // DELETE FROM
+  m = stmtCtx.match(/\bDELETE\s+FROM\s+(\w+)/i);
+  if (m) return m[1];
+  // SELECT … FROM table [alias] WHERE/JOIN/GROUP/ORDER/HAVING
+  m = stmtCtx.match(/\bFROM\s+(\w+)(?:\s+(?:AS\s+)?\w+)?\s*(?:WHERE|JOIN|ON|GROUP|ORDER|HAVING)/i);
+  if (m) return m[1];
+  // FROM table at end of current stmt (user still typing)
+  m = stmtCtx.match(/\bFROM\s+(\w+)\s*$/i);
+  if (m) return m[1];
+  // JOIN table ON
+  m = stmtCtx.match(/\bJOIN\s+(\w+)(?:\s+(?:AS\s+)?\w+)?\s+ON\b/i);
+  if (m) return m[1];
+  return null;
 }
 
 // Collect the full statement text before the cursor (across lines, after last ;)
@@ -3462,19 +3767,21 @@ function oracleHint(editor) {
 // ============================================================================
 // HISTORY
 // ============================================================================
-const HIST_KEY = 'oracle_ddl_history_v1';
+const HIST_KEY = 'oracle_ddl_history_v2';
+const HIST_MAX = 50;
 function _loadHistory() {
-  try {
-    return (JSON.parse(sessionStorage.getItem(HIST_KEY)||'[]')).map(h=>({...h,time:new Date(h.time)}));
-  } catch { return []; }
+  try { return (JSON.parse(localStorage.getItem(HIST_KEY)||'[]')).map(h=>({...h,time:new Date(h.time)})); }
+  catch { return []; }
 }
 function _saveHistory() {
-  try { sessionStorage.setItem(HIST_KEY, JSON.stringify(historyItems)); } catch {}
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(historyItems.slice(0,HIST_MAX).map(h=>({...h,text:h.text.slice(0,10000)})))); }
+  catch(e) { statusMsg('⚠ History storage full','warn',2000); }
 }
+
 const historyItems = _loadHistory();
 function addHistoryEntry(text, type) {
   historyItems.unshift({ text, type: type||'copy', time: new Date(), chars: text.length });
-  if (historyItems.length > 20) historyItems.pop();
+  while (historyItems.length > HIST_MAX) historyItems.pop();
   _saveHistory();
   if (document.getElementById('tab-history').style.display !== 'none') renderHistory();
 }
@@ -3988,7 +4295,68 @@ function replaceTemplate(sql) {
 // GLOBAL STATE & EDITOR INIT
 // ============================================================================
 let cm, currentSchema = null, isDirty = false, currentFileName = 'untitled.sql', lineMarks = [];
+/* ── Multi-tab state ─────────────────────────────────────────────────────── */
+let _tabs=[], _activeTabId=0, _tabNextId=0;
+function _tabCur(){ return _tabs.find(t=>t.id===_activeTabId)||null; }
+function initTabs(){
+  if(!_tabs.length){ _tabs=[{id:++_tabNextId,name:currentFileName,content:cm?cm.getValue():'',dirty:false}]; _activeTabId=_tabs[0].id; }
+  renderTabsBar();
+}
+function renderTabsBar(){
+  const el=document.getElementById('tabs-bar'); if(!el)return;
+  el.innerHTML=_tabs.map(t=>`<div class="tab-item${t.id===_activeTabId?' active':''}" onclick="switchTab(${t.id})" title="Dbl-click to rename"><span class="tab-dot${t.dirty?' dirty':''}"></span><span class="tab-name" ondblclick="event.stopPropagation();renameTab(${t.id})">${escHtml(t.name)}</span>${_tabs.length>1?`<span class="tab-x" onclick="event.stopPropagation();closeTab(${t.id})">✕</span>`:''}</div>`).join('')+`<button class="tab-add" onclick="newTabFile()" title="New tab (Ctrl+T)">＋</button>`;
+}
+function renameTab(id){
+  const t=_tabs.find(x=>x.id===id);if(!t)return;
+  const n=prompt('Rename tab:',t.name);if(!n||!n.trim())return;
+  t.name=n.trim();if(!t.name.includes('.'))t.name+='.sql';
+  if(id===_activeTabId){currentFileName=t.name;document.getElementById('fileName').textContent=t.name;}
+  renderTabsBar();statusMsg('Renamed → "'+t.name+'"','ok',1800);
+}
+function newTabFile(content='',name='untitled.sql'){
+  const cur=_tabCur(); if(cur&&cm){cur.content=cm.getValue();cur.dirty=isDirty;}
+  const t={id:++_tabNextId,name,content,dirty:false}; _tabs.push(t); _activeTabId=t.id;
+  if(cm){cm.setValue(content);setDirty(false);} currentFileName=name;
+  document.getElementById('fileName').textContent=name; renderTabsBar(); if(!content&&cm)cm.focus();
+}
+function switchTab(id){
+  if(id===_activeTabId)return;
+  const cur=_tabCur(); if(cur&&cm){cur.content=cm.getValue();cur.dirty=isDirty;}
+  _activeTabId=id; const t=_tabCur(); if(!t)return;
+  if(cm){cm.setValue(t.content);setDirty(t.dirty);} currentFileName=t.name;
+  document.getElementById('fileName').textContent=t.name; renderTabsBar();
+}
+function closeTab(id){
+  const t=_tabs.find(x=>x.id===id);
+  if(t&&t.dirty&&!confirm(`Discard changes in "${t.name}"?`))return;
+  const idx=_tabs.findIndex(x=>x.id===id); _tabs.splice(idx,1);
+  if(!_tabs.length) _tabs=[{id:++_tabNextId,name:'untitled.sql',content:'',dirty:false}];
+  if(_activeTabId===id){const nt=_tabs[Math.min(idx,_tabs.length-1)];_activeTabId=nt.id;if(cm){cm.setValue(nt.content);setDirty(nt.dirty);}currentFileName=nt.name;document.getElementById('fileName').textContent=nt.name;}
+  renderTabsBar();
+}
 const _tmplSqlStore = [];
+const _bookmarks = new Set();
+function toggleBookmark(line) {
+  if (!cm) return;
+  if (_bookmarks.has(line)) {
+    _bookmarks.delete(line);
+    cm.setGutterMarker(line, 'bookmark-gutter', null);
+    statusMsg('Bookmark removed — line ' + (line+1), 'ok', 1500);
+  } else {
+    _bookmarks.add(line);
+    const m = document.createElement('div');
+    m.innerHTML = '🔖'; m.className = 'bm-gutter'; m.title = 'Bookmark · Ctrl+B toggle · F9 next';
+    cm.setGutterMarker(line, 'bookmark-gutter', m);
+    statusMsg('Bookmark set — line ' + (line+1), 'ok', 1500);
+  }
+}
+function nextBookmark(dir) {
+  if (!cm || !_bookmarks.size) { statusMsg('No bookmarks set', 'warn', 1500); return; }
+  const cur = cm.getCursor().line;
+  const sorted = [..._bookmarks].sort((a,b)=>a-b);
+  const target = dir > 0 ? (sorted.find(l=>l>cur)||sorted[0]) : ([...sorted].reverse().find(l=>l<cur)||sorted[sorted.length-1]);
+  if (target != null) { cm.setCursor({line:target,ch:0}); cm.scrollIntoView({line:target,ch:0},80); statusMsg('Bookmark → line '+(target+1),'ok',1500); }
+}
 
 function initEditor() {
   const textarea = document.getElementById('editor');
@@ -4000,7 +4368,7 @@ function initEditor() {
     autoCloseBrackets: true,
     styleActiveLine: true,
     foldGutter: true,
-    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'issue-gutter'],
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'issue-gutter', 'bookmark-gutter'],
     extraKeys: {
       'Ctrl-Space': cm => cm.showHint({ hint: oracleHint, completeSingle: false }),
       'Ctrl-Shift-F': () => formatDDL(),
@@ -4038,10 +4406,95 @@ function initEditor() {
     }
   });
   cm.on('cursorActivity', updateCursorInfo);
+  // ── Hover documentation ─────────────────────────────────────────────────
+  const HOVER_DOCS={
+    'VARCHAR2':{sig:'VARCHAR2(size)',desc:'Variable-length string. size = max bytes (up to 4000, or 32767 extended).',ex:"name VARCHAR2(100) NOT NULL"},
+    'NUMBER':{sig:'NUMBER(p,s)',desc:'Numeric. p=precision (1-38), s=scale (-84 to 127). Omit s for integers.',ex:"salary NUMBER(12,2)"},
+    'DATE':{sig:'DATE',desc:'Stores date+time (no fractional seconds, no timezone). Oracle DATE includes the time part.',ex:"hire_date DATE DEFAULT SYSDATE"},
+    'TIMESTAMP':{sig:'TIMESTAMP[(p)]',desc:'Date-time with fractional seconds. p=0-9 (default 6). Use WITH TIME ZONE variant for tz.',ex:"created TIMESTAMP(6)"},
+    'CLOB':{sig:'CLOB',desc:'Character LOB — up to 128 TB. No size param. For text longer than VARCHAR2 max.',ex:"notes CLOB"},
+    'BLOB':{sig:'BLOB',desc:'Binary LOB — up to 128 TB. Stores raw bytes (images, PDFs, etc.).',ex:"attachment BLOB"},
+    'CHAR':{sig:'CHAR(size)',desc:'Fixed-length, right-padded with spaces. Max 2000 bytes. Use only for truly fixed-width data.',ex:"gender CHAR(1) DEFAULT 'M'"},
+    'SYSDATE':{sig:'SYSDATE',desc:'Current date+time of the DB server. No fractional seconds. Not a function — no parentheses.',ex:"DEFAULT SYSDATE"},
+    'SYSTIMESTAMP':{sig:'SYSTIMESTAMP',desc:'Current timestamp with fractional seconds and time zone of the DB server.',ex:"DEFAULT SYSTIMESTAMP"},
+    'NVL':{sig:'NVL(expr, default)',desc:'Returns default when expr IS NULL, else returns expr. Both args must be compatible types.',ex:"NVL(commission, 0)"},
+    'NVL2':{sig:'NVL2(expr, nn_val, null_val)',desc:'Returns nn_val when expr is NOT NULL, null_val when expr IS NULL.',ex:"NVL2(bonus, salary+bonus, salary)"},
+    'COALESCE':{sig:'COALESCE(e1, e2, ...)',desc:'Returns first non-NULL value from the list. SQL standard equivalent of NVL for multiple args.',ex:"COALESCE(mobile, phone, 'N/A')"},
+    'DECODE':{sig:"DECODE(expr, v1, r1, ..., default)",desc:'Oracle IF-THEN-ELSE. Returns r1 if expr=v1, etc. Use CASE for ANSI portability.',ex:"DECODE(status,'A','Active','Inactive')"},
+    'TO_CHAR':{sig:"TO_CHAR(val [, fmt])",desc:'Converts date or number to formatted string. Common fmt: YYYY-MM-DD, HH24:MI:SS, 999,999.99',ex:"TO_CHAR(SYSDATE,'YYYY-MM-DD')"},
+    'TO_DATE':{sig:"TO_DATE(str, fmt)",desc:'Parses a string into a DATE using format mask. Always specify the format for safety.',ex:"TO_DATE('2024-01-31','YYYY-MM-DD')"},
+    'TO_NUMBER':{sig:'TO_NUMBER(str [, fmt])',desc:'Converts a string to NUMBER. Use format mask if string contains currency or group chars.',ex:"TO_NUMBER('1,234.56','9,999.99')"},
+    'SUBSTR':{sig:'SUBSTR(str, pos [, len])',desc:'Extracts substring. pos is 1-based; negative pos counts from end. len=chars to extract.',ex:"SUBSTR(email,1,INSTR(email,'@')-1)"},
+    'INSTR':{sig:'INSTR(str, search [, pos [, n]])',desc:'Returns position of nth occurrence of search. Returns 0 if not found.',ex:"INSTR(email,'@')"},
+    'TRIM':{sig:'TRIM([LEAD|TRAIL|BOTH] [c FROM] str)',desc:'Removes leading/trailing chars (default: spaces). LEADING, TRAILING, or BOTH.',ex:"TRIM('  hello  ')"},
+    'UPPER':{sig:'UPPER(str)',desc:'Converts all characters to uppercase.',ex:"UPPER(last_name)"},
+    'LOWER':{sig:'LOWER(str)',desc:'Converts all characters to lowercase.',ex:"LOWER(email)"},
+    'LENGTH':{sig:'LENGTH(str)',desc:'Returns number of characters (not bytes). Use LENGTHB for byte length.',ex:"LENGTH(description)"},
+    'ROUND':{sig:'ROUND(n[,d]) / ROUND(date[,fmt])',desc:'Rounds number to d decimal places, or date to nearest unit (fmt: YYYY, MM, DD, HH...).',ex:"ROUND(salary/12,2)"},
+    'TRUNC':{sig:'TRUNC(n[,d]) / TRUNC(date[,fmt])',desc:'Truncates number or date. TRUNC(SYSDATE) = midnight today. Never rounds up.',ex:"TRUNC(SYSDATE,'MM')"},
+    'ADD_MONTHS':{sig:'ADD_MONTHS(date, n)',desc:'Adds n months to date. Handles month-end correctly. n can be negative.',ex:"ADD_MONTHS(hire_date, 6)"},
+    'MONTHS_BETWEEN':{sig:'MONTHS_BETWEEN(d1, d2)',desc:'Returns fractional months between two dates. Positive when d1 > d2.',ex:"MONTHS_BETWEEN(SYSDATE,hire_date)"},
+    'ROW_NUMBER':{sig:'ROW_NUMBER() OVER (...)',desc:'Assigns unique sequential integers within a partition. No ties — every row gets a unique number.',ex:"ROW_NUMBER() OVER(PARTITION BY dept_id ORDER BY salary DESC)"},
+    'RANK':{sig:'RANK() OVER (...)',desc:'Rank with gaps for ties (1,1,3). Dense_rank has no gaps (1,1,2).',ex:"RANK() OVER(ORDER BY score DESC)"},
+    'DENSE_RANK':{sig:'DENSE_RANK() OVER (...)',desc:'Rank without gaps for ties (1,1,2,3). Better than RANK when you need contiguous values.',ex:"DENSE_RANK() OVER(PARTITION BY region ORDER BY revenue DESC)"},
+    'LAG':{sig:'LAG(col[,offset[,def]]) OVER(...)',desc:'Accesses value from a previous row within the partition. Default offset=1.',ex:"LAG(salary,1,0) OVER(ORDER BY hire_date)"},
+    'LEAD':{sig:'LEAD(col[,offset[,def]]) OVER(...)',desc:'Accesses value from a subsequent row within the partition. Default offset=1.',ex:"LEAD(salary) OVER(ORDER BY hire_date)"},
+    'LISTAGG':{sig:"LISTAGG(col, sep) WITHIN GROUP (ORDER BY col)",desc:'Aggregates rows into a delimited string. ORA-01489 if result > 4000 chars.',ex:"LISTAGG(name,', ') WITHIN GROUP(ORDER BY name)"},
+    'SYS_GUID':{sig:'SYS_GUID()',desc:'Generates a globally unique 16-byte RAW value (displayed as 32-char hex). Suitable as surrogate key.',ex:"id RAW(16) DEFAULT SYS_GUID()"},
+    'RAISE_APPLICATION_ERROR':{sig:'RAISE_APPLICATION_ERROR(-20nnn, msg)',desc:'Raises user-defined error. Number must be -20000 to -20999. Message up to 2048 chars.',ex:"RAISE_APPLICATION_ERROR(-20001,'Invalid status')"},
+    'REFERENCES':{sig:'REFERENCES table [(col)]',desc:'Defines FK target. Referenced column must be PRIMARY KEY or UNIQUE. Types must be compatible.',ex:"REFERENCES departments(dept_id) ON DELETE CASCADE"},
+    'SEQUENCE':{sig:'CREATE SEQUENCE name ...',desc:'Auto-increment generator. Access via seq.NEXTVAL (increments) or seq.CURRVAL (current session value).',ex:"seq_emp.NEXTVAL"},
+    'CONSTRAINT':{sig:'CONSTRAINT name type (cols)',desc:'Named table/column constraint. Name must be unique in schema. Types: PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK.',ex:"CONSTRAINT pk_emp PRIMARY KEY(emp_id)"},
+  };
+  let _hoverTimer=null;
+  cm.getWrapperElement().addEventListener('mousemove',function(e){
+    clearTimeout(_hoverTimer);
+    _hoverTimer=setTimeout(function(){
+      const coords=cm.coordsChar({left:e.clientX,top:e.clientY},'window');
+      const token=cm.getTokenAt(coords);
+      if(!token||token.string.length<2){document.getElementById('hover-tip').style.display='none';return;}
+      const doc=HOVER_DOCS[token.string.toUpperCase()];
+      if(!doc){document.getElementById('hover-tip').style.display='none';return;}
+      const tip=document.getElementById('hover-tip');
+      tip.innerHTML=`<div style="color:var(--amber);font-weight:700;font-size:.68rem;margin-bottom:5px;font-family:var(--sans)">${doc.sig}</div><div style="color:var(--text2);margin-bottom:6px">${doc.desc}</div><div style="color:var(--text3);font-size:.57rem;border-top:1px solid var(--border);padding-top:5px"><em>e.g.</em> <span style="color:var(--cyan)">${escHtml(doc.ex)}</span></div>`;
+      tip.style.left=Math.min(e.clientX+16,window.innerWidth-330)+'px';
+      tip.style.top=Math.min(e.clientY+16,window.innerHeight-150)+'px';
+      tip.style.display='block';
+    },420);
+  });
+  cm.getWrapperElement().addEventListener('mouseleave',function(){clearTimeout(_hoverTimer);document.getElementById('hover-tip').style.display='none';});
   cm.on('change', () => {
     setDirty(true);
+    const _ct=_tabCur(); if(_ct){_ct.dirty=true; renderTabsBar();}
     clearTimeout(window._autoValTimer);
+    clearTimeout(window._outlineTimer);
     window._autoValTimer = setTimeout(() => { if (cm.lineCount() < 600) validateDDL(); }, 1200);
+    window._outlineTimer = setTimeout(()=>{ if(document.getElementById('tab-outline')?.style.display!=='none') renderOutline(); },800);
+  });
+  cm.on('gutterClick', (editor, line, gutter) => {
+    if (gutter === 'bookmark-gutter') toggleBookmark(line);
+  });
+  // Ctrl/Cmd+Click → Go to definition for REFERENCES keyword
+  cm.getWrapperElement().addEventListener('click', function(e) {
+    if (!e.ctrlKey && !e.metaKey) return;
+    const coords = cm.coordsChar({left:e.clientX, top:e.clientY}, 'window');
+    const lineStr = cm.getLine(coords.line) || '';
+    const before = lineStr.slice(0, coords.ch);
+    const wordM = before.match(/(\w+)\s*$/);
+    if (!wordM) return;
+    const word = wordM[1].toUpperCase();
+    // Must be after a REFERENCES keyword in nearby context
+    const ctx = cm.getRange({line:Math.max(0,coords.line-3),ch:0},{line:coords.line,ch:coords.ch});
+    if (!/\bREFERENCES\s+\w*$/.test(ctx)) return;
+    // Find CREATE TABLE <word> in editor
+    const sql = cm.getValue();
+    const re = new RegExp('(?:^|\\n)\\s*CREATE\\s+(?:OR\\s+REPLACE\\s+)?(?:GLOBAL\\s+TEMPORARY\\s+)?TABLE\\s+(?:\\w+\\.)?(' + word + ')\\b', 'i');
+    const match = re.exec(sql);
+    if (!match) { statusMsg(`Definition of "${word}" not found in editor`, 'warn', 2500); return; }
+    const targetLine = sql.slice(0, match.index).split('\n').length;
+    goToLine(targetLine);
+    statusMsg(`→ CREATE TABLE ${word} · Line ${targetLine} (Ctrl+Click)`, 'ok', 2500);
+    e.preventDefault();
   });
   cm.setValue(`-- Oracle DDL Studio v3 — Validation Demo
 -- Hit F5 to validate. All errors below are intentional demos.
@@ -4078,6 +4531,7 @@ CREATE TABLE demo_reserved (
 ALTER TABLE test ADD ts NUMBER()))));
 `);
   setDirty(false);
+  setTimeout(initTabs,0);
   updateCursorInfo();
 }
 
@@ -4130,6 +4584,23 @@ const _sqlFoldFn = function(cm, start) {
     }
   }
 };
+let _editorFontSize = 13.5;
+function changeFontSize(delta) {
+  _editorFontSize = Math.min(24, Math.max(9, _editorFontSize + delta));
+  document.documentElement.style.setProperty('--editor-font-size', _editorFontSize + 'px');
+  if (cm) cm.refresh();
+  try { localStorage.setItem('oracle_ddl_fontsize', _editorFontSize); } catch(e) {}
+  statusMsg('Font: ' + _editorFontSize + 'px', 'ok', 1800);
+}
+
+function toggleLineWrap() {
+  if (!cm) return;
+  const wrap = !cm.getOption('lineWrapping');
+  cm.setOption('lineWrapping', wrap);
+  const btn = document.getElementById('wrap-btn');
+  if (btn) btn.classList.toggle('active-btn', wrap);
+  statusMsg('Line wrap: ' + (wrap ? 'ON' : 'OFF'), 'ok', 1800);
+}
 
 function foldAll() {
   if (!cm) return;
@@ -4181,6 +4652,85 @@ function statusMsg(msg, type, duration) {
 // ============================================================================
 function doUndo() { if (cm) { cm.undo(); statusMsg('Undo', 'ok'); } }
 function doRedo() { if (cm) { cm.redo(); statusMsg('Redo', 'ok'); } }
+// ── Lint rules config ────────────────────────────────────────────────────────
+const LINT_RULES=[
+  {id:'trailing_comma',    label:'Trailing comma before )',            def:'error'},
+  {id:'double_semicolon',  label:'Double semicolons (;;)',             def:'warning'},
+  {id:'reserved_word_col', label:'Reserved word as unquoted identifier',def:'error'},
+  {id:'unreserved_kw',     label:'Unreserved keyword as identifier',   def:'warning'},
+  {id:'quoted_reserved',   label:'Quoted reserved word (info note)',   def:'info'},
+  {id:'naming_convention', label:'Constraint naming convention',       def:'info'},
+  {id:'fk_not_unique',     label:'FK references non-PK/UNIQUE column', def:'warning'},
+  {id:'circular_fk',       label:'Circular FK dependency',            def:'warning'},
+  {id:'varchar2_no_size',  label:'VARCHAR2 without size',              def:'error'},
+  {id:'grant_all',         label:'GRANT ALL privilege',                def:'warning'},
+  {id:'name_length',       label:'Identifier > 30 chars (pre-12.1)',  def:'warning'},
+  {id:'missing_semicolon', label:'Missing semicolon between stmts',   def:'error'},
+  {id:'dup_keyword',       label:'Duplicate consecutive keywords',     def:'error'},
+  {id:'on_delete_restrict',label:'ON DELETE RESTRICT (unsupported)',   def:'error'},
+  {id:'plsql_semantics',   label:'PL/SQL semantic warnings',          def:'warning'},
+];
+const LINT_CFG_KEY='oracle_ddl_lint_cfg_v1';
+const NAMING_CFG_KEY='oracle_ddl_naming_v1';
+const NAMING_DEFAULTS={pk:'PK_',fk:'FK_',uq:'AK_',ck:'CK_',ix:'IDX_',tbl:''};
+function getLintConfig(){try{return JSON.parse(localStorage.getItem(LINT_CFG_KEY)||'{}')||{};}catch{return {};}}
+function getNamingConfig(){try{return {...NAMING_DEFAULTS,...JSON.parse(localStorage.getItem(NAMING_CFG_KEY)||'{}')};}catch{return {...NAMING_DEFAULTS};}}
+function showLintConfig(){
+  const cfg=getLintConfig();
+  document.getElementById('lint-config-list').innerHTML=LINT_RULES.map(r=>{
+    const cur=cfg[r.id]||r.def;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)"><div style="flex:1;font-size:.62rem;color:var(--text2)">${r.label}</div><select data-rule="${r.id}" class="modal-sel" style="padding:2px 4px"><option value="error" ${cur==='error'?'selected':''}>Error</option><option value="warning" ${cur==='warning'?'selected':''}>Warning</option><option value="info" ${cur==='info'?'selected':''}>Info</option><option value="off" ${cur==='off'?'selected':''}>Off</option></select></div>`;
+  }).join('');
+  document.getElementById('lint-modal').style.display='flex';
+}
+function saveLintConfig(){
+  const cfg={};
+  document.querySelectorAll('#lint-config-list select[data-rule]').forEach(s=>cfg[s.dataset.rule]=s.value);
+  localStorage.setItem(LINT_CFG_KEY,JSON.stringify(cfg));
+  closeModal('lint-modal'); statusMsg('Lint rules saved — press F5 to re-validate','ok');
+}
+function resetLintConfig(){localStorage.removeItem(LINT_CFG_KEY);showLintConfig();statusMsg('Reset to defaults','ok');}
+function showNamingConfig(){
+  const c=getNamingConfig();
+  ['pk','fk','uq','ck','ix','tbl'].forEach(k=>{const el=document.getElementById('naming-'+k);if(el)el.value=c[k]||'';});
+  document.getElementById('naming-modal').style.display='flex';
+}
+function saveNamingConfig(){
+  const c={};['pk','fk','uq','ck','ix','tbl'].forEach(k=>{const el=document.getElementById('naming-'+k);if(el)c[k]=el.value.trim().toUpperCase();});
+  localStorage.setItem(NAMING_CFG_KEY,JSON.stringify(c));
+  closeModal('naming-modal'); statusMsg('Naming config saved — press F5 to re-validate','ok');
+}
+function resetNamingConfig(){localStorage.removeItem(NAMING_CFG_KEY);showNamingConfig();statusMsg('Naming config reset','ok');}
+function _applyLintConfig(issues){
+  const cfg=getLintConfig();
+  const matchers={
+    trailing_comma:   i=>/[Tt]railing comma/.test(i.msg),
+    double_semicolon: i=>/[Dd]ouble semicolon|;;/.test(i.msg),
+    reserved_word_col:i=>/reserved word/.test(i.msg)&&!/quoted/.test(i.msg)&&i.sev==='error',
+    unreserved_kw:    i=>/unreserved keyword/.test(i.msg),
+    quoted_reserved:  i=>/quoted reserved/.test(i.msg)||/uses quoted/.test(i.msg),
+    naming_convention:i=>/naming convention/.test(i.msg),
+    fk_not_unique:    i=>/not declared as PRIMARY KEY or UNIQUE/.test(i.msg),
+    circular_fk:      i=>/[Cc]ircular FK/.test(i.msg),
+    varchar2_no_size: i=>/VARCHAR2 requires a size/.test(i.msg),
+    grant_all:        i=>/GRANT ALL/.test(i.msg),
+    name_length:      i=>/exceeds 30 chars/.test(i.msg),
+    missing_semicolon:i=>/Missing .;./.test(i.msg),
+    dup_keyword:      i=>/[Dd]uplicate keyword/.test(i.msg),
+    on_delete_restrict:i=>/RESTRICT/.test(i.msg)&&/ON DELETE/.test(i.msg),
+    plsql_semantics:  i=>/DBMS_OUTPUT|WHEN OTHERS THEN NULL|RETURN statement|Cursor/.test(i.msg),
+  };
+  const defaults={};LINT_RULES.forEach(r=>defaults[r.id]=r.def);
+  for(const [ruleId,fn] of Object.entries(matchers)){
+    const override=cfg[ruleId]; if(!override||override===defaults[ruleId])continue;
+    issues.forEach((iss,idx)=>{
+      if(!fn(iss))return;
+      if(override==='off')issues[idx]=null;
+      else iss.sev=override;
+    });
+  }
+  return issues.filter(Boolean);
+}
 
 function validateDDL() {
   if (!cm) return;
@@ -4255,7 +4805,8 @@ function validateDDL() {
     statusMsg(`${errCount} error(s), ${warnCount} warning(s)`, errCount > 0 ? 'err' : 'warn');
 
   switchRTab('validation');
- renderSchemaPanel(schema, _schemaShowAll);
+  renderSchemaPanel(schema, _schemaShowAll);
+  renderStats(schema);
 }
 
 function showValidationResults(issues, schema) {
@@ -4338,7 +4889,7 @@ function applyFmtOptions() {
 }
 
 // Holds the pending fix result for the popup
-let _pendingFix = null;
+let _pendingFix = null, _preFix = null;
 
 function fixDDL() {
   if (!cm) return;
@@ -4410,9 +4961,16 @@ function showFixPopup(fixes, originalSql, fixedSql, preRemaining) {
   overlay.style.display = 'flex';
 }
 
+function undoFix() {
+  if (!_preFix || !cm) return;
+  cm.setValue(_preFix); setDirty(true); _preFix = null;
+  const btn = document.getElementById('sb-undo-fix'); if(btn) btn.style.display = 'none';
+  statusMsg('⟲ Pre-fix state restored', 'ok'); validateDDL();
+}
 function applyFix() {
   if (!_pendingFix || !cm) return;
   const { sql, fixed, fixes } = _pendingFix;
+  _preFix = sql;
   closeFix();
   addHistoryEntry(sql, 'fix');
   cm.setValue(fixed);
@@ -4428,6 +4986,12 @@ function applyFix() {
   validateDDL();
   switchRTab('validation');
   _pendingFix = null;
+  const _undoBtn = document.getElementById('sb-undo-fix');
+  if (_undoBtn) {
+    _undoBtn.style.display = '';
+    clearTimeout(window._undoFixTimer);
+    window._undoFixTimer = setTimeout(() => { _undoBtn.style.display='none'; _preFix=null; }, 30000);
+  }
 }
 
 function closeFix() {
@@ -4463,26 +5027,14 @@ function clearEditor() {
 
 function newFile() {
   if (!cm) return;
-  if (isDirty && !confirm('Discard unsaved changes?')) return;
-  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
-  cm.setValue('-- New Oracle DDL Script\n\n');
-  currentFileName = 'untitled.sql';
-  document.getElementById('fileName').textContent = currentFileName;
+  newTabFile('-- New Oracle DDL Script\n\n','untitled.sql');
   currentSchema = null;
-  for (let i = 0; i < cm.lineCount(); i++) {
-    cm.removeLineClass(i, 'background', 'cm-err-line');
-    cm.removeLineClass(i, 'background', 'cm-warn-line');
-    cm.setGutterMarker(i, 'issue-gutter', null);
-  }
-  document.getElementById('val-list').innerHTML = '<div class="val-empty"><div style="font-size:2rem;opacity:.3">✓</div><div>Press F5 to validate</div></div>';
-  document.getElementById('val-summary').innerHTML = '';
-  document.getElementById('sb-err').style.display = 'none';
-  document.getElementById('sb-warn').style.display = 'none';
-  document.getElementById('sb-tables').style.display = 'none';
-  const badge = document.getElementById('issues-badge');
-  if (badge) badge.style.display = 'none';
-  setDirty(false);
-  statusMsg('New file', 'ok');
+  for(let i=0;i<cm.lineCount();i++){cm.removeLineClass(i,'background','cm-err-line');cm.removeLineClass(i,'background','cm-warn-line');cm.setGutterMarker(i,'issue-gutter',null);}
+  document.getElementById('val-list').innerHTML='<div class="val-empty"><div style="font-size:2rem;opacity:.3">✓</div><div>Press F5 to validate</div></div>';
+  document.getElementById('val-summary').innerHTML='';
+  ['sb-err','sb-warn','sb-tables'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const badge=document.getElementById('issues-badge'); if(badge)badge.style.display='none';
+  statusMsg('New tab','ok');
 }
 
 function openFile() { document.getElementById('fileInput').click(); }
@@ -4518,7 +5070,7 @@ function saveFile() {
 // PANEL / TABS
 // ============================================================================
 function switchRTab(tab) {
-  const tabOrder = ['validation','schema','dictionary','history','templates'];
+  const tabOrder = ['validation','schema','dictionary','history','templates','outline','stats'];
   document.querySelectorAll('.r-tab').forEach((btn, i) => {
     btn.classList.toggle('active', tabOrder[i] === tab);
   });
@@ -4529,7 +5081,9 @@ function switchRTab(tab) {
   if (tab === 'dictionary') renderDictionary();
   if (tab === 'history') renderHistory();
   if (tab === 'templates') renderTemplates();
-  if (tab === 'schema') renderSchemaPanel(currentSchema);
+  if (tab === 'schema' && currentSchema) renderSchemaPanel(currentSchema);
+  if (tab === 'outline') renderOutline();
+  if (tab === 'stats') renderStats(currentSchema);
 }
 
 let panelPinned = true;
@@ -4647,65 +5201,67 @@ function switchSchemaView(view) {
 }
 
 function renderERD(schema) {
-  const el = document.getElementById('schema-erd');
-  if (!schema || !Object.keys(schema.tables).length) {
-    el.innerHTML = '<div class="val-empty"><div style="font-size:1.5rem;opacity:.3">◈</div><div>Validate DDL first to generate ERD</div></div>';
-    return;
-  }
-  const tables = Object.entries(schema.tables);
-  const COLS = Math.min(4, Math.ceil(Math.sqrt(tables.length)));
-  const TW=210, TH_HDR=24, ROW_H=16, PAD=48;
-  const positions = {};
-  tables.forEach(([name], i) => {
-    positions[name] = {
-      x: PAD + (i % COLS) * (TW + PAD),
-      y: PAD + Math.floor(i / COLS) * (TH_HDR + 5*ROW_H + 24 + PAD)
-    };
+  const el=document.getElementById('schema-erd');
+  if(!schema||!Object.keys(schema.tables).length){el.innerHTML='<div class="val-empty"><div style="font-size:1.5rem;opacity:.3">◈</div><div>Validate DDL first to generate ERD</div></div>';return;}
+  const tables=Object.entries(schema.tables);
+  const TW=200, ROW_H=15, HDR=22, COLS=Math.min(4,Math.ceil(Math.sqrt(tables.length)));
+  const pos={};
+  tables.forEach(([name,tbl],i)=>{
+    const h=HDR+Math.min(tbl.colOrder?.length||0,5)*ROW_H+8;
+    pos[name]={x:50+(i%COLS)*(TW+80),y:50+Math.floor(i/COLS)*155,w:TW,h};
   });
-  const svgW = COLS*(TW+PAD)+PAD;
-  const svgH = Math.ceil(tables.length/COLS)*(TH_HDR+5*ROW_H+24+PAD)+PAD;
-
-  // FK edges
-  const edges = tables.flatMap(([tblName, tbl]) =>
-    tbl.constraints
-      .filter(c => c.type==='FK' && c.refTable && positions[c.refTable.toUpperCase()])
-      .map(c => ({from:tblName, to:c.refTable.toUpperCase(), name:c.name||''}))
-  );
-  const edgeSvg = edges.map(e => {
-    const fp=positions[e.from], tp=positions[e.to]; if(!fp||!tp) return '';
-    const x1=fp.x+TW, y1=fp.y+TH_HDR/2, x2=tp.x, y2=tp.y+TH_HDR/2, cx=(x1+x2)/2;
-    return `<path d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}" fill="none" stroke="var(--cyan)" stroke-width="1.2" stroke-dasharray="4,3" opacity=".55" marker-end="url(#erd-arr)"/>`;
-  }).join('');
-
-  // Table boxes
-  const boxSvg = tables.map(([name, tbl]) => {
-    const p = positions[name];
-    const colList = (tbl.colOrder || Object.keys(tbl.columns)).slice(0,5);
-    const boxH = TH_HDR + colList.length*ROW_H + 12;
-    const colRows = colList.map((c,i) => {
-      const col = tbl.columns[c] || {};
-      const isPK = col.pk || tbl.constraints.some(cn=>cn.type==='PK'&&cn.cols?.includes(c));
-      const isFK = tbl.constraints.some(cn=>cn.type==='FK'&&cn.cols?.includes(c));
-      const icon = isPK?'⬡':isFK?'→':'·';
-      const icol = isPK?'var(--amber)':isFK?'var(--cyan)':'var(--text3)';
-      return `<text x="${p.x+10}" y="${p.y+TH_HDR+8+i*ROW_H}" font-size="9.5" fill="var(--text2)" font-family="monospace"><tspan fill="${icol}">${icon} </tspan>${c}<tspan fill="var(--blue)" opacity=".7">  ${col.type?.base||''}</tspan></text>`;
-    }).join('');
-    const more = tbl.colOrder?.length>5
-      ? `<text x="${p.x+10}" y="${p.y+TH_HDR+8+5*ROW_H}" font-size="9" fill="var(--text3)" font-family="monospace">+${tbl.colOrder.length-5} more…</text>` : '';
-    return `<g onclick="goToLine(${tbl.line});switchSchemaView('tree')" style="cursor:pointer" title="${name}">
-      <rect x="${p.x}" y="${p.y}" width="${TW}" height="${boxH}" rx="5" fill="var(--bg2)" stroke="var(--border2)" stroke-width="1"/>
-      <rect x="${p.x}" y="${p.y}" width="${TW}" height="${TH_HDR}" rx="5" fill="var(--bg4)"/>
-      <rect x="${p.x}" y="${p.y+TH_HDR-5}" width="${TW}" height="5" fill="var(--bg4)"/>
-      <text x="${p.x+TW/2}" y="${p.y+16}" font-size="11" font-weight="bold" fill="var(--amber)" font-family="monospace" text-anchor="middle">${name}</text>
-      <line x1="${p.x}" y1="${p.y+TH_HDR}" x2="${p.x+TW}" y2="${p.y+TH_HDR}" stroke="var(--border2)" stroke-width="1"/>
-      ${colRows}${more}
-    </g>`;
-  }).join('');
-
-  el.innerHTML = `<svg width="${svgW}" height="${svgH}" style="min-width:${svgW}px;display:block">
-    <defs><marker id="erd-arr" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="var(--cyan)" opacity=".7"/></marker></defs>
-    ${edgeSvg}${boxSvg}
-  </svg>`;
+  const svgW=COLS*(TW+80)+100, svgH=Math.ceil(tables.length/COLS)*155+100;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
+    <button class="tb-btn dim" style="padding:2px 7px;font-size:.57rem" onclick="erdZoom(.15)">＋</button>
+    <button class="tb-btn dim" style="padding:2px 7px;font-size:.57rem" onclick="erdZoom(-.15)">－</button>
+    <button class="tb-btn dim" style="padding:2px 7px;font-size:.57rem" onclick="erdReset()">⊙ FIT</button>
+    <button class="tb-btn dim" style="padding:2px 7px;font-size:.57rem" onclick="erdExport()">⬇ SVG</button>
+    <span style="font-size:.54rem;color:var(--text3);margin-left:auto">Scroll=zoom · Drag=pan · Click=highlight FKs</span>
+  </div>
+  <div id="erd-vp" style="overflow:hidden;flex:1;cursor:grab;user-select:none;background:var(--bg0)">
+    <svg id="erd-svg" width="${svgW}" height="${svgH}" style="display:block;transform-origin:0 0">
+      <defs>
+        <marker id="ea" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="var(--cyan)" opacity=".7"/></marker>
+        <marker id="eah" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="var(--amber)"/></marker>
+      </defs>
+      <g id="erd-edges">${tables.flatMap(([tn,tbl])=>tbl.constraints.filter(c=>c.type==='FK'&&c.refTable&&pos[c.refTable.toUpperCase()]).map(c=>{
+        const fp=pos[tn],tp=pos[c.refTable.toUpperCase()],cx=(fp.x+TW+tp.x)/2;
+        return `<path class="erd-e" data-f="${tn}" data-t="${c.refTable.toUpperCase()}" d="M${fp.x+TW},${fp.y+12}C${cx},${fp.y+12} ${cx},${tp.y+12} ${tp.x},${tp.y+12}" fill="none" stroke="var(--cyan)" stroke-width="1.2" stroke-dasharray="5,3" opacity=".5" marker-end="url(#ea)"/>`;
+      })).join('')}</g>
+      <g id="erd-nodes">${tables.map(([name,tbl])=>{
+        const p=pos[name],cols=(tbl.colOrder||[]).slice(0,5);
+        const rows=cols.map((c,i)=>{const col=tbl.columns[c]||{},isPK=col.pk||tbl.constraints.some(cn=>cn.type==='PK'&&cn.cols?.includes(c)),isFK=tbl.constraints.some(cn=>cn.type==='FK'&&cn.cols?.includes(c)),icon=isPK?'⬡':isFK?'→':'·',icol=isPK?'var(--amber)':isFK?'var(--cyan)':'var(--text3)';return `<text x="${p.x+9}" y="${p.y+HDR+6+i*ROW_H}" font-size="9.5" fill="var(--text2)" font-family="monospace"><tspan fill="${icol}">${icon} </tspan>${c}<tspan fill="var(--blue)" opacity=".7">  ${col.type?.base||''}</tspan></text>`;}).join('');
+        const more=(tbl.colOrder?.length||0)>5?`<text x="${p.x+9}" y="${p.y+HDR+6+5*ROW_H}" font-size="9" fill="var(--text3)" font-family="monospace">+${tbl.colOrder.length-5} more…</text>`:'';
+        return `<g class="erd-n" data-t="${name}" onclick="erdSel('${name}')" style="cursor:pointer">
+          <rect class="erd-b" data-t="${name}" x="${p.x}" y="${p.y}" width="${TW}" height="${p.h}" rx="5" fill="var(--bg2)" stroke="var(--border2)" stroke-width="1.2"/>
+          <rect x="${p.x}" y="${p.y}" width="${TW}" height="${HDR}" rx="5" fill="var(--bg4)"/>
+          <rect x="${p.x}" y="${p.y+HDR-4}" width="${TW}" height="4" fill="var(--bg4)"/>
+          <text x="${p.x+TW/2}" y="${p.y+15}" font-size="11" font-weight="bold" fill="var(--amber)" font-family="monospace" text-anchor="middle">${name}</text>
+          <line x1="${p.x}" y1="${p.y+HDR}" x2="${p.x+TW}" y2="${p.y+HDR}" stroke="var(--border2)" stroke-width="1"/>
+          ${rows}${more}
+        </g>`;
+      }).join('')}</g>
+    </svg>
+  </div>`;
+  window._erd={s:1,tx:0,ty:0,drag:false};
+  const vp=document.getElementById('erd-vp'),svg=document.getElementById('erd-svg');
+  const applyT=()=>svg.style.transform=`translate(${window._erd.tx}px,${window._erd.ty}px) scale(${window._erd.s})`;
+  vp.addEventListener('wheel',e=>{e.preventDefault();window._erd.s=Math.min(3,Math.max(.25,window._erd.s+(e.deltaY<0?.12:-.12)));applyT();},{passive:false});
+  vp.addEventListener('mousedown',e=>{if(e.target.closest('.erd-n'))return;window._erd.drag=true;window._erd._sx=e.clientX-window._erd.tx;window._erd._sy=e.clientY-window._erd.ty;vp.style.cursor='grabbing';});
+  document.addEventListener('mousemove',e=>{if(!window._erd?.drag)return;window._erd.tx=e.clientX-window._erd._sx;window._erd.ty=e.clientY-window._erd._sy;applyT();});
+  document.addEventListener('mouseup',()=>{if(window._erd?.drag){window._erd.drag=false;if(document.getElementById('erd-vp'))document.getElementById('erd-vp').style.cursor='grab';}});
+}
+function erdZoom(d){if(!window._erd)return;window._erd.s=Math.min(3,Math.max(.25,window._erd.s+d));const s=document.getElementById('erd-svg');if(s)s.style.transform=`translate(${window._erd.tx}px,${window._erd.ty}px) scale(${window._erd.s})`;}
+function erdReset(){if(!window._erd)return;window._erd.s=1;window._erd.tx=0;window._erd.ty=0;const s=document.getElementById('erd-svg');if(s)s.style.transform='';}
+function erdSel(name){
+  document.querySelectorAll('.erd-b').forEach(r=>{const sel=r.dataset.t===name;r.setAttribute('stroke',sel?'var(--amber)':'var(--border2)');r.setAttribute('stroke-width',sel?'2.5':'1.2');});
+  document.querySelectorAll('.erd-e').forEach(e=>{const rel=e.dataset.f===name||e.dataset.t===name;e.setAttribute('stroke',rel?'var(--amber)':'var(--cyan)');e.setAttribute('stroke-width',rel?'2':'1.2');e.setAttribute('opacity',rel?'1':'0.3');e.setAttribute('marker-end',rel?'url(#eah)':'url(#ea)');});
+}
+function erdExport(){
+  const s=document.getElementById('erd-svg');if(!s)return;
+  const c=s.cloneNode(true);c.style.transform='';c.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c.outerHTML],{type:'image/svg+xml'}));a.download='erd.svg';a.click();
+  statusMsg('ERD exported as erd.svg','ok');
 }
 
 function filterSchemaPanel(q) {
@@ -4743,6 +5299,51 @@ function toggleSection(head) {
 // ============================================================================
 // DICTIONARY UI
 // ============================================================================
+function renderOutline() {
+  const el=document.getElementById('outline-list'); if(!el)return;
+  const sql=cm?cm.getValue():'';
+  const q=(document.getElementById('outline-search')?.value||'').toLowerCase();
+  const items=[];
+  const re=/^(CREATE\s+(?:OR\s+REPLACE\s+)?(?:(?:GLOBAL\s+TEMPORARY\s+)?TABLE|VIEW|MATERIALIZED\s+VIEW|SEQUENCE|(?:UNIQUE\s+)?INDEX|BITMAP\s+INDEX|PROCEDURE|FUNCTION|PACKAGE(?:\s+BODY)?|TRIGGER|TYPE(?:\s+BODY)?|SYNONYM)|ALTER\s+TABLE)\s+(?:\w+\.)?(\w+)/gim;
+  let m;
+  while((m=re.exec(sql))!==null){
+    const line=sql.slice(0,m.index).split('\n').length;
+    const kw=m[1].trim().replace(/\s+/g,' ').toUpperCase(), name=m[2].toUpperCase();
+    if(q&&!name.toLowerCase().includes(q)&&!kw.toLowerCase().includes(q))continue;
+    const icon=kw.includes('ALTER')?'🔧':kw.includes('TABLE')?'📋':kw.includes('INDEX')?'📑':kw.includes('SEQUENCE')?'⏩':kw.includes('VIEW')?'👁':kw.includes('PROCEDURE')||kw.includes('FUNCTION')?'⚙':kw.includes('TRIGGER')?'⚡':kw.includes('PACKAGE')?'📦':'◈';
+    const color=kw.includes('ALTER')?'var(--orange)':kw.includes('TABLE')?'var(--amber)':kw.includes('INDEX')?'var(--cyan)':kw.includes('SEQUENCE')?'var(--purple)':kw.includes('VIEW')?'var(--green)':'var(--blue)';
+    items.push({icon,name,kw,line,color});
+  }
+  if(!items.length){el.innerHTML=`<div class="val-empty"><div style="font-size:1.5rem;opacity:.25">🗂</div><div>${sql.trim()?'No DDL objects found':'Type or open SQL to see outline'}</div></div>`;return;}
+  el.innerHTML=items.map(it=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 10px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s" onclick="goToLine(${it.line})" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''">
+    <span style="font-size:.8rem;width:16px;flex-shrink:0">${it.icon}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:.65rem;font-weight:700;color:${it.color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.name}</div><div style="font-size:.54rem;color:var(--text3)">${it.kw} · Line ${it.line}</div></div>
+  </div>`).join('');
+}
+
+function renderStats(schema) {
+  const el=document.getElementById('stats-body'); if(!el)return;
+  if(!schema){el.innerHTML='<div class="val-empty"><div style="font-size:1.5rem;opacity:.25">📊</div><div>Validate DDL (F5) to see statistics</div></div>';return;}
+  const tables=Object.entries(schema.tables);
+  const tCount=tables.length, colCount=tables.reduce((s,[,t])=>s+Object.keys(t.columns).length,0);
+  const conCount=tables.reduce((s,[,t])=>s+t.constraints.length,0);
+  const seqCount=Object.keys(schema.sequences||{}).length, idxCount=(schema.indexes||[]).length;
+  const fkTables=tables.filter(([,t])=>t.constraints.some(c=>c.type==='FK')).length;
+  const fkPct=tCount?Math.round(fkTables/tCount*100):0;
+  const nullableCols=tables.reduce((s,[,t])=>s+Object.values(t.columns).filter(c=>!c.notNull&&!c.pk).length,0);
+  const nullPct=colCount?Math.round(nullableCols/colCount*100):0;
+  const longestTbl=tables.reduce((b,[n])=>n.length>b.length?n:b,'');
+  const longestCol=tables.reduce((b,[,t])=>{const lc=Object.keys(t.columns).reduce((bc,c)=>c.length>bc.length?c:bc,'');return lc.length>b.length?lc:b;},'');
+  const lines=cm?cm.lineCount():0, stmts=(cm?cm.getValue():'').split(';').length-1;
+  function row(label,val,color,sub=''){return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:.62rem;color:var(--text2)">${label}</div>${sub?`<div style="font-size:.54rem;color:var(--text3)">${sub}</div>`:''}</div><div style="font-size:.82rem;font-weight:700;color:${color};font-family:var(--mono)">${val}</div></div>`;}
+  function hdr(label){return `<div style="font-size:.55rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:10px 0 5px;border-bottom:2px solid var(--border2);margin-top:4px">${label}</div>`;}
+  el.innerHTML=hdr('Schema Objects')+row('Tables',tCount,'var(--amber)')+row('Columns (total)',colCount,'var(--text)')+row('Constraints',conCount,'var(--purple)')+row('Sequences',seqCount,'var(--blue)')+row('Indexes',idxCount,'var(--cyan)')
+    +hdr('Quality Metrics')+row('FK Coverage',fkPct+'%',fkPct>=60?'var(--green)':'var(--warn)',`${fkTables} of ${tCount} tables have a foreign key`)
+    +row('Nullable Ratio',nullPct+'%',nullPct>70?'var(--warn)':'var(--text)',`${nullableCols} of ${colCount} columns allow NULL`)
+    +hdr('Identifiers')+row('Longest Table',longestTbl.length||0,'var(--text)',longestTbl||'—')+row('Longest Column',longestCol.length||0,'var(--text)',longestCol||'—')
+    +hdr('Script')+row('Lines',lines,'var(--text)')+row('Statements',stmts,'var(--text)');
+}
+
 function renderDictionary() {
   const d = loadDictionary();
   const q = document.getElementById('dictSearch')?.value?.toLowerCase()||'';
@@ -4805,10 +5406,21 @@ function setTheme(theme) {
 
 function loadSavedTheme() {
   const saved = localStorage.getItem('oracle_studio_theme');
+  const sel = document.querySelector('.theme-select');
   if (saved) {
     setTheme(saved);
-    const sel = document.querySelector('.theme-select');
     if (sel) sel.value = saved;
+  } else {
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    const autoTheme = prefersLight ? 'github-light' : 'dark';
+    setTheme(autoTheme);
+    if (sel) sel.value = autoTheme;
+    // Follow system changes live
+    try { window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+      if (localStorage.getItem('oracle_studio_theme')) return; // user has set manually, don't override
+      const t = e.matches ? 'github-light' : 'dark';
+      setTheme(t); if (sel) sel.value = t;
+    }); } catch(e) {}
   }
 }
 
@@ -4817,6 +5429,10 @@ function loadSavedTheme() {
 // ============================================================================
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function showHelp() { document.getElementById('help-modal').style.display = 'flex'; }
+function closeAllDropdowns(){['file-dd','tools-dd','cfg-dd'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none';});}
+function toggleDropdown(id){const open=document.getElementById(id)?.style.display==='block';closeAllDropdowns();const m=document.getElementById(id);if(m)m.style.display=open?'none':'block';}
+function toggleSettingsMenu(){const m=document.getElementById('settings-menu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
+function closeSettingsMenu(){const m=document.getElementById('settings-menu');if(m)m.style.display='none';}
 
 // ============================================================================
 // WINDOW INIT
@@ -4828,7 +5444,20 @@ window.onload = function() {
   switchRTab('validation');
   loadSavedTheme();
   loadFromURL();
-
+  loadExternalSchemaDB().then(saved => {
+    if (saved && saved.tables && Object.keys(saved.tables).length) {
+      externalSchema = saved;
+      const tCount = Object.keys(saved.tables).length;
+      const badge = document.getElementById('ext-schema-badge');
+      const countEl = document.getElementById('ext-schema-count');
+      if (badge) badge.style.display = 'block';
+      if (countEl) countEl.textContent = tCount;
+      invalidateCompletionCache();
+      renderSchemaPanel(currentSchema);
+      statusMsg('🗂 Restored imported schema — ' + tCount + ' table(s)', 'ok', 4000);
+    }
+  });
+  try{const fs=parseFloat(localStorage.getItem('oracle_ddl_fontsize'));if(fs&&fs>=9&&fs<=24){_editorFontSize=fs;document.documentElement.style.setProperty('--editor-font-size',fs+'px');if(cm)cm.refresh();}}catch(e){}
   // Sync editor size
   const wrap = document.getElementById('cm-wrap');
   if (cm && wrap) cm.setSize('100%', wrap.offsetHeight + 'px');
@@ -4867,11 +5496,17 @@ window.onload = function() {
   cm.on('change', () => { clearTimeout(window._saveTimer); window._saveTimer = setTimeout(saveSession, 1500); });
 
   // Keyboard shortcuts not in CodeMirror
-  document.addEventListener('keydown', e => {
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('#settings-wrap'))closeSettingsMenu();
     if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newFile(); }
+    if (e.ctrlKey && e.key === 't') { e.preventDefault(); newTabFile(); }
     if (e.ctrlKey && e.shiftKey && e.key === 'I') { e.preventDefault(); showIOPanel(); }
     if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openPalette(); }
     if (e.ctrlKey && e.key === 'g') { e.preventDefault(); promptGoToLine(); }
+    if (e.ctrlKey && e.key === 'g') { e.preventDefault(); promptGoToLine(); }
+    if (e.ctrlKey && e.key === 'b') { e.preventDefault(); if(cm) toggleBookmark(cm.getCursor().line); }
+    if (e.key === 'F9' && !e.shiftKey) { e.preventDefault(); nextBookmark(1); }
+    if (e.key === 'F9' && e.shiftKey)  { e.preventDefault(); nextBookmark(-1); }
     if (e.key === 'Escape') { closePalette(); }
   });
 
@@ -5152,6 +5787,10 @@ const COMMANDS = [
   { g:'View',    label:'History tab',            kb:'',             fn:()=>switchRTab('history') },
   { g:'View',    label:'Templates tab',          kb:'',             fn:()=>switchRTab('templates') },
   { g:'View',    label:'Toggle panel pin/auto',  kb:'',             fn:()=>togglePanelPin() },
+  { g:'Editor',  label:'Toggle bookmark',         kb:'Ctrl+B',       fn:()=>{ if(cm) toggleBookmark(cm.getCursor().line); } },
+  { g:'Editor',  label:'Next bookmark',           kb:'F9',           fn:()=>nextBookmark(1) },
+  { g:'Editor',  label:'Previous bookmark',       kb:'Shift+F9',     fn:()=>nextBookmark(-1) },
+  { g:'Editor',  label:'Clear all bookmarks',     kb:'',             fn:()=>{ _bookmarks.forEach(l=>cm.setGutterMarker(l,'bookmark-gutter',null)); _bookmarks.clear(); statusMsg('All bookmarks cleared','ok'); } },
   { g:'Help',    label:'Keyboard shortcuts',     kb:'',             fn:()=>showHelp() },
 ];
 let _palIdx = 0;
@@ -5442,5 +6081,36 @@ function insertMigration() {
 })();
 
 </script>
+<div id="hover-tip" style="display:none;position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:9px 13px;font-size:.62rem;font-family:var(--mono);color:var(--text2);max-width:310px;z-index:3000;line-height:1.75;box-shadow:0 8px 28px rgba(0,0,0,.55);pointer-events:none"></div>
+<!-- Lint Config Modal -->
+<div class="modal-overlay" id="lint-modal" style="display:none" onclick="if(event.target===this)closeModal('lint-modal')">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('lint-modal')">✕ CLOSE</button>
+    <div class="modal-title">⚙ LINTING RULES</div>
+    <div style="font-size:.6rem;color:var(--text3);margin-bottom:10px">Override severity per check. Applies on next F5 validation.</div>
+    <div id="lint-config-list" style="display:flex;flex-direction:column;gap:4px;max-height:58vh;overflow-y:auto"></div>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="tb-btn primary" onclick="saveLintConfig()">✓ SAVE</button>
+      <button class="tb-btn dim" onclick="resetLintConfig()">↺ RESET</button>
+      <button class="tb-btn" onclick="closeModal('lint-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
+<!-- Naming Convention Modal -->
+<div class="modal-overlay" id="naming-modal" style="display:none" onclick="if(event.target===this)closeModal('naming-modal')">
+  <div class="modal-box" style="max-width:380px">
+    <button class="modal-close" onclick="closeModal('naming-modal')">✕ CLOSE</button>
+    <div class="modal-title">🏷 NAMING CONVENTIONS</div>
+    <div style="font-size:.6rem;color:var(--text3);margin-bottom:12px">Required prefix per type. Leave blank to disable that check.</div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      ${[['pk','Primary Key','PK_'],['fk','Foreign Key','FK_'],['uq','Unique','AK_'],['ck','Check','CK_'],['ix','Index','IDX_'],['tbl','Table','']].map(([k,l,d])=>`<div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">${l}</label><input id="naming-${k}" class="modal-input" style="flex:1" placeholder="e.g. ${d||'leave blank to skip'}"></div>`).join('')}
+    </div>
+    <div class="modal-actions" style="margin-top:14px">
+      <button class="tb-btn primary" onclick="saveNamingConfig()">✓ SAVE</button>
+      <button class="tb-btn dim" onclick="resetNamingConfig()">↺ RESET</button>
+      <button class="tb-btn" onclick="closeModal('naming-modal')">CANCEL</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
