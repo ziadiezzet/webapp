@@ -1159,7 +1159,6 @@ input.modal-input:focus{border-color:var(--amber)}
     </div>
   </div>
 </div>
-</div>
 
 <!-- Formatter Options Modal -->
 <div class="modal-overlay" id="fmt-modal" style="display:none" onclick="if(event.target===this)closeModal('fmt-modal')">
@@ -1167,6 +1166,16 @@ input.modal-input:focus{border-color:var(--amber)}
     <button class="modal-close" onclick="closeModal('fmt-modal')">✕ CLOSE</button>
     <div class="modal-title">⌸ FORMAT OPTIONS</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <label style="font-size:.65rem;color:var(--text2)">Profile</label>
+        <select id="fmt-profile" class="modal-sel" onchange="if(this.value!=='custom')applyFmtProfile(this.value)">
+          <option value="custom">Custom</option>
+          <option value="oracle">Oracle Standard</option>
+          <option value="liquibase">Liquibase Style</option>
+          <option value="flyway">Flyway Style</option>
+          <option value="corporate">Corporate Style</option>
+        </select>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between">
         <label style="font-size:.65rem;color:var(--text2)">Indent size</label>
         <select id="fmt-indent" class="modal-sel">
@@ -1577,7 +1586,7 @@ function parseDDL(sql) {
       if(u==='CONSTRAINT'){const cn=parseConstraintName();if(cn){schema.constraintNames.add(cn);colInfo.constraintName=cn;}continue;}
       if(u==='PRIMARY'){pos++;if(cur()?.upper==='KEY'){pos++;colInfo.pk=true;colInfo.notNull=true;}continue;}
       if(u==='UNIQUE'){pos++;colInfo.unique=true;continue;}
-      if(u==='REFERENCES'){pos++;const[,refTable]=parseSchemaObject();let refCols=[];if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')'){if(cur()?.type!=='PUNCT')refCols.push(cur().upper);pos++;}if(cur()?.value===')')pos++;}colInfo.references={table:refTable,cols:refCols};continue;}
+      if(u==='REFERENCES'){pos++;const _refLine=cur()?.line;const[,refTable]=parseSchemaObject();let refCols=[];if(cur()?.value==='('){pos++;while(pos<toks.length&&cur()?.value!==')'){if(cur()?.type!=='PUNCT')refCols.push(cur().upper);pos++;}if(cur()?.value===')')pos++;if(refCols.length===0)schema.errors.push({msg:`Inline REFERENCES on column has empty column list — you must specify the referenced column: REFERENCES ${refTable||'table'} (column_name)`,line:_refLine});}colInfo.references={table:refTable,cols:refCols};continue;}
       if(u==='CHECK'){pos++;if(cur()?.value==='('){let d=1;pos++;while(pos<toks.length&&d>0){if(cur()?.value==='(')d++;else if(cur()?.value===')')d--;pos++;}}continue;}
       if(u==='GENERATED'){
         pos++;
@@ -1619,9 +1628,7 @@ function parseDDL(sql) {
       pos++;if(cur()?.upper==='KEY'){pos++;
         const cols=collectParenContent().filter(t=>t.type!=='PUNCT').map(t=>t.upper);
         if(cols.length===0) schema.errors.push({msg:`PRIMARY KEY constraint "${cname||'<unnamed>'}" has empty column list — template: CONSTRAINT pk_name PRIMARY KEY (col1, col2)`,line:cLine});
-        if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}
-        if(tableObj.constraints.some(c=>c.type==='PK'))
-          schema.errors.push({msg:`Table already has a PRIMARY KEY — only one PRIMARY KEY constraint is allowed per table`,line:cLine});
+        if(cname){if(schema.constraintNames.has(cname))schema.errors.push({msg:`Duplicate constraint name "${cname}"`,line:cLine});schema.constraintNames.add(cname);}      
         if(tableObj.constraints.some(c=>c.type==='PK'))
           schema.errors.push({msg:`Table already has a PRIMARY KEY — only one PRIMARY KEY constraint is allowed per table`,line:cLine});
         tableObj.constraints.push({type:'PK',name:cname,cols,line:cLine});
@@ -2424,6 +2431,15 @@ function validateSchema(schema, sql) {
     }
 
     // Check table name length and reserved words
+    // ── Data model quality: table has no PRIMARY KEY ──────────────────────
+    {
+      const hasConPK = tbl.constraints.some(c => c.type === 'PK');
+      const hasInlinePK = Object.values(tbl.columns).some(c => c.pk);
+      if (!hasConPK && !hasInlinePK && tbl.colOrder.length > 0)
+        warn(`Table "${tblName}" has no PRIMARY KEY — every table should have one for replication, indexing, and referential integrity`, tblName, null, tbl.line);
+    }
+
+    // Check table name length and reserved words
     if (tblName.length > 128) err(`Table name "${tblName}" exceeds 128 chars`, tblName, null, tbl.line);
     else if (tblName.length > 30) warn(`Table name "${tblName}" exceeds 30 chars (pre-12.1 limit)`, tblName, null, tbl.line);
     if (ORACLE_TRUE_RESERVED.has(tblName))
@@ -2530,18 +2546,18 @@ function formatDDLText(sql, opts) {
     if (stmt.length > 0) stmts.push(stmt);
   }
   if (stmts.length === 0) return sql;
-  return stmts.map(s => fmtStmt(s)).join('\n\n') + '\n';
+  return stmts.map(s => fmtStmt(s, opts)).join('\n\n') + '\n';
 }
 
-function fmtToken(tok) {
+function fmtToken(tok, opts) {
   if (!tok) return '';
-  const _fo = (typeof opts !== 'undefined' && opts) ? opts : loadFmtOpts();
+  const _fo = opts || loadFmtOpts();
   if (tok.type === 'KEYWORD' || KW_SET.has(tok.upper) || DTYPE_SET.has(tok.upper))
     return _fo.keywords === 'lower' ? tok.upper.toLowerCase() : tok.upper;
   return tok.value;
 }
 
-function fmtTokensGeneric(toks) {
+function fmtTokensGeneric(toks, opts) {
   let out = '';
   for (let i = 0; i < toks.length; i++) {
     const tok = toks[i], prev = toks[i-1];
@@ -2549,27 +2565,27 @@ function fmtTokensGeneric(toks) {
         && prev.value !== '(' && prev.value !== '.') {
       out += ' ';
     }
-    out += fmtToken(tok);
+    out += fmtToken(tok, opts);
   }
   return out;
 }
 
-function fmtStmt(toks) {
+function fmtStmt(toks, opts) {
   if (!toks.length) return '';
   const firstUp = toks.find(t => t.type === 'KEYWORD')?.upper;
   if (firstUp === 'CREATE') {
     const tableIdx = toks.findIndex(t => t.upper === 'TABLE');
-    if (tableIdx >= 0) return fmtCreateTable(toks);
+    if (tableIdx >= 0) return fmtCreateTable(toks, opts);
   }
-  return fmtTokensGeneric(toks) + ';';
+  return fmtTokensGeneric(toks, opts) + ';';
 }
 
-function fmtCreateTable(toks) {
+function fmtCreateTable(toks, opts) {
   // Build header (everything before the opening '(')
   let i = 0, header = '';
   while (i < toks.length && toks[i].value !== '(') {
     if (header.length > 0) header += ' ';
-    header += fmtToken(toks[i++]);
+    header += fmtToken(toks[i++], opts);
   }
   if (i >= toks.length) return header + ';';
   i++; // skip (
@@ -2595,14 +2611,14 @@ function fmtCreateTable(toks) {
     if (!item.length) return;
     const fu = item[0]?.upper;
     if (['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(fu)) {
-      conItems.push(fmtTokensGeneric(item));
+      conItems.push(fmtTokensGeneric(item, opts));
     } else {
       // Parse: colName datatype [precision] [rest...]
       let j = 0;
-      const colName = fmtToken(item[j++]);
+      const colName = fmtToken(item[j++], opts);
       let typePart = '';
       if (j < item.length) {
-        typePart = fmtToken(item[j]);
+        typePart = fmtToken(item[j], opts);
         // Handle DOUBLE PRECISION / LONG RAW
         if ((item[j]?.upper === 'DOUBLE' && item[j+1]?.upper === 'PRECISION') ||
             (item[j]?.upper === 'LONG'   && item[j+1]?.upper === 'RAW')) {
@@ -2614,18 +2630,18 @@ function fmtCreateTable(toks) {
           while (j < item.length && pd > 0) {
             if (item[j].value === '(') pd++;
             else if (item[j].value === ')') { pd--; if (pd === 0) { j++; break; } }
-            if (pd > 0) tp += fmtToken(item[j]);
+            if (pd > 0) tp += fmtToken(item[j], opts);
             j++;
           }
           typePart += tp + ')';
         }
       }
-      const rest = item.slice(j).map(fmtToken).join(' ');
+      const rest = item.slice(j).map(t => fmtToken(t, opts)).join(' ');
       colItems.push({ name: colName, type: typePart, rest });
     }
   });
 
-  const _fo2 = (typeof opts !== 'undefined' && opts) ? opts : loadFmtOpts();
+  const _fo2 = opts || loadFmtOpts();
   const _ind = ' '.repeat(_fo2.indent || 4);
   const maxNameLen = Math.max(0, ...colItems.map(c => c.name.length));
   const maxTypeLen = Math.max(0, ...colItems.map(c => c.type.length));
@@ -3516,7 +3532,19 @@ const FUNCTION_ARG_HINTS = {
 // AUTOCOMPLETE ENGINE
 // ============================================================================
 let _hintCache = null;
-function invalidateCompletionCache() { _hintCache = null; }
+let _prefixQueryCache = new Map(); // word(upper) -> {tables,columns,objects,keywords,datatypes,functions}
+function invalidateCompletionCache() { _hintCache = null; _prefixQueryCache.clear(); }
+
+// Binary-search the lower bound of a sorted array for a given prefix
+function _prefixSearch(sortedArr, prefix) {
+  if (!prefix) return sortedArr; // no filter needed
+  let lo = 0, hi = sortedArr.length;
+  while (lo < hi) { const mid = (lo+hi)>>1; if (sortedArr[mid] < prefix) lo = mid+1; else hi = mid; }
+  const out = [];
+  for (let i = lo; i < sortedArr.length && sortedArr[i].startsWith(prefix); i++) out.push(sortedArr[i]);
+  return out;
+}
+
 function getHintWords() {
   if (_hintCache) return _hintCache;
   const d = loadDictionary();
@@ -3524,8 +3552,30 @@ function getHintWords() {
     keywords: [...ORACLE_KEYWORDS, ...(d.custom_kw||[])],
     datatypes: [...ORACLE_DATATYPES, ...(d.custom_types||[])],
     tables: d.tables, columns: d.columns, objects: d.objects, functions: ORACLE_FUNCTIONS,
+    // Pre-sorted copies enable binary-search prefix matching for large dictionaries
+    _sorted: {
+      tables:  [...d.tables].sort(),
+      columns: [...d.columns].sort(),
+      objects: [...d.objects].sort(),
+    },
   };
   return _hintCache;
+}
+
+// Cached, indexed prefix lookup — avoids re-scanning the full dictionary on every keystroke
+// for large schemas (falls back to linear filter for keywords/datatypes/functions, which are small).
+function getPrefixMatches(word) {
+  const key = word.toUpperCase();
+  if (_prefixQueryCache.has(key)) return _prefixQueryCache.get(key);
+  const hints = getHintWords();
+  const result = {
+    tables:  _prefixSearch(hints._sorted.tables,  key),
+    columns: _prefixSearch(hints._sorted.columns, key),
+    objects: _prefixSearch(hints._sorted.objects, key),
+  };
+  if (_prefixQueryCache.size > 500) _prefixQueryCache.clear(); // simple cache-size guard
+  _prefixQueryCache.set(key, result);
+  return result;
 }
 
 // Get columns of a specific table from currentSchema or externalSchema
@@ -3738,11 +3788,12 @@ function oracleHint(editor) {
     ...(word.length > 0 ? hints.keywords.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'🔑 '+w, className:'hint-kw'})) : []),
     ...(word.length > 0 ? hints.datatypes.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'🔷 '+w, className:'hint-type'})) : []),
     // Tables and columns show even after space (useful for FROM clause etc.)
-    ...hints.tables.filter(w  => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📋 '+w, className:'hint-table'})),
+    // Uses cached binary-search prefix index instead of a full linear scan each keystroke
+    ...getPrefixMatches(word).tables.map(w => ({text:w, displayText:'📋 '+w, className:'hint-table'})),
     // Context-specific columns for the targeted table — shown with 🎯 above generic columns
     ...getTableColumns(getContextTableName(stmtCtx)).filter(c => word.length===0||c.startsWith(word)).map(c => ({text:c, displayText:'🎯 '+c, className:'hint-col'})),
-    ...hints.columns.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'📌 '+w, className:'hint-col'})),
-    ...hints.objects.filter(w => word.length === 0 || w.startsWith(word)).map(w => ({text:w, displayText:'◈ '  +w, className:'hint-obj'})),
+    ...getPrefixMatches(word).columns.map(w => ({text:w, displayText:'📌 '+w, className:'hint-col'})),
+    ...getPrefixMatches(word).objects.map(w => ({text:w, displayText:'◈ '  +w, className:'hint-obj'})),
     ...(word.length > 0 ? hints.functions.filter(w => w.startsWith(word)).map(w => ({text:w, displayText:'⚙ '+w, className:'hint-obj'})) : []),
   ];
   const seen = new Set();
@@ -4669,6 +4720,7 @@ const LINT_RULES=[
   {id:'dup_keyword',       label:'Duplicate consecutive keywords',     def:'error'},
   {id:'on_delete_restrict',label:'ON DELETE RESTRICT (unsupported)',   def:'error'},
   {id:'plsql_semantics',   label:'PL/SQL semantic warnings',          def:'warning'},
+  {id:'no_primary_key',    label:'Table has no PRIMARY KEY',          def:'warning'},
 ];
 const LINT_CFG_KEY='oracle_ddl_lint_cfg_v1';
 const NAMING_CFG_KEY='oracle_ddl_naming_v1';
@@ -4719,6 +4771,7 @@ function _applyLintConfig(issues){
     dup_keyword:      i=>/[Dd]uplicate keyword/.test(i.msg),
     on_delete_restrict:i=>/RESTRICT/.test(i.msg)&&/ON DELETE/.test(i.msg),
     plsql_semantics:  i=>/DBMS_OUTPUT|WHEN OTHERS THEN NULL|RETURN statement|Cursor/.test(i.msg),
+    no_primary_key:   i=>/has no PRIMARY KEY —/.test(i.msg),
   };
   const defaults={};LINT_RULES.forEach(r=>defaults[r.id]=r.def);
   for(const [ruleId,fn] of Object.entries(matchers)){
@@ -4826,17 +4879,19 @@ function showValidationResults(issues, schema) {
     listEl.innerHTML = `<div class="val-empty"><div style="font-size:2rem">✅</div><div><strong style="color:var(--green)">DDL is valid!</strong><br>No errors or warnings found.</div></div>`;
     return;
   }
-  listEl.innerHTML = issues.map((issue, i) => {
+listEl.innerHTML = issues.map((issue, i) => {
     const icons = {error:'●', warning:'▲', info:'ℹ'};
     const msg = issue.msg
       .replace(/("[\w$#_]+")/g, '<strong>$1</strong>')
       .replace(/(\bORA-\d+\b)/g, '<span style="color:var(--red);font-family:var(--mono)">$1</span>');
-    return `<div class="val-item ${issue.sev}" onclick="goToLine(${issue.line||0})">
+    const canQuickFix = issue.line && issue.sev !== 'info';
+    return `<div class="val-item ${issue.sev}" onclick="goToLine(${issue.line||0})" style="position:relative">
       <div class="val-icon">${icons[issue.sev]||'?'}</div>
-      <div>
+      <div style="flex:1">
         <div class="val-msg">${msg}</div>
         ${issue.line?`<div class="val-loc">Line ${issue.line}${issue.table?' · '+issue.table:''}${issue.col?' · '+issue.col:''}</div>`:''}
       </div>
+      ${canQuickFix?`<button class="hist-small-btn" style="color:var(--amber);border-color:rgba(245,158,11,.35);flex-shrink:0" title="Quick Fix (line ${issue.line})" onclick="event.stopPropagation();quickFixLine(${issue.line})">💡 Fix</button>`:''}
     </div>`;
   }).join('');
 }
@@ -4848,12 +4903,42 @@ function goToLine(line) {
   cm.focus();
 }
 
+// VS Code-style lightbulb quick fix — applies autoFixDDL's line-level rules
+// to just the single offending line, without touching the rest of the file.
+function quickFixLine(lineNum) {
+  if (!cm || !lineNum) { statusMsg('No quick fix available for this issue', 'warn'); return; }
+  const lineIdx = lineNum - 1;
+  if (lineIdx < 0 || lineIdx >= cm.lineCount()) return;
+  const original = cm.getLine(lineIdx);
+  const { fixed } = autoFixDDL(original);
+  if (fixed === original || !fixed.trim()) {
+    statusMsg('No automatic fix available for this line — see Auto-Fix (🔧 FIX) for broader fixes', 'warn', 4000);
+    return;
+  }
+  cm.replaceRange(fixed.replace(/\n+$/,''), {line:lineIdx, ch:0}, {line:lineIdx, ch:original.length});
+  setDirty(true);
+  statusMsg('💡 Quick-fixed line ' + lineNum, 'ok');
+  validateDDL();
+}
+
 const FMT_KEY = 'oracle_ddl_fmt_opts_v1';
+const FMT_PROFILES = {
+  oracle:     { indent:4, keywords:'upper', align:true,  label:'Oracle Standard' },
+  liquibase:  { indent:4, keywords:'upper', align:false, label:'Liquibase Style' },
+  flyway:     { indent:2, keywords:'upper', align:false, label:'Flyway Style' },
+  corporate:  { indent:4, keywords:'lower', align:true,  label:'Corporate Style' },
+};
 function loadFmtOpts() {
-  try { return JSON.parse(localStorage.getItem(FMT_KEY)||'null') || { indent:4, keywords:'upper', align:true }; }
-  catch { return { indent:4, keywords:'upper', align:true }; }
+  try { return JSON.parse(localStorage.getItem(FMT_KEY)||'null') || { indent:4, keywords:'upper', align:true, profile:'oracle' }; }
+  catch { return { indent:4, keywords:'upper', align:true, profile:'oracle' }; }
 }
 function saveFmtOpts(o) { try { localStorage.setItem(FMT_KEY, JSON.stringify(o)); } catch {} }
+function applyFmtProfile(name) {
+  const p = FMT_PROFILES[name]; if (!p) return;
+  document.getElementById('fmt-indent').value   = p.indent;
+  document.getElementById('fmt-keywords').value = p.keywords;
+  document.getElementById('fmt-align').checked  = p.align;
+}
 
 function formatDDL() {
   if (!cm) return;
@@ -4875,6 +4960,8 @@ function showFmtOptions() {
   document.getElementById('fmt-indent').value   = o.indent;
   document.getElementById('fmt-keywords').value = o.keywords;
   document.getElementById('fmt-align').checked  = o.align;
+  const profSel = document.getElementById('fmt-profile');
+  if (profSel) profSel.value = o.profile || 'custom';
   document.getElementById('fmt-modal').style.display = 'flex';
 }
 function applyFmtOptions() {
@@ -4882,6 +4969,7 @@ function applyFmtOptions() {
     indent:   parseInt(document.getElementById('fmt-indent').value, 10) || 4,
     keywords: document.getElementById('fmt-keywords').value,
     align:    document.getElementById('fmt-align').checked,
+    profile:  document.getElementById('fmt-profile')?.value || 'custom',
   };
   saveFmtOpts(o);
   closeModal('fmt-modal');
@@ -5046,6 +5134,7 @@ function handleFileOpen(e) {
    if (cm) { cm.setValue(ev.target.result); saveSession(); }
     currentFileName = file.name;
     document.getElementById('fileName').textContent = file.name;
+    const _ct=_tabCur(); if(_ct){_ct.name=file.name;_ct.dirty=false;renderTabsBar();}
     setDirty(false);
     statusMsg(`Opened: ${file.name}`, 'ok');
     validateDDL();
@@ -5135,9 +5224,12 @@ function renderSchemaPanel(schema, showAll) {
       const colCount = Object.keys(tbl.columns).length;
       const conCount = tbl.constraints.length;
       const isExt = !!tbl._ext;
-      html += `<div class="obj-table-item" onclick="toggleTableCols('cols_${tblName}',${tbl.line||0})">
-        <div class="obj-table-name" style="${isExt?'color:var(--cyan)':''}">${tblName}${isExt?` <span style="font-size:.5rem;opacity:.5;color:var(--cyan)">PDM</span>`:''}</div>
-        <div class="obj-table-meta">${isExt&&tbl.name&&tbl.name!==tblName?tbl.name+' · ':''}${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+(conCount!==1?'s':''):''}</div>
+      html += `<div class="obj-table-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+        <div style="flex:1;min-width:0;cursor:pointer" onclick="toggleTableCols('cols_${tblName}',${tbl.line||0})">
+          <div class="obj-table-name" style="${isExt?'color:var(--cyan)':''}">${tblName}${isExt?` <span style="font-size:.5rem;opacity:.5;color:var(--cyan)">PDM</span>`:''}</div>
+          <div class="obj-table-meta">${isExt&&tbl.name&&tbl.name!==tblName?tbl.name+' · ':''}${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+(conCount!==1?'s':''):''}</div>
+        </div>
+        ${isExt?'':`<button class="hist-small-btn" style="flex-shrink:0" title="Dependency impact analysis" onclick="event.stopPropagation();showImpactAnalysis('${tblName}')">🕸</button>`}
       </div>
       <div id="cols_${tblName}" class="obj-col-list" style="display:none">`;
       if (isExt) {
@@ -5190,6 +5282,42 @@ function renderSchemaPanel(schema, showAll) {
     html += '</div></div>';
   }
   el.innerHTML = html;
+}
+
+function computeImpact(schema, tblName) {
+  const up = tblName.toUpperCase();
+  const dependents = [];
+  for (const [t, tbl] of Object.entries(schema.tables)) {
+    (tbl.constraints||[]).forEach(con => {
+      if (con.type === 'FK' && con.refTable && con.refTable.toUpperCase() === up)
+        dependents.push({ table: t, constraint: con.name || '<unnamed>', cols: con.cols||[], line: con.line });
+    });
+  }
+  const referencedBy = [];
+  const self = schema.tables[up];
+  (self?.constraints||[]).forEach(con => {
+    if (con.type === 'FK' && con.refTable)
+      referencedBy.push({ table: con.refTable.toUpperCase(), constraint: con.name || '<unnamed>', cols: con.cols||[], line: con.line });
+  });
+  return { dependents, referencedBy };
+}
+function showImpactAnalysis(tblName) {
+  if (!currentSchema) { statusMsg('Validate DDL first','warn'); return; }
+  const { dependents, referencedBy } = computeImpact(currentSchema, tblName);
+  const rows = (list, emptyMsg) => list.length
+    ? list.map(d => `<div class="obj-table-item" onclick="goToLine(${d.line||0})">
+        <div class="obj-table-name" style="color:var(--cyan)">${d.table}</div>
+        <div class="obj-table-meta">via ${d.constraint} (${d.cols.join(', ')})</div>
+      </div>`).join('')
+    : `<div class="val-empty" style="padding:14px"><div style="font-size:.62rem">${emptyMsg}</div></div>`;
+  document.getElementById('impact-title').textContent = '🕸 IMPACT ANALYSIS — ' + tblName.toUpperCase();
+  document.getElementById('impact-body').innerHTML = `
+    <div style="font-size:.6rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px;border-bottom:2px solid var(--border2)">⬇ Tables that depend on ${tblName} (${dependents.length})</div>
+    ${rows(dependents, 'No other table references this one — safe to drop/rename without breaking FKs.')}
+    <div style="font-size:.6rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px;border-bottom:2px solid var(--border2);margin-top:8px">⬆ Tables this one depends on (${referencedBy.length})</div>
+    ${rows(referencedBy, 'This table has no outgoing foreign keys.')}
+  `;
+  document.getElementById('impact-modal').style.display = 'flex';
 }
 
 function switchSchemaView(view) {
@@ -5492,8 +5620,15 @@ window.onload = function() {
       if (_saved && _saved.trim()) { cm.setValue(_saved); setDirty(false); statusMsg('Session restored','ok'); }
     } catch(e) {}
   }
-  // Auto-save on change
+   // Auto-save on change
   cm.on('change', () => { clearTimeout(window._saveTimer); window._saveTimer = setTimeout(saveSession, 1500); });
+
+  // Warn before closing tab/window with unsaved changes
+  window.addEventListener('beforeunload', (e) => {
+    if (!isDirty) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
 
   // Keyboard shortcuts not in CodeMirror
   document.addEventListener('click', e=>{
@@ -5525,6 +5660,7 @@ window.onload = function() {
       cm.setValue(ev.target.result);
       currentFileName = file.name;
       document.getElementById('fileName').textContent = file.name;
+      const _ct=_tabCur(); if(_ct){_ct.name=file.name;_ct.dirty=false;renderTabsBar();}
       setDirty(false);
       statusMsg(`Opened: ${file.name}`, 'ok');
       validateDDL();
@@ -5807,7 +5943,7 @@ function renderPalette() {
   let html='',lastG='';
   filtered.forEach((c,i) => {
     if(c.g!==lastG){ html+=`<div class="cmd-group-label">${c.g}</div>`; lastG=c.g; }
-    html+=`<div class="cmd-item${i===_palIdx?' cmd-active':''}" onclick="runCmd(${i},${JSON.stringify(filtered.map(x=>COMMANDS.indexOf(x)))[i]})">
+    html+=`<div class="cmd-item${i===_palIdx?' cmd-active':''}" onclick="runCmd(${i})">
       <span>${c.label}</span>${c.kb?`<span class="cmd-shortcut">${c.kb}</span>`:''}
     </div>`;
   });
@@ -5912,8 +6048,11 @@ function doCSVtoDDL() {
   const raw=document.getElementById('csv-input').value.trim();
   const tbl=(document.getElementById('csv-table').value.trim()||'MY_TABLE').toUpperCase();
   if (!raw) { statusMsg('Paste column headers first','warn'); return; }
-  const cols=raw.split('\n')[0].split(',').map(c=>c.replace(/["\s\r]/g,'').toUpperCase()).filter(Boolean);
+  let cols=raw.split('\n')[0].split(',').map(c=>c.replace(/["\s\r]/g,'').toUpperCase()).filter(Boolean);
   if (!cols.length) { statusMsg('No columns detected','warn'); return; }
+  const _seenCols=new Set(); const _dupCols=[];
+  cols=cols.filter(c=>{ if(_seenCols.has(c)){_dupCols.push(c);return false;} _seenCols.add(c); return true; });
+  if (_dupCols.length) statusMsg(`⚠ Removed ${_dupCols.length} duplicate column(s): ${[...new Set(_dupCols)].join(', ')}`,'warn',5000);
   function inferType(n) {
     if (/_?ID$|_KEY$|_NUM$|_SEQ$|^(NUM|COUNT|QTY|AGE|RANK|SORT)$/i.test(n)) return 'NUMBER(10)';
     if (/(DATE|TIME|_AT|CREATED|UPDATED|MODIFIED|BORN|SINCE|EXPIRES)$/i.test(n)) return 'DATE';
@@ -5937,33 +6076,56 @@ function doCSVtoDDL() {
 function convertToPG() {
   if (!cm) return;
   let sql = cm.getValue();
-  const rules = [
+const rules = [
+    // Sequences → PG identity-friendly syntax note (structural, done separately below)
     [/\bVARCHAR2\s*\(/gi,           'VARCHAR('],
     [/\bNVARCHAR2\s*\(/gi,          'VARCHAR('],
     [/\bNVARCHAR2\b/gi,             'VARCHAR'],
     [/\bNCHAR\b/gi,                 'CHAR'],
-    [/\bNUMBER\s*\(\s*(\d+)\s*,\s*0\s*\)/gi, (_,p) => `INTEGER`],
+    [/\bNUMBER\s*\(\s*(\d+)\s*,\s*0\s*\)/gi, () => `INTEGER`],
     [/\bNUMBER\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)/gi, (_,p,s) => `NUMERIC(${p},${s})`],
     [/\bNUMBER\s*\(\s*(\d+)\s*\)/gi, (_,p) => parseInt(p)>9?'BIGINT':'INTEGER'],
     [/\bNUMBER\b/gi,                'NUMERIC'],
-    [/\bINTEGER\b/gi,               'INTEGER'],
+    [/\bPLS_INTEGER\b/gi,           'INTEGER'],
+    [/\bBINARY_INTEGER\b/gi,        'INTEGER'],
     [/\bCLOB\b/gi,                  'TEXT'],
     [/\bNCLOB\b/gi,                 'TEXT'],
     [/\bBLOB\b/gi,                  'BYTEA'],
     [/\bRAW\s*\(\d+\)/gi,           'BYTEA'],
+    [/\bLONG\s+RAW\b/gi,            'BYTEA'],
+    [/\bLONG\b/gi,                  'TEXT'],
     [/\bXMLTYPE\b/gi,               'XML'],
     [/\bBINARY_FLOAT\b/gi,          'REAL'],
     [/\bBINARY_DOUBLE\b/gi,         'DOUBLE PRECISION'],
+    [/\bROWID\b/gi,                 'TEXT /* Oracle ROWID has no PG equivalent — consider a surrogate key */'],
+    [/\bTIMESTAMP\s*\(\s*(\d+)\s*\)/gi, (_,p) => `TIMESTAMP(${p})`],
     [/\bDATE\b/gi,                  'TIMESTAMP'],
     [/\bSYSDATE\b/gi,               'CURRENT_TIMESTAMP'],
+    [/\bSYSTIMESTAMP\b/gi,          'CURRENT_TIMESTAMP'],
+    [/\bNVL2\s*\(/gi,               '/* NVL2 has no direct PG equivalent — rewrite as CASE */ NVL2('],
     [/\bNVL\s*\(/gi,                'COALESCE('],
-    [/\bROWNUM\b/gi,                '/* ROWNUM→LIMIT */ ROWNUM'],
+    [/\bDECODE\s*\(/gi,             '/* DECODE has no direct PG equivalent — rewrite as CASE */ DECODE('],
+    [/\bROWNUM\b/gi,                '/* ROWNUM→LIMIT/OFFSET or ROW_NUMBER() OVER() */ ROWNUM'],
+    [/(\w+)\.NEXTVAL/gi,            "nextval('$1')"],
+    [/(\w+)\.CURRVAL/gi,            "currval('$1')"],
+    [/\bCONNECT\s+BY\b/gi,          '/* CONNECT BY has no direct PG equivalent — rewrite as WITH RECURSIVE */ CONNECT BY'],
+    [/\bMINUS\b/gi,                 'EXCEPT'],
     [/\bNOCACHE\b/gi,               ''],
     [/\bNOCYCLE\b/gi,               ''],
     [/\bNOORDER\b/gi,               ''],
+    [/\bLOGGING\b/gi,               ''],
+    [/\bNOLOGGING\b/gi,             ''],
   ];
   rules.forEach(([re, rep]) => { sql = sql.replace(re, rep); });
-  document.getElementById('pg-result').value = '-- Auto-converted from Oracle DDL (review required)\n' + sql;
+
+  // Structural: convert CREATE SEQUENCE …; + trailing NEXTVAL DEFAULT into PG-style sequence
+  // (kept as CREATE SEQUENCE — valid PG syntax as-is — but strip Oracle-only clauses)
+  sql = sql.replace(/\bMAXVALUE\s+9+\b/gi, 'NO MAXVALUE');
+
+  // Structural: GENERATED ... AS IDENTITY is valid in both — leave untouched.
+  // Structural: ON DELETE CASCADE / SET NULL — identical in PG, leave untouched.
+
+  document.getElementById('pg-result').value = '-- Auto-converted from Oracle DDL (review required — items in /* */ need manual rewriting)\n' + sql;
   document.getElementById('pg-output').style.display = '';
   statusMsg('Approximate PG conversion done — review carefully', 'warn', 6000);
 }
@@ -6015,6 +6177,7 @@ function runMigrate() {
     : '-- No differences detected.';
   document.getElementById('mg-output').style.display='';
 }
+
 function insertMigration() {
   if (!cm) return;
   cm.replaceRange('\n'+document.getElementById('mg-result').value+'\n', cm.getCursor());
@@ -6079,7 +6242,6 @@ function insertMigration() {
     }
   });
 })();
-
 </script>
 <div id="hover-tip" style="display:none;position:fixed;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:9px 13px;font-size:.62rem;font-family:var(--mono);color:var(--text2);max-width:310px;z-index:3000;line-height:1.75;box-shadow:0 8px 28px rgba(0,0,0,.55);pointer-events:none"></div>
 <!-- Lint Config Modal -->
@@ -6103,13 +6265,27 @@ function insertMigration() {
     <div class="modal-title">🏷 NAMING CONVENTIONS</div>
     <div style="font-size:.6rem;color:var(--text3);margin-bottom:12px">Required prefix per type. Leave blank to disable that check.</div>
     <div style="display:flex;flex-direction:column;gap:9px">
-      ${[['pk','Primary Key','PK_'],['fk','Foreign Key','FK_'],['uq','Unique','AK_'],['ck','Check','CK_'],['ix','Index','IDX_'],['tbl','Table','']].map(([k,l,d])=>`<div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">${l}</label><input id="naming-${k}" class="modal-input" style="flex:1" placeholder="e.g. ${d||'leave blank to skip'}"></div>`).join('')}
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Primary Key</label><input id="naming-pk" class="modal-input" style="flex:1" placeholder="e.g. PK_"></div>
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Foreign Key</label><input id="naming-fk" class="modal-input" style="flex:1" placeholder="e.g. FK_"></div>
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Unique</label><input id="naming-uq" class="modal-input" style="flex:1" placeholder="e.g. AK_"></div>
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Check</label><input id="naming-ck" class="modal-input" style="flex:1" placeholder="e.g. CK_"></div>
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Index</label><input id="naming-ix" class="modal-input" style="flex:1" placeholder="e.g. IDX_"></div>
+      <div style="display:flex;align-items:center;gap:8px"><label style="font-size:.62rem;color:var(--text2);width:95px">Table</label><input id="naming-tbl" class="modal-input" style="flex:1" placeholder="leave blank to skip"></div>
     </div>
     <div class="modal-actions" style="margin-top:14px">
       <button class="tb-btn primary" onclick="saveNamingConfig()">✓ SAVE</button>
       <button class="tb-btn dim" onclick="resetNamingConfig()">↺ RESET</button>
       <button class="tb-btn" onclick="closeModal('naming-modal')">CANCEL</button>
     </div>
+  </div>
+</div>
+
+<!-- Dependency Impact Analysis Modal -->
+<div class="modal-overlay" id="impact-modal" style="display:none" onclick="if(event.target===this)closeModal('impact-modal')">
+  <div class="modal-box" style="max-width:460px;max-height:80vh;display:flex;flex-direction:column">
+    <button class="modal-close" onclick="closeModal('impact-modal')">✕ CLOSE</button>
+    <div class="modal-title" id="impact-title">🕸 IMPACT ANALYSIS</div>
+    <div id="impact-body" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 </body>
