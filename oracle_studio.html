@@ -526,6 +526,10 @@ input.modal-input:focus{border-color:var(--amber)}
 .fix-item-line{font-size:.55rem;color:var(--text3);white-space:nowrap;margin-left:auto;padding-left:8px}
 .fix-popup-summary{font-size:.58rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;flex-shrink:0}
 .fix-popup-actions{display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+#editor-ctx-menu{display:none;position:fixed;z-index:5000;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;min-width:190px;padding:4px 0;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.ctx-menu-hdr{padding:6px 12px;font-size:.58rem;font-weight:700;color:var(--amber);border-bottom:1px solid var(--border);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx-menu-item{padding:7px 12px;font-size:.62rem;color:var(--text2);cursor:pointer;font-family:var(--mono);white-space:nowrap;transition:background .1s}
+.ctx-menu-item:hover{background:var(--bg3);color:var(--text)}
 
 /* ═══════════════════════════════════════════════════════════════════
    RESPONSIVE / MOBILE LAYOUT
@@ -1455,9 +1459,23 @@ function getTypeFamily(t) {
   const up = (t||'').toUpperCase().replace(/\s*\(.*\)/, '').trim();
   return TYPE_FAMILY[up] || 'other';
 }
+
 function areFKTypesCompatible(a, b) {
   const fa = getTypeFamily(a), fb = getTypeFamily(b);
   return fa === fb;
+}
+// Splits a raw external/PDM datatype string (e.g. "VARCHAR2(10 CHAR)", "NUMBER(10,2)")
+// into {base, precision, scale, full} so it validates the same way as parsed DDL types.
+function _extParseType(raw) {
+  raw = raw || '';
+  const m = raw.match(/^([A-Za-z_][A-Za-z0-9_ ]*?)\s*(?:\((\d+)(?:\s*,\s*(\d+))?\s*(?:CHAR|BYTE)?\s*\))?\s*$/i);
+  if (!m) return { base: raw.toUpperCase(), precision: null, scale: null, full: raw };
+  return {
+    base: m[1].trim().toUpperCase(),
+    precision: m[2] != null ? parseInt(m[2], 10) : null,
+    scale: m[3] != null ? parseInt(m[3], 10) : null,
+    full: raw
+  };
 }
 
 // ============================================================================
@@ -1788,6 +1806,18 @@ function parseDDL(sql) {
       schema.warnings.push({msg:`Duplicate index name "${_idup}" — index names must be unique in schema`,line});
     schema.indexes.push({name:_idup,table:tableName?.toUpperCase(),cols,unique,line});
   }
+    function _getOrCreateStub(tblUp, line) {
+    if (schema.tables[tblUp]) return schema.tables[tblUp];
+    const ext = externalSchema?.tables?.[tblUp];
+    if (ext) {
+      const cols={}, order=[];
+      Object.entries(ext.columns||{}).forEach(([cn,cd])=>{cols[cn]={type:_extParseType(cd.datatype),notNull:!!cd.mandatory,pk:!!cd.pk,line};order.push(cn);});
+      schema.warnings.push({msg:`ALTER TABLE references unknown table "${tblUp}"`, line});
+      return (schema.tables[tblUp] = {columns:cols,constraints:[],line,colOrder:order});
+    }
+    schema.warnings.push({msg:`ALTER TABLE references unknown table "${tblUp}" — a new empty stub was created; check for a typo`, line});
+    return (schema.tables[tblUp] = {columns:{},constraints:[],line,colOrder:[]});
+  }
   function parseAlterTable() {
     const line=cur()?.line;
     if(!expectKeyword('TABLE','Expected TABLE after ALTER')){skipToSemicolon();return;}
@@ -1802,13 +1832,14 @@ function parseDDL(sql) {
           const _ext=externalSchema?.tables?.[tblUp];
           if(_ext){
             const _ec={},_eo=[];
-            Object.entries(_ext.columns||{}).forEach(([cn,cd])=>{_ec[cn]={type:{base:cd.datatype||'',full:cd.datatype||''},notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo.push(cn);});
+            Object.entries(_ext.columns||{}).forEach(([cn,cd])=>{_ec[cn]={type:_extParseType(cd.datatype),notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo.push(cn);});
             schema.tables[tblUp]={columns:_ec,constraints:[],line,colOrder:_eo};
             schema.warnings.push({
                msg:`ALTER TABLE references unknown table "${tblUp}"`,
                line
             });
-          } else {
+                    } else {
+            schema.warnings.push({msg:`ALTER TABLE references unknown table "${tblUp}" — a new empty stub was created; check for a typo`,line});
             schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]};
           }
         }
@@ -1816,17 +1847,20 @@ function parseDDL(sql) {
         parseTableConstraint(tblUp,tObj);
       } else if(cur()?.value==='('){
         pos++;
+              } else if(cur()?.value==='('){
+        pos++;
+        if(!schema.tables[tblUp]) _getOrCreateStub(tblUp, line);
         while(pos<toks.length&&cur()?.value!==')'&&cur()?.value!==';'){
           if(cur()?.value===','){pos++;continue;}
           const nu=cur()?.upper;
           if(['CONSTRAINT','PRIMARY','FOREIGN','UNIQUE','CHECK'].includes(nu)){
-            parseTableConstraint(tblUp,schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]}));
+            parseTableConstraint(tblUp,schema.tables[tblUp]);
           } else {
             const cl=cur()?.line; const cn=parseIdentifier();
             if(!cn){schema.errors.push({msg:'Expected column name in ADD',line:cl});break;}
             const dt=parseDataType();
             if(!dt){schema.errors.push({msg:`Missing data type for "${cn}"`,line:cl});break;}
-            const tObj=schema.tables[tblUp]||(schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]});
+            const tObj=schema.tables[tblUp];
             const cu=cn.toUpperCase();
             const extCol =
                externalSchema?.tables?.[tblUp]?.columns?.[cu];
@@ -1845,8 +1879,8 @@ function parseDDL(sql) {
         if(!dt){schema.errors.push({msg:`Missing data type for "${colId.origCase}"`,line:cl});skipToSemicolon();return;}
         if(!schema.tables[tblUp]){
           const _ext2=externalSchema?.tables?.[tblUp];
-          if(_ext2){const _ec2={},_eo2=[];Object.entries(_ext2.columns||{}).forEach(([cn,cd])=>{_ec2[cn]={type:{base:cd.datatype||'',full:cd.datatype||''},notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo2.push(cn);});schema.tables[tblUp]={columns:_ec2,constraints:[],line,colOrder:_eo2};}
-          else{schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]};}
+          if(_ext2){const _ec2={},_eo2=[];Object.entries(_ext2.columns||{}).forEach(([cn,cd])=>{_ec2[cn]={type:_extParseType(cd.datatype),notNull:!!cd.mandatory,pk:!!cd.pk,line};_eo2.push(cn);});schema.tables[tblUp]={columns:_ec2,constraints:[],line,colOrder:_eo2};}
+          else{schema.warnings.push({msg:`ALTER TABLE references unknown table "${tblUp}" — a new empty stub was created; check for a typo`,line});schema.tables[tblUp]={columns:{},constraints:[],line,colOrder:[]};}
         }
         const tObj=schema.tables[tblUp];
         const cu=colId.nameU;
@@ -4457,7 +4491,8 @@ function initEditor() {
     }
   });
   cm.on('cursorActivity', updateCursorInfo);
-  // ── Hover documentation ─────────────────────────────────────────────────
+  cm.on('scroll', hideContextMenu);
+  cm.getWrapperElement().addEventListener('contextmenu', showEditorContextMenu);  // ── Hover documentation ─────────────────────────────────────────────────
   const HOVER_DOCS={
     'VARCHAR2':{sig:'VARCHAR2(size)',desc:'Variable-length string. size = max bytes (up to 4000, or 32767 extended).',ex:"name VARCHAR2(100) NOT NULL"},
     'NUMBER':{sig:'NUMBER(p,s)',desc:'Numeric. p=precision (1-38), s=scale (-84 to 127). Omit s for integers.',ex:"salary NUMBER(12,2)"},
@@ -5229,7 +5264,7 @@ function renderSchemaPanel(schema, showAll) {
           <div class="obj-table-name" style="${isExt?'color:var(--cyan)':''}">${tblName}${isExt?` <span style="font-size:.5rem;opacity:.5;color:var(--cyan)">PDM</span>`:''}</div>
           <div class="obj-table-meta">${isExt&&tbl.name&&tbl.name!==tblName?tbl.name+' · ':''}${colCount} col${colCount!==1?'s':''}${conCount?' · '+conCount+' constraint'+(conCount!==1?'s':''):''}</div>
         </div>
-        ${isExt?'':`<button class="hist-small-btn" style="flex-shrink:0" title="Dependency impact analysis" onclick="event.stopPropagation();showImpactAnalysis('${tblName}')">🕸</button>`}
+        <button class="hist-small-btn" style="flex-shrink:0" title="Dependency impact analysis" onclick="event.stopPropagation();showImpactAnalysis('${tblName}')">🕸</button>
       </div>
       <div id="cols_${tblName}" class="obj-col-list" style="display:none">`;
       if (isExt) {
@@ -5284,25 +5319,38 @@ function renderSchemaPanel(schema, showAll) {
   el.innerHTML = html;
 }
 
+function _normFK(con) {
+  if (!con || con.type !== 'FK') return null;
+  if (con.cols) return { cols: con.cols||[], refCols: con.refCols||[], refTable: con.refTable, name: con.name };
+  if (con.childCol || con.parentCol)
+    return { cols: con.childCol?[con.childCol]:[], refCols: con.parentCol?[con.parentCol]:[], refTable: con.refTable, name: con.name };
+  return null;
+}
 function computeImpact(schema, tblName) {
   const up = tblName.toUpperCase();
   const dependents = [];
-  for (const [t, tbl] of Object.entries(schema.tables)) {
+  const scanned = new Map();
+  Object.entries(schema?.tables||{}).forEach(([t,tbl])=>scanned.set(t,tbl));
+  Object.entries(externalSchema?.tables||{}).forEach(([t,tbl])=>{ if(!scanned.has(t)) scanned.set(t,tbl); });
+  for (const [t, tbl] of scanned) {
     (tbl.constraints||[]).forEach(con => {
-      if (con.type === 'FK' && con.refTable && con.refTable.toUpperCase() === up)
-        dependents.push({ table: t, constraint: con.name || '<unnamed>', cols: con.cols||[], line: con.line });
+      const fk = _normFK(con);
+      if (fk && fk.refTable && fk.refTable.toUpperCase() === up)
+        dependents.push({ table: t, constraint: fk.name || '<unnamed>', cols: fk.cols, line: con.line });
     });
   }
   const referencedBy = [];
-  const self = schema.tables[up];
+  const self = schema?.tables?.[up] || externalSchema?.tables?.[up];
   (self?.constraints||[]).forEach(con => {
-    if (con.type === 'FK' && con.refTable)
-      referencedBy.push({ table: con.refTable.toUpperCase(), constraint: con.name || '<unnamed>', cols: con.cols||[], line: con.line });
+    const fk = _normFK(con);
+    if (fk && fk.refTable)
+      referencedBy.push({ table: fk.refTable.toUpperCase(), constraint: fk.name || '<unnamed>', cols: fk.cols, line: con.line });
   });
   return { dependents, referencedBy };
 }
+
 function showImpactAnalysis(tblName) {
-  if (!currentSchema) { statusMsg('Validate DDL first','warn'); return; }
+  if (!currentSchema && !externalSchema) { statusMsg('Validate DDL or import a schema first','warn'); return; }
   const { dependents, referencedBy } = computeImpact(currentSchema, tblName);
   const rows = (list, emptyMsg) => list.length
     ? list.map(d => `<div class="obj-table-item" onclick="goToLine(${d.line||0})">
@@ -5631,7 +5679,8 @@ window.onload = function() {
   });
 
   // Keyboard shortcuts not in CodeMirror
-  document.addEventListener('click', e=>{
+    document.addEventListener('click', e=>{
+    if(!e.target.closest('#editor-ctx-menu'))hideContextMenu();
     if(!e.target.closest('#settings-wrap'))closeSettingsMenu();
     if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newFile(); }
     if (e.ctrlKey && e.key === 't') { e.preventDefault(); newTabFile(); }
@@ -5642,7 +5691,7 @@ window.onload = function() {
     if (e.ctrlKey && e.key === 'b') { e.preventDefault(); if(cm) toggleBookmark(cm.getCursor().line); }
     if (e.key === 'F9' && !e.shiftKey) { e.preventDefault(); nextBookmark(1); }
     if (e.key === 'F9' && e.shiftKey)  { e.preventDefault(); nextBookmark(-1); }
-    if (e.key === 'Escape') { closePalette(); }
+    if (e.key === 'Escape') { closePalette(); hideContextMenu(); }
   });
 
   // Drag-and-drop file open
@@ -5993,8 +6042,149 @@ function renameIdentifier() {
 }
 
 // ============================================================================
+// EDITOR CONTEXT MENU — right-click: Analyze Impact / Describe Structure
+// ============================================================================
+let _ctxTarget = null;
+function findEnclosingTableName(editor, fromLine) {
+  const re = /^\s*(?:CREATE|ALTER)\s+TABLE\s+(?:\w+\.)?(\w+)/i;
+  for (let l = fromLine; l >= 0; l--) {
+    const m = re.exec(editor.getLine(l) || '');
+    if (m) return m[1].toUpperCase();
+  }
+  return null;
+}
+
+function identifyEditorToken(editor, coords) {
+  if (!currentSchema && !externalSchema) return null;
+  const word = editor.findWordAt(coords);
+  const name = editor.getRange(word.anchor, word.head);
+  if (!name || !/^[\w$#_]+$/.test(name)) return null;
+  const up = name.toUpperCase();
+  if (currentSchema?.tables[up] || externalSchema?.tables?.[up]) return { type: 'table', table: up };
+  for (const [tbl, tObj] of Object.entries(currentSchema?.tables||{})) {
+    const con = (tObj.constraints || []).find(c => c.name && c.name.toUpperCase() === up);
+    if (con) return { type: 'constraint', table: tbl, constraint: con };
+  }
+  const enclosing = findEnclosingTableName(editor, coords.line);
+  if (enclosing && currentSchema?.tables[enclosing]?.columns[up])
+    return { type: 'column', table: enclosing, column: up };
+  for (const [tbl, tObj] of Object.entries(currentSchema?.tables||{})) {
+    if (tObj.columns[up]) return { type: 'column', table: tbl, column: up };
+  }
+  return null;
+}
+
+function hideContextMenu() {
+  const m = document.getElementById('editor-ctx-menu');
+  if (m) m.style.display = 'none';
+  _ctxTarget = null;
+}
+function _ctxTargetLine(t) {
+  const tObj = currentSchema?.tables?.[t.table];
+  if (!tObj) return 0;
+  if (t.type === 'table') return tObj.line || 0;
+  if (t.type === 'column') return tObj.columns[t.column]?.line || tObj.line || 0;
+  if (t.type === 'constraint') return t.constraint.line || tObj.line || 0;
+  return 0;
+}
+function showEditorContextMenu(e) {
+  if (!cm) return;
+  const coords = cm.coordsChar({ left: e.clientX, top: e.clientY }, 'window');
+  const target = identifyEditorToken(cm, coords);
+  if (!target) { hideContextMenu(); return; }
+  e.preventDefault();
+  _ctxTarget = target;
+  const menu = document.getElementById('editor-ctx-menu');
+  const label = target.type === 'table' ? target.table
+    : target.type === 'column' ? `${target.table}.${target.column}`
+    : (target.constraint.name || '<unnamed>');
+  const icon = target.type === 'table' ? '📋' : target.type === 'column' ? '📌' : '🔗';
+  menu.innerHTML = `
+    <div class="ctx-menu-hdr">${icon} ${escHtml(label)}</div>
+    <div class="ctx-menu-item" onclick="ctxAnalyzeImpact()">🕸 Analyze Impact</div>
+    <div class="ctx-menu-item" onclick="ctxDescribe()">📖 Describe Structure</div>
+    <div class="ctx-menu-item" onclick="goToLine(${_ctxTargetLine(target)});hideContextMenu()">📍 Go to Definition</div>
+  `;
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 220) + 'px';
+  menu.style.top  = Math.min(e.clientY, window.innerHeight - 140) + 'px';
+  menu.style.display = 'block';
+}
+function ctxAnalyzeImpact() {
+  const t = _ctxTarget; hideContextMenu();
+  if (!t || (!currentSchema && !externalSchema)) return;
+  if (t.type === 'table') return showImpactAnalysis(t.table);
+  if (t.type === 'column') return showColumnImpact(t.table, t.column);
+  if (t.type === 'constraint') return showConstraintImpact(t.table, t.constraint);
+}
+function ctxDescribe() {
+  const t = _ctxTarget; hideContextMenu();
+  if (!t || (!currentSchema && !externalSchema)) return;
+  describeTable(t.table, t.type === 'column' ? t.column : null);
+}
+function showColumnImpact(tblName, colName) {
+  const rows = [];
+  for (const [t, tObj] of Object.entries(currentSchema.tables)) {
+    (tObj.constraints || []).forEach(con => {
+      if (con.type === 'FK' && con.refTable?.toUpperCase() === tblName &&
+          (con.refCols || []).some(c => c.toUpperCase() === colName))
+        rows.push(`<div class="obj-table-item" onclick="goToLine(${con.line||0})"><div class="obj-table-name" style="color:var(--cyan)">${t}.${(con.cols||[]).join(',')}</div><div class="obj-table-meta">FK ${con.name||'<unnamed>'} → ${tblName}.${colName}</div></div>`);
+    });
+  }
+  const self = currentSchema.tables[tblName];
+  (self?.constraints || []).forEach(con => {
+    if (con.type === 'FK' && (con.cols || []).some(c => c.toUpperCase() === colName))
+      rows.push(`<div class="obj-table-item" onclick="goToLine(${con.line||0})"><div class="obj-table-name" style="color:var(--amber)">${tblName}.${colName}</div><div class="obj-table-meta">FK ${con.name||'<unnamed>'} → ${con.refTable}.${(con.refCols||[]).join(',')}</div></div>`);
+  });
+  document.getElementById('impact-title').textContent = '🕸 IMPACT — ' + tblName + '.' + colName;
+  document.getElementById('impact-body').innerHTML = rows.length ? rows.join('')
+    : `<div class="val-empty" style="padding:14px"><div style="font-size:.62rem">No foreign key relationships involve this column.</div></div>`;
+  document.getElementById('impact-modal').style.display = 'flex';
+}
+function showConstraintImpact(tblName, con) {
+  let html = `<div class="obj-table-item"><div class="obj-table-name" style="color:var(--purple)">${con.name||'<unnamed>'}</div><div class="obj-table-meta">${con.type} on ${tblName} (${(con.cols||[]).join(', ')})</div></div>`;
+  if (con.type === 'FK' && con.refTable)
+    html += `<div class="obj-table-item" onclick="goToLine(${currentSchema.tables[con.refTable.toUpperCase()]?.line||0})"><div class="obj-table-name" style="color:var(--cyan)">${con.refTable}</div><div class="obj-table-meta">Referenced columns: ${(con.refCols||[]).join(', ')}</div></div>`;
+  document.getElementById('impact-title').textContent = '🕸 IMPACT — CONSTRAINT ' + (con.name || '<unnamed>');
+  document.getElementById('impact-body').innerHTML = html;
+  document.getElementById('impact-modal').style.display = 'flex';
+}
+function describeTable(tblName, highlightCol) {
+  const up = tblName.toUpperCase();
+  const tObj = currentSchema?.tables?.[up] || externalSchema?.tables?.[up];
+  if (!tObj) { statusMsg('Table not found in current schema', 'warn'); return; }
+  const colOrder = tObj.colOrder || Object.keys(tObj.columns||{});
+  const rows = colOrder.map(c => {
+    const col = tObj.columns[c] || {};
+    const isNN = col.notNull != null ? col.notNull : col.mandatory;
+    const flags = [col.pk?'PK':'', isNN?'NOT NULL':'NULL', col.unique?'UQ':'', col.fk?'FK':''].filter(Boolean).join(' · ');
+    const typeText = col.type?.full || col.type?.base || col.datatype || '?';
+    const hl = highlightCol && c === highlightCol ? 'background:rgba(245,158,11,.12)' : '';
+    return `<tr style="${hl}"><td style="padding:4px 8px;font-family:var(--mono);color:var(--text)">${c}</td><td style="padding:4px 8px;font-family:var(--mono);color:var(--blue)">${typeText}</td><td style="padding:4px 8px;font-size:.58rem;color:var(--text3)">${flags}</td></tr>`;
+  }).join('');
+  const cons = (tObj.constraints || []).map(con => {
+    const icon = {PK:'🔑',FK:'🔗',UNIQUE:'◈',CHECK:'✓'}[con.type] || '•';
+    if (con.type === 'FK') {
+      const fk = _normFK(con) || {};
+      const ref = fk.refTable ? ` → ${fk.refTable}(${(fk.refCols||[]).join(',')})` : '';
+      return `<div class="obj-con">${icon} ${con.name||'<unnamed>'} (${(fk.cols||[]).join(', ')})${ref}</div>`;
+    }
+    return `<div class="obj-con">${icon} ${con.name||'<unnamed>'} (${(con.col?[con.col]:con.cols||[]).join(', ')})</div>`;
+  }).join('');
+  document.getElementById('impact-title').textContent = '📖 DESCRIBE — ' + tblName;
+  document.getElementById('impact-body').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:.62rem">
+      <thead><tr style="background:var(--bg2)"><th style="padding:4px 8px;text-align:left">Column</th><th style="padding:4px 8px;text-align:left">Type</th><th style="padding:4px 8px;text-align:left">Flags</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${cons ? `<div style="font-size:.6rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px;border-bottom:2px solid var(--border2);margin-top:10px">Constraints</div>${cons}` : ''}
+  `;
+  document.getElementById('impact-modal').style.display = 'flex';
+}
+
+// ============================================================================
 // MULTI-FORMAT EXPORT
 // ============================================================================
+
 function exportHTML() {
   const schema=currentSchema, sql=cm?cm.getValue():'';
   const issues=schema?validateSchema(schema,sql):[];
@@ -6288,5 +6478,6 @@ function insertMigration() {
     <div id="impact-body" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
+<div id="editor-ctx-menu"></div>
 </body>
 </html>
