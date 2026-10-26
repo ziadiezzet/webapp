@@ -315,9 +315,11 @@ input:disabled,textarea:disabled{background:#eef2f7;color:var(--muted);cursor:no
   --logo-max-h: 100px;
 }
 
-/* Uppercase mode */
+/* Text case modes: lowercase explicitly overrides the global uppercase mode. */
 .invoice.uppercase-all,
 .invoice.uppercase-all *{text-transform:uppercase;}
+.invoice.lowercase-all,
+.invoice.lowercase-all *{text-transform:lowercase !important;}
 
 .invoice-header{
   display:flex;justify-content:space-between;align-items:flex-start;gap:28px;
@@ -863,6 +865,10 @@ Tel: 07-44-18-54-80</textarea>
           <div class="checkbox-group">
             <input type="checkbox" id="uppercaseAll" checked onchange="updateStyleFromControls()">
             <label for="uppercaseAll">Afficher tout le texte en MAJUSCULES</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="lowercaseAll" onchange="updateStyleFromControls()">
+            <label for="lowercaseAll">Afficher tout le texte en minuscules (y compris Désignation)</label>
           </div>
         </div>
 
@@ -1466,6 +1472,7 @@ let currentEditingType = null;
    ============================================================ */
 const GENERAL_DEFAULTS = {
     uppercaseAll: true,
+    lowercaseAll: false,
     logoMaxW: 200,
     logoMaxH: 100
 };
@@ -1624,7 +1631,9 @@ function applyStyleToEl(el){
     el.style.setProperty('--logo-max-w', c.general.logoMaxW + 'px');
     el.style.setProperty('--logo-max-h', c.general.logoMaxH + 'px');
 
-    el.classList.toggle('uppercase-all', !!c.general.uppercaseAll);
+    const useLowercase = !!c.general.lowercaseAll;
+    el.classList.toggle('uppercase-all', !useLowercase && !!c.general.uppercaseAll);
+    el.classList.toggle('lowercase-all', useLowercase);
 }
 
 function applyStyle(){
@@ -1633,7 +1642,10 @@ function applyStyle(){
 
 /* ---- Read controls ---- */
 function readStyleControls(){
-    generalStyle.uppercaseAll = $('uppercaseAll').checked;
+    // Keep global case modes mutually exclusive.
+    if ($('lowercaseAll').checked) $('uppercaseAll').checked = false;
+    generalStyle.lowercaseAll = $('lowercaseAll').checked;
+    generalStyle.uppercaseAll = $('uppercaseAll').checked && !generalStyle.lowercaseAll;
     generalStyle.logoMaxW = parseFloat($('logoMaxW').value) || 200;
     generalStyle.logoMaxH = parseFloat($('logoMaxH').value) || 100;
 
@@ -1680,7 +1692,8 @@ function readStyleControls(){
 
 /* ---- Write controls ---- */
 function syncStyleControls(){
-    $('uppercaseAll').checked = !!generalStyle.uppercaseAll;
+    $('lowercaseAll').checked = !!generalStyle.lowercaseAll;
+    $('uppercaseAll').checked = !!generalStyle.uppercaseAll && !generalStyle.lowercaseAll;
     $('logoMaxW').value = generalStyle.logoMaxW;
     $('logoMaxH').value = generalStyle.logoMaxH;
 
@@ -1892,20 +1905,33 @@ async function resetPositions() {
 /* ============================================================
    TEMPLATE SYSTEM
    ============================================================ */
+function isUsableTemplateConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) return false;
+    return ['general','title','table','block','positions'].some(key =>
+        config[key] && typeof config[key] === 'object' && !Array.isArray(config[key]));
+}
+
 async function saveTemplateFromUI() {
     const name = ($('templateName').value || '').trim();
-    if (!name) { showToast('Veuillez saisir un nom pour le template.', 'warning'); return; }
-
-    const template = {
-        id: 'tpl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-        name: name,
-        createdAt: new Date().toISOString(),
-        config: getStyleConfig()
-    };
-
-    await dbPut(STORE_TEMPLATES, template);
-    await refreshTemplatesList();
-    showToast(`Template « ${name} » enregistré.`, 'success');
+    if (!name) { showToast('Veuillez saisir un nom pour le template.', 'warning'); $('templateName').focus(); return; }
+    try {
+        const all = await dbGetAll(STORE_TEMPLATES);
+        const existing = all.find(t => String(t.name || '').trim().toLocaleLowerCase() === name.toLocaleLowerCase());
+        if (existing && !confirm(`Un template nommé « ${existing.name} » existe déjà. Voulez-vous le remplacer par le style actuel ?`)) return;
+        const now = new Date().toISOString();
+        const template = {
+            id: existing?.id || ('tpl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9)),
+            name, createdAt: existing?.createdAt || now, updatedAt: now, schemaVersion: 1,
+            config: normalizeConfig(getStyleConfig())
+        };
+        await dbPut(STORE_TEMPLATES, template);
+        await setSetting('styleConfig', template.config);
+        await refreshTemplatesList();
+        showToast(`Template « ${name} » ${existing ? 'mis à jour' : 'enregistré'} avec succès.`, 'success');
+    } catch (err) {
+        console.error('Template save failed:', err);
+        showToast('Impossible d’enregistrer le template. Vérifiez que le stockage local est disponible.', 'error');
+    }
 }
 
 async function refreshTemplatesList() {
@@ -1930,11 +1956,23 @@ async function refreshTemplatesList() {
 }
 
 async function loadTemplate(id) {
-    const t = await dbGet(STORE_TEMPLATES, id);
-    if (!t) { showToast('Template introuvable.', 'error'); return; }
-    applyStyleConfig(t.config || t);
-    try { await setSetting('styleConfig', getStyleConfig()); } catch(e){}
-    showToast(`Template « ${t.name} » chargé.`, 'success');
+    try {
+        const t = await dbGet(STORE_TEMPLATES, id);
+        if (!t) { showToast('Template introuvable.', 'error'); await refreshTemplatesList(); return; }
+        const config = t.config || t;
+        if (!isUsableTemplateConfig(config)) {
+            showToast('Ce template est invalide ou incomplet. Votre style actuel a été conservé.', 'error');
+            return;
+        }
+        const normalized = normalizeConfig(config);
+        applyStyleConfig(normalized);
+        await setSetting('styleConfig', normalized);
+        $('templateName').value = t.name || '';
+        showToast(`Template « ${t.name || 'Sans nom'} » chargé et appliqué.`, 'success');
+    } catch (err) {
+        console.error('Template load failed:', err);
+        showToast('Impossible de charger ce template. Votre style actuel a été conservé.', 'error');
+    }
 }
 
 async function deleteTemplate(id) {
@@ -1961,31 +1999,39 @@ function exportTemplate() {
 }
 
 function importTemplate(e) {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async function (ev) {
         try {
-            const t = JSON.parse(ev.target.result);
-            applyStyleConfig(t.config || t);
-            if (t.name) {
-                const rec = {
-                    id: 'tpl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-                    name: t.name,
-                    createdAt: t.createdAt || new Date().toISOString(),
-                    config: getStyleConfig()
-                };
-                await dbPut(STORE_TEMPLATES, rec);
-                await refreshTemplatesList();
-            }
-            await persistStyle();
-            showToast('Template importé avec succès.', 'success');
+            const imported = JSON.parse(ev.target.result);
+            const config = imported && (imported.config || imported);
+            if (!isUsableTemplateConfig(config)) throw new Error('Le fichier ne contient pas de configuration de style valide.');
+            const normalized = normalizeConfig(config);
+            const name = String(imported.name || file.name.replace(/\\.json$/i, '') || 'Template importé').trim().slice(0, 100);
+            const all = await dbGetAll(STORE_TEMPLATES);
+            const existing = all.find(t => String(t.name || '').trim().toLocaleLowerCase() === name.toLocaleLowerCase());
+            const now = new Date().toISOString();
+            const rec = {
+                id: existing?.id || ('tpl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9)),
+                name, createdAt: existing?.createdAt || imported.createdAt || now,
+                updatedAt: now, schemaVersion: 1, config: normalized
+            };
+            await dbPut(STORE_TEMPLATES, rec);
+            applyStyleConfig(normalized);
+            await setSetting('styleConfig', normalized);
+            $('templateName').value = name;
+            await refreshTemplatesList();
+            showToast(`Template « ${name} » importé et enregistré.`, 'success');
         } catch (ex) {
+            console.error('Template import failed:', ex);
             showToast("Erreur lors de l'import : " + ex.message, 'error');
+        } finally {
+            e.target.value = '';
         }
     };
+    reader.onerror = () => { showToast('Impossible de lire le fichier de template.', 'error'); e.target.value = ''; };
     reader.readAsText(file);
-    e.target.value = '';
 }
 
 /* --- Random generation --- */
@@ -2673,7 +2719,7 @@ function generatePreviewHTML(doc) {
     const pc = $('previewContent');
     const cfg = docStyleConfigOf(doc);
     const styleVars = styleConfigToVars(cfg);
-    const ucClass = cfg.general.uppercaseAll ? ' uppercase-all' : '';
+    const ucClass = cfg.general.lowercaseAll ? ' lowercase-all' : (cfg.general.uppercaseAll ? ' uppercase-all' : '');
     const currency = doc.currency || DEFAULT_CURRENCY;
     const savedTotal = Number.isFinite(Number(doc.grandTotalAmount)) ? formatMoney(Number(doc.grandTotalAmount), currency) : (doc.grandTotal || formatMoney(0, currency));
 
@@ -2765,6 +2811,7 @@ const PRINT_INVOICE_CSS = `
     body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;color:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .invoice{max-width:100%;padding:0;margin:0;font-size:12.5px;line-height:1.55;position:relative;overflow:visible;}
     .invoice.uppercase-all,.invoice.uppercase-all *{text-transform:uppercase;}
+    .invoice.lowercase-all,.invoice.lowercase-all *{text-transform:lowercase !important;}
     .invoice-header{display:flex;justify-content:space-between;gap:28px;align-items:flex-start;margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid #e2e8f0;page-break-inside:avoid;}
     .logo-section{flex:1 1 50%;min-width:0;padding-right:20px;}
     .logo-section img{max-width:var(--logo-max-w);max-height:var(--logo-max-h);object-fit:contain;display:block;margin-bottom:15px;}
